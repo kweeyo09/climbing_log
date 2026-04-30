@@ -7,6 +7,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
 import RouteEntry from '../../components/RouteEntry';
+import LocationSearch from '../../components/LocationSearch';
 import { CLIMB_STYLES, getGrades } from '../../constants/grades';
 import { colors, spacing, radius } from '../../constants/theme';
 import type { GradeSystem, ClimbStyle } from '../../types';
@@ -107,15 +108,7 @@ export default function LogScreen() {
           {/* Location */}
           <View style={s.field}>
             <Text style={s.label}>LOCATION / GYM</Text>
-            <TextInput
-              style={s.input}
-              value={location}
-              onChangeText={setLocation}
-              placeholder="e.g. The Climbing Hangar, Fontainebleau…"
-              placeholderTextColor={colors.text3}
-              keyboardAppearance="dark"
-              autoCapitalize="words"
-            />
+            <LocationSearch value={location} onChange={setLocation} />
           </View>
 
           {/* Duration */}
@@ -213,9 +206,9 @@ const s = StyleSheet.create({
   toggleBtn:       { flex: 1, paddingVertical: 10, borderRadius: radius.sm, alignItems: 'center' },
   toggleBtnOn:     { backgroundColor: colors.accent },
   toggleBtnText:   { fontSize: 12, fontWeight: '700', color: colors.text2, textTransform: 'uppercase', letterSpacing: 0.5 },
-  toggleBtnTextOn: { color: '#000' },
+  toggleBtnTextOn: { color: '#fff' },
   addRouteBtn:     { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed', borderRadius: radius.md, padding: spacing.md, alignItems: 'center' },
   addRouteBtnText: { fontSize: 13, fontWeight: '700', color: colors.text2, letterSpacing: 0.5 },
   saveBtn:         { backgroundColor: colors.accent, borderRadius: radius.lg, padding: spacing.md + 2, alignItems: 'center', marginTop: 4 },
-  saveBtnText:     { fontSize: 16, fontWeight: '900', color: '#000', letterSpacing: 1.5 },
+  saveBtnText:     { fontSize: 16, fontWeight: '900', color: '#fff', letterSpacing: 1.5 },
 });

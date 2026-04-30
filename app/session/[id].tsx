@@ -138,7 +138,7 @@ const s = StyleSheet.create({
   chip:            { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 6 },
   chipText:        { fontSize: 13, fontWeight: '600', color: colors.text2 },
   chipAccent:      { backgroundColor: colors.accentDim, borderColor: colors.accentBorder },
-  chipTextAccent:  { color: colors.accent },
+  chipTextAccent:  { color: colors.accent, fontWeight: '700' },
   sectionTitle:    { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, marginBottom: spacing.sm },
   routeList:       { gap: 6, marginBottom: spacing.lg },
   routeRow:        { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: spacing.md, paddingVertical: 10, gap: 12 },
