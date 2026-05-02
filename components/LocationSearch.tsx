@@ -5,16 +5,13 @@ import {
 } from 'react-native';
 import { colors, radius, spacing } from '../constants/theme';
 
-const PLACES_API_KEY = process.env.EXPO_PUBLIC_GOOGLE_PLACES_KEY ?? '';
+const MAPBOX_TOKEN = process.env.EXPO_PUBLIC_MAPBOX_TOKEN ?? '';
 
-interface Prediction {
-  place_id:     string;
-  description:  string;
-  // structured_formatting gives us the main gym name vs city
-  structured_formatting: {
-    main_text:      string;
-    secondary_text: string;
-  };
+interface Feature {
+  id: string;
+  place_name: string;
+  text: string; // venue/place name
+  context?: Array<{ id: string; text: string }>;
 }
 
 interface Props {
@@ -22,36 +19,42 @@ interface Props {
   onChange: (value: string) => void;
 }
 
+/** Returns "Venue Name, City" — skips street numbers, postcodes, countries */
+function shortLocation(feature: Feature): string {
+  const name = feature.text;
+  // context array goes: neighbourhood → locality → place (city) → region → country
+  const city = feature.context?.find(
+    c => c.id.startsWith('place.') || c.id.startsWith('locality.') || c.id.startsWith('district.')
+  )?.text ?? '';
+  return city ? `${name}, ${city}` : name;
+}
+
 export default function LocationSearch({ value, onChange }: Props) {
-  const [predictions, setPredictions] = useState<Prediction[]>([]);
+  const [suggestions, setSuggestions] = useState<Feature[]>([]);
   const [loading,     setLoading]     = useState(false);
   const [open,        setOpen]        = useState(false);
   const debounce = useRef<ReturnType<typeof setTimeout> | null>(null);
 
-  const fetchPredictions = async (text: string) => {
-    if (text.length < 2) { setPredictions([]); setOpen(false); return; }
-
+  const fetchSuggestions = async (text: string) => {
+    if (text.length < 2) { setSuggestions([]); setOpen(false); return; }
     setLoading(true);
     try {
-      const url = new URL('https://maps.googleapis.com/maps/api/place/autocomplete/json');
-      url.searchParams.set('input', text);
-      url.searchParams.set('key', PLACES_API_KEY);
-      url.searchParams.set('types', 'establishment');
-      // Bias results toward climbing-related places
-      url.searchParams.set('keyword', 'climbing gym bouldering wall');
-
-      const res  = await fetch(url.toString());
+      const encoded = encodeURIComponent(text);
+      const url = `https://api.mapbox.com/geocoding/v5/mapbox.places/${encoded}.json` +
+        `?access_token=${MAPBOX_TOKEN}` +
+        `&types=poi,place` +
+        `&limit=5`;
+      const res  = await fetch(url);
       const data = await res.json();
-
-      if (data.status === 'OK') {
-        setPredictions(data.predictions.slice(0, 5));
+      if (data.features?.length) {
+        setSuggestions(data.features);
         setOpen(true);
       } else {
-        setPredictions([]);
+        setSuggestions([]);
         setOpen(false);
       }
     } catch {
-      setPredictions([]);
+      setSuggestions([]);
     } finally {
       setLoading(false);
     }
@@ -60,12 +63,13 @@ export default function LocationSearch({ value, onChange }: Props) {
   const handleChange = (text: string) => {
     onChange(text);
     if (debounce.current) clearTimeout(debounce.current);
-    debounce.current = setTimeout(() => fetchPredictions(text), 350);
+    debounce.current = setTimeout(() => fetchSuggestions(text), 350);
   };
 
-  const handleSelect = (prediction: Prediction) => {
-    onChange(prediction.description);
-    setPredictions([]);
+  const handleSelect = (feature: Feature) => {
+    const short = shortLocation(feature);
+    onChange(short);
+    setSuggestions([]);
     setOpen(false);
   };
 
@@ -76,7 +80,7 @@ export default function LocationSearch({ value, onChange }: Props) {
           style={s.input}
           value={value}
           onChangeText={handleChange}
-          placeholder="e.g. The Climbing Hangar, Fontainebleau…"
+          placeholder="Search climbing gym or location…"
           placeholderTextColor={colors.text3}
           autoCapitalize="words"
           returnKeyType="done"
@@ -91,27 +95,30 @@ export default function LocationSearch({ value, onChange }: Props) {
         )}
       </View>
 
-      {open && predictions.length > 0 && (
+      {open && suggestions.length > 0 && (
         <View style={s.dropdown}>
           <FlatList
-            data={predictions}
-            keyExtractor={item => item.place_id}
+            data={suggestions}
+            keyExtractor={item => item.id}
             keyboardShouldPersistTaps="handled"
             scrollEnabled={false}
-            renderItem={({ item, index }) => (
-              <TouchableOpacity
-                style={[s.suggestion, index === 0 && s.suggestionFirst]}
-                onPress={() => handleSelect(item)}
-                activeOpacity={0.7}
-              >
-                <Text style={s.suggestionMain} numberOfLines={1}>
-                  {item.structured_formatting.main_text}
-                </Text>
-                <Text style={s.suggestionSub} numberOfLines={1}>
-                  {item.structured_formatting.secondary_text}
-                </Text>
-              </TouchableOpacity>
-            )}
+            renderItem={({ item, index }) => {
+              const short = shortLocation(item);
+              return (
+                <TouchableOpacity
+                  style={[s.suggestion, index === 0 && s.suggestionFirst]}
+                  onPress={() => handleSelect(item)}
+                  activeOpacity={0.7}
+                >
+                  <Text style={s.suggestionMain} numberOfLines={1}>
+                    {item.text}
+                  </Text>
+                  <Text style={s.suggestionSub} numberOfLines={1}>
+                    {short.includes(',') ? short.split(', ').slice(1).join(', ') : item.place_name}
+                  </Text>
+                </TouchableOpacity>
+              );
+            }}
           />
         </View>
       )}
@@ -120,13 +127,13 @@ export default function LocationSearch({ value, onChange }: Props) {
 }
 
 const s = StyleSheet.create({
-  container:      { position: 'relative', zIndex: 10 },
-  inputRow:       { flexDirection: 'row', alignItems: 'center' },
-  input:          { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
-  spinner:        { position: 'absolute', right: 14 },
-  dropdown:       { position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, marginTop: 4, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
-  suggestion:     { paddingHorizontal: spacing.md, paddingVertical: 11, borderTopWidth: 1, borderTopColor: colors.border },
-  suggestionFirst:{ borderTopWidth: 0 },
-  suggestionMain: { fontSize: 14, fontWeight: '600', color: colors.text },
-  suggestionSub:  { fontSize: 11, color: colors.text3, marginTop: 1 },
+  container:       { position: 'relative', zIndex: 10 },
+  inputRow:        { flexDirection: 'row', alignItems: 'center' },
+  input:           { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
+  spinner:         { position: 'absolute', right: 14 },
+  dropdown:        { position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, marginTop: 4, overflow: 'hidden', shadowColor: '#000', shadowOpacity: 0.08, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 4 },
+  suggestion:      { paddingHorizontal: spacing.md, paddingVertical: 11, borderTopWidth: 1, borderTopColor: colors.border },
+  suggestionFirst: { borderTopWidth: 0 },
+  suggestionMain:  { fontSize: 14, fontWeight: '600', color: colors.text },
+  suggestionSub:   { fontSize: 11, color: colors.text3, marginTop: 1 },
 });

@@ -54,6 +54,22 @@ export default function StatsScreen() {
   });
   const maxCount = Math.max(...barData.map(d => d.count), 1);
 
+  // Grade progression — top grade per session over time (last 10 sessions)
+  const progressionData = sessions
+    .slice(0, 10)
+    .reverse()
+    .map((s, i) => {
+      const done = s.routes.filter(r => r.completed);
+      const grades = s.grade_system === 'french' ? FRENCH_GRADES : V_GRADES;
+      const topGradeStr = done.length > 0
+        ? done.reduce((best, r) =>
+            grades.indexOf(r.grade) > grades.indexOf(best.grade) ? r : best, done[0]).grade
+        : null;
+      const gradeIdx = topGradeStr ? grades.indexOf(topGradeStr) : -1;
+      return { label: `S${i + 1}`, gradeIdx, gradeStr: topGradeStr, system: s.grade_system };
+    })
+    .filter(d => d.gradeIdx >= 0);
+
   // Grade distribution — V0–V7 completed routes only
   const vSessions = sessions.filter(s => s.grade_system === 'v');
   const gradeDistData = V_CHART_GRADES.map(grade => ({
@@ -189,6 +205,30 @@ export default function StatsScreen() {
           )}
         </View>
 
+        {/* Grade progression chart */}
+        {progressionData.length >= 2 && (
+          <>
+            <Text style={[s.sectionTitle, { marginTop: spacing.lg }]}>📈 GRADE PROGRESSION</Text>
+            <View style={[s.chartCard, { paddingBottom: spacing.md }]}>
+              <View style={s.progressionChart}>
+                {progressionData.map((d, i) => {
+                  const maxIdx = Math.max(...progressionData.map(p => p.gradeIdx));
+                  const minIdx = Math.min(...progressionData.map(p => p.gradeIdx));
+                  const range  = maxIdx - minIdx || 1;
+                  const heightPct = ((d.gradeIdx - minIdx) / range) * 70 + 10; // 10–80%
+                  return (
+                    <View key={i} style={s.progressionCol}>
+                      <Text style={s.progressionGrade}>{d.gradeStr}</Text>
+                      <View style={[s.progressionBar, { height: `${heightPct}%` as any }]} />
+                      <Text style={s.progressionLabel}>{d.label}</Text>
+                    </View>
+                  );
+                })}
+              </View>
+            </View>
+          </>
+        )}
+
         {sessions.length === 0 && (
           <View style={s.empty}>
             <Text style={s.emptyIcon}>📊</Text>
@@ -236,7 +276,13 @@ const s = StyleSheet.create({
   barCountGrade:  { color: colors.highlight },
   gradeEmpty:     { fontSize: 13, color: colors.text3, textAlign: 'center', paddingVertical: 8 },
   gradeTotal:     { fontSize: 11, color: colors.text3, textAlign: 'right', marginTop: 2 },
-  empty:          { alignItems: 'center', paddingVertical: 40, gap: 10 },
-  emptyIcon:      { fontSize: 44, opacity: 0.3 },
-  emptyText:      { color: colors.text3, fontSize: 13 },
+  empty:             { alignItems: 'center', paddingVertical: 40, gap: 10 },
+  emptyIcon:         { fontSize: 44, opacity: 0.3 },
+  emptyText:         { color: colors.text3, fontSize: 13 },
+  // Progression chart
+  progressionChart:  { flexDirection: 'row', alignItems: 'flex-end', height: 120, gap: 6, paddingTop: 8 },
+  progressionCol:    { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
+  progressionBar:    { width: '60%', backgroundColor: colors.accent, borderRadius: 4, opacity: 0.85, minHeight: 8 },
+  progressionGrade:  { fontSize: 9, fontWeight: '700', color: colors.accent, marginBottom: 3, textAlign: 'center' },
+  progressionLabel:  { fontSize: 9, color: colors.text3, marginTop: 4, textAlign: 'center' },
 });

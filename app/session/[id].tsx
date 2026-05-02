@@ -53,11 +53,21 @@ export default function SessionDetailScreen() {
       <View style={s.handle} />
 
       <ScrollView contentContainerStyle={s.scroll}>
-        {/* Back / close button */}
-        <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
-          <Ionicons name="chevron-down" size={22} color={colors.text2} />
-          <Text style={s.backText}>Close</Text>
-        </TouchableOpacity>
+        {/* Back / close + Edit row */}
+        <View style={s.topRow}>
+          <TouchableOpacity style={s.backBtn} onPress={() => router.back()}>
+            <Ionicons name="chevron-down" size={22} color={colors.text2} />
+            <Text style={s.backText}>Close</Text>
+          </TouchableOpacity>
+          <TouchableOpacity
+            style={s.editBtn}
+            onPress={() => router.push({ pathname: '/(tabs)/log', params: { editId: session.id } })}
+            activeOpacity={0.75}
+          >
+            <Ionicons name="pencil-outline" size={14} color={colors.accent} />
+            <Text style={s.editBtnText}>Edit Session</Text>
+          </TouchableOpacity>
+        </View>
 
         {/* Title */}
         <Text style={s.location}>{session.location}</Text>
@@ -130,8 +140,11 @@ const s = StyleSheet.create({
   safe:            { flex: 1, backgroundColor: colors.card },
   handle:          { width: 40, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 4 },
   scroll:          { paddingHorizontal: spacing.lg, paddingBottom: 48 },
-  backBtn:         { flexDirection: 'row', alignItems: 'center', gap: 4, paddingVertical: spacing.sm, marginBottom: spacing.sm },
+  topRow:          { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingVertical: spacing.sm, marginBottom: spacing.sm },
+  backBtn:         { flexDirection: 'row', alignItems: 'center', gap: 4 },
   backText:        { color: colors.text2, fontSize: 14 },
+  editBtn:         { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentDim, borderWidth: 1, borderColor: colors.accentBorder, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 6 },
+  editBtnText:     { fontSize: 12, fontWeight: '700', color: colors.accent },
   location:        { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   date:            { fontSize: 13, color: colors.text2, marginTop: 4, marginBottom: spacing.md },
   chips:           { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: spacing.lg },

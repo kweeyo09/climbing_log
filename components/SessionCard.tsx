@@ -55,7 +55,7 @@ export default function SessionCard({ session, onPress }: Props) {
 }
 
 const s = StyleSheet.create({
-  card:         { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginHorizontal: spacing.lg, marginBottom: 10 },
+  card:         { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.lg, padding: spacing.md, marginHorizontal: spacing.lg, marginBottom: 10, borderLeftWidth: 3, borderLeftColor: colors.accent },
   header:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 8 },
   location:     { fontSize: 16, fontWeight: '700', color: colors.text, flex: 1 },
   date:         { fontSize: 11, color: colors.text2, marginLeft: spacing.sm, marginTop: 2 },

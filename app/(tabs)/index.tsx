@@ -103,7 +103,6 @@ export default function CalendarScreen() {
                   {day}
                 </Text>
                 {active && <View style={s.dot} />}
-                {tod && !active && <View style={s.todayDot} />}
               </TouchableOpacity>
             );
           })}
@@ -132,6 +131,16 @@ export default function CalendarScreen() {
         )}
 
       </ScrollView>
+
+      {/* FAB quick-log button */}
+      <TouchableOpacity
+        style={s.fab}
+        onPress={() => router.push('/(tabs)/log')}
+        activeOpacity={0.85}
+      >
+        <Text style={s.fabIcon}>+</Text>
+      </TouchableOpacity>
+
     </SafeAreaView>
   );
 }
@@ -156,7 +165,8 @@ const s = StyleSheet.create({
   dayNumActive:   { color: colors.accent, fontWeight: '700' },
   dayNumToday:    { color: colors.accent, fontWeight: '700' },
   dot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  todayDot:       { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2, opacity: 0.5 },
+  fab:            { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#F14400', alignItems: 'center', justifyContent: 'center', shadowColor: '#F14400', shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  fabIcon:        { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
   sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.sm },
   sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.text3, letterSpacing: 1.5 },
   empty:          { alignItems: 'center', paddingVertical: 48 },

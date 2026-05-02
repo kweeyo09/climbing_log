@@ -23,10 +23,11 @@ interface SessionState {
   sessions: Session[];
   loading: boolean;
   // Methods
-  loadSessions: () => Promise<void>;
-  addSession:   (input: NewSessionInput) => Promise<void>;
-  deleteSession:(id: string) => Promise<void>;
-  syncToCloud:  () => Promise<void>;
+  loadSessions:   () => Promise<void>;
+  addSession:     (input: NewSessionInput) => Promise<void>;
+  updateSession:  (id: string, input: NewSessionInput) => Promise<void>;
+  deleteSession:  (id: string) => Promise<void>;
+  syncToCloud:    () => Promise<void>;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -73,6 +74,29 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     }));
 
     // Fire-and-forget sync (offline? it'll sync next time)
+    get().syncToCloud().catch(() => {});
+  },
+
+  /** Update an existing session locally (re-uses dbInsertSession with INSERT OR REPLACE) */
+  updateSession: async (id, input) => {
+    const existing = get().sessions.find(s => s.id === id);
+    if (!existing) return;
+    const updated: Session = {
+      ...existing,
+      ...input,
+      synced: false,
+      routes: input.routes.map((r, i) => ({
+        ...r,
+        id:         `${Date.now()}-${i}`,
+        session_id: id,
+      })),
+    };
+    await dbInsertSession(updated); // INSERT OR REPLACE handles the update
+    set(state => ({
+      sessions: state.sessions
+        .map(s => s.id === id ? updated : s)
+        .sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime()),
+    }));
     get().syncToCloud().catch(() => {});
   },
 
