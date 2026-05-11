@@ -1,7 +1,7 @@
 {
   "expo": {
-    "name": "ClimbingLog",
-    "slug": "climbing-log",
+    "name": "SENDLOG",
+    "slug": "sendlog",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
@@ -14,14 +14,14 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.yourname.climbinglog"
+      "bundleIdentifier": "com.kweeyo09.sendlog"
     },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/adaptive-icon.png",
         "backgroundColor": "#0d0d0e"
       },
-      "package": "com.yourname.climbinglog"
+      "package": "com.kweeyo09.sendlog"
     },
     "plugins": [
       "expo-router",
@@ -30,7 +30,7 @@
         { "enableFTS": true }
       ]
     ],
-    "scheme": "climbinglog",
+    "scheme": "sendlog",
     "experiments": {
       "typedRoutes": true
     }
