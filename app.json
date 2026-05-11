@@ -24,11 +24,7 @@
       "package": "com.kweeyo09.sendlog"
     },
     "plugins": [
-      "expo-router",
-      [
-        "expo-sqlite",
-        { "enableFTS": true }
-      ]
+      "expo-router"
     ],
     "scheme": "sendlog",
     "experiments": {
