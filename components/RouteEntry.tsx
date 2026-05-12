@@ -1,10 +1,7 @@
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { Picker } from '@react-native-picker/picker';
+import React, { useState } from 'react';
+import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList, SafeAreaView } from 'react-native';
 import { colors, radius, spacing } from '../constants/theme';
 import type { ClimbStyle } from '../types';
-
-// Note: install @react-native-picker/picker:
-//   npx expo install @react-native-picker/picker
 
 interface Props {
   grade:         string;
@@ -18,7 +15,6 @@ interface Props {
   onRemove:      () => void;
 }
 
-// Abbreviate style labels so they fit in the compact picker
 const STYLE_SHORT: Record<string, string> = {
   'Lead':       'Lead',
   'Top Rope':   'TR',
@@ -26,46 +22,60 @@ const STYLE_SHORT: Record<string, string> = {
   'Auto-belay': 'Auto',
 };
 
+interface PickerModalProps {
+  visible: boolean;
+  items: string[];
+  selected: string;
+  onSelect: (val: string) => void;
+  onClose: () => void;
+  label: (val: string) => string;
+}
+
+function PickerModal({ visible, items, selected, onSelect, onClose, label }: PickerModalProps) {
+  return (
+    <Modal visible={visible} transparent animationType="slide" onRequestClose={onClose}>
+      <TouchableOpacity style={m.overlay} activeOpacity={1} onPress={onClose} />
+      <SafeAreaView style={m.sheet}>
+        <View style={m.handle} />
+        <FlatList
+          data={items}
+          keyExtractor={i => i}
+          renderItem={({ item }) => (
+            <TouchableOpacity
+              style={[m.option, item === selected && m.optionSelected]}
+              onPress={() => { onSelect(item); onClose(); }}
+            >
+              <Text style={[m.optionText, item === selected && m.optionTextSelected]}>
+                {label(item)}
+              </Text>
+            </TouchableOpacity>
+          )}
+        />
+      </SafeAreaView>
+    </Modal>
+  );
+}
+
 export default function RouteEntry({
   grade, style, completed, grades, styles,
   onGradeChange, onStyleChange, onToggle, onRemove,
 }: Props) {
+  const [gradeOpen, setGradeOpen] = useState(false);
+  const [styleOpen, setStyleOpen] = useState(false);
+
   return (
     <View style={s.row}>
-      {/* Grade picker — narrower */}
-      <View style={[s.pickerWrap, s.gradeWrap]}>
-        <Picker
-          selectedValue={grade}
-          onValueChange={onGradeChange}
-          style={s.picker}
-          dropdownIconColor={colors.text2}
-          itemStyle={{ color: colors.text, fontSize: 12 }}
-        >
-          {grades.map(g => (
-            <Picker.Item key={g} label={g} value={g} color={colors.text} />
-          ))}
-        </Picker>
-      </View>
+      {/* Grade selector */}
+      <TouchableOpacity style={[s.pickerWrap, s.gradeWrap]} onPress={() => setGradeOpen(true)} activeOpacity={0.8}>
+        <Text style={s.pickerText}>{grade}</Text>
+        <Text style={s.caret}>▾</Text>
+      </TouchableOpacity>
 
-      {/* Style picker — flex, abbreviated labels */}
-      <View style={[s.pickerWrap, s.styleWrap]}>
-        <Picker
-          selectedValue={style}
-          onValueChange={onStyleChange}
-          style={s.picker}
-          dropdownIconColor={colors.text2}
-          itemStyle={{ color: colors.text, fontSize: 12 }}
-        >
-          {styles.map(st => (
-            <Picker.Item
-              key={st}
-              label={STYLE_SHORT[st] ?? st}
-              value={st}
-              color={colors.text}
-            />
-          ))}
-        </Picker>
-      </View>
+      {/* Style selector */}
+      <TouchableOpacity style={[s.pickerWrap, s.styleWrap]} onPress={() => setStyleOpen(true)} activeOpacity={0.8}>
+        <Text style={s.pickerText}>{STYLE_SHORT[style] ?? style}</Text>
+        <Text style={s.caret}>▾</Text>
+      </TouchableOpacity>
 
       {/* Completed toggle */}
       <TouchableOpacity
@@ -82,20 +92,48 @@ export default function RouteEntry({
       <TouchableOpacity style={s.remove} onPress={onRemove} activeOpacity={0.7}>
         <Text style={s.removeText}>×</Text>
       </TouchableOpacity>
+
+      <PickerModal
+        visible={gradeOpen}
+        items={grades}
+        selected={grade}
+        onSelect={onGradeChange}
+        onClose={() => setGradeOpen(false)}
+        label={v => v}
+      />
+      <PickerModal
+        visible={styleOpen}
+        items={styles}
+        selected={style}
+        onSelect={onStyleChange}
+        onClose={() => setStyleOpen(false)}
+        label={v => v}
+      />
     </View>
   );
 }
 
 const s = StyleSheet.create({
   row:            { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.xs, marginBottom: 7, gap: 5 },
-  pickerWrap:     { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, overflow: 'hidden', height: 38, justifyContent: 'center' },
+  pickerWrap:     { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, height: 38, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, justifyContent: 'space-between' },
   gradeWrap:      { width: 72 },
   styleWrap:      { flex: 1 },
-  picker:         { color: colors.text, height: 38 },
+  pickerText:     { color: colors.text, fontSize: 13, fontWeight: '500' },
+  caret:          { color: colors.text3, fontSize: 10, marginLeft: 2 },
   toggle:         { width: 34, height: 34, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   toggleDone:     { backgroundColor: colors.successDim, borderColor: colors.successBdr },
   toggleText:     { fontSize: 14, color: colors.text3 },
   toggleTextDone: { color: colors.success, fontWeight: '700' },
   remove:         { width: 26, height: 26, alignItems: 'center', justifyContent: 'center', borderRadius: 6 },
   removeText:     { fontSize: 18, color: colors.text3, lineHeight: 20 },
+});
+
+const m = StyleSheet.create({
+  overlay:             { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  sheet:               { backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 },
+  handle:              { width: 40, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 6 },
+  option:              { paddingVertical: 14, paddingHorizontal: 24, borderBottomWidth: 1, borderBottomColor: colors.border },
+  optionSelected:      { backgroundColor: colors.accentDim },
+  optionText:          { color: colors.text, fontSize: 16 },
+  optionTextSelected:  { color: colors.accent, fontWeight: '700' },
 });
