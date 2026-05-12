@@ -4,6 +4,7 @@
   "version": "1.0.0",
   "scripts": {
     "start": "expo start",
+    "clean": "npx rimraf node_modules package-lock.json && npm install",
     "android": "expo start --android",
     "ios": "expo start --ios",
     "build:ios": "eas build --platform ios",
