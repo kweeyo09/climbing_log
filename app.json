@@ -1,32 +1,32 @@
 {
   "expo": {
-    "name": "SENDLOG",
-    "slug": "sendlog",
+    "name": "Ascenta",
+    "slug": "ascenta",
     "version": "1.0.0",
     "orientation": "portrait",
     "icon": "./assets/icon.png",
     "userInterfaceStyle": "dark",
     "splash": {
-      "image": "./assets/splash.png",
+      "image": "./assets/icon.png",
       "resizeMode": "contain",
-      "backgroundColor": "#0d0d0e"
+      "backgroundColor": "#EDE5D8"
     },
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.kweeyo09.sendlog"
+      "bundleIdentifier": "com.kweeyo09.ascenta"
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
-        "backgroundColor": "#0d0d0e"
+        "foregroundImage": "./assets/icon.png",
+        "backgroundColor": "#EDE5D8"
       },
-      "package": "com.kweeyo09.sendlog"
+      "package": "com.kweeyo09.ascenta"
     },
     "plugins": [
       "expo-router"
     ],
-    "scheme": "sendlog",
+    "scheme": "ascenta",
     "experiments": {
       "typedRoutes": true
     }
