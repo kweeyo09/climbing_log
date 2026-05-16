@@ -70,7 +70,7 @@ export default function SessionCard({ session, onPress }: Props) {
           onPress={() => router.push(`/session/${session.id}`)}
           activeOpacity={0.7}
         >
-          <Text style={s.editBtnText}>\u270F\uFE0F Edit Session</Text>
+          <Text style={s.editBtnText}>{'\u270F\uFE0F Edit Session'}</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

@@ -203,22 +203,27 @@ const s = StyleSheet.create({
   emptyIcon:      { fontSize: 40, opacity: 0.3 },
   emptyText:      { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
 
-  // FAB — gold hexagon shape
+  // FAB — climbing hold shape (asymmetric rounded blob)
   fab:            {
     position: 'absolute',
-    bottom: 90,
+    bottom: 16,  // just above the tab bar
     right: 20,
-    width: 62,
-    height: 58,
+    width: 60,
+    height: 60,
     backgroundColor: colors.highlight,
-    borderRadius: 28,
+    // Climbing hold: asymmetric border radii to mimic a hold shape
+    borderTopLeftRadius: 32,
+    borderTopRightRadius: 18,
+    borderBottomLeftRadius: 22,
+    borderBottomRightRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: colors.highlight,
-    shadowOpacity: 0.5,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 4 },
-    elevation: 8,
+    shadowOpacity: 0.55,
+    shadowRadius: 14,
+    shadowOffset: { width: 2, height: 4 },
+    elevation: 10,
+    transform: [{ rotate: '-12deg' }],
   },
-  fabIcon:        { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
+  fabIcon:        { color: '#1a1612', fontSize: 26, fontWeight: '400', lineHeight: 30, transform: [{ rotate: '12deg' }] },
 });

@@ -248,7 +248,7 @@ export default function StatsScreen() {
 
 const s = StyleSheet.create({
   safe:           { flex: 1, backgroundColor: colors.bg },
-  scroll:         { paddingBottom: 40 },
+  scroll:         { paddingBottom: 16 },
   header:         { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 12 },
   headerTitle:    { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   headerSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
