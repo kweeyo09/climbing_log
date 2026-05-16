@@ -1,10 +1,7 @@
 /**
  * Calendar screen — matches the preview HTML exactly.
- * Key visual elements:
- *  - "ASCENTA 🧗" header in accent purple
- *  - Bordered accent grid card with filled purple day cells
- *  - "📅 THIS MONTH" section title in accent colour
- *  - Gold hexagonal FAB
+ * Design: ASCENTA header, bordered accent grid, filled day cells, gold hold FAB.
+ * NOTE: All emoji are literal UTF-8 characters — no unicode escape sequences.
  */
 import { useState } from 'react';
 import {
@@ -40,7 +37,7 @@ export default function CalendarScreen() {
   };
 
   const daysInMonth  = new Date(year, month + 1, 0).getDate();
-  const firstWeekDay = new Date(year, month, 1).getDay(); // 0=Sun
+  const firstWeekDay = new Date(year, month, 1).getDay();
 
   const dateString = (day: number) =>
     `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -62,11 +59,11 @@ export default function CalendarScreen() {
     <SafeAreaView style={s.safe}>
       <ScrollView contentContainerStyle={s.scroll}>
 
-        {/* Header — "ASCENTA 🧗" matching preview */}
+        {/* Header */}
         <View style={s.header}>
           <Text style={s.headerTitle}>
             <Text style={s.accent}>ASCENTA</Text>
-            {' \uD83E\uDDD7'}
+            <Text> 🧗</Text>
           </Text>
           <Text style={s.headerSub}>{MONTHS[month]} {year}</Text>
         </View>
@@ -83,28 +80,23 @@ export default function CalendarScreen() {
           </Pressable>
         </View>
 
-        {/* Calendar grid — bordered accent card matching preview */}
+        {/* Calendar grid */}
         <View style={s.gridCard}>
           {DAY_NAMES.map((d, i) => (
             <Text key={i} style={s.dayName}>{d}</Text>
           ))}
-
-          {/* Empty cells before the first day */}
           {Array.from({ length: firstWeekDay }).map((_, i) => (
             <View key={`e${i}`} style={s.dayCell} />
           ))}
-
-          {/* Day cells */}
           {Array.from({ length: daysInMonth }).map((_, i) => {
             const day     = i + 1;
             const daySess = sessionsForDay(day);
             const active  = daySess.length > 0;
             const tod     = isToday(day);
-
             return (
               <TouchableOpacity
                 key={day}
-                style={[s.dayCell, active && s.dayCellActive]}
+                style={[s.dayCell, active && s.dayCellActive, tod && !active && s.dayCellToday]}
                 onPress={() => active ? router.push(`/session/${daySess[0].id}`) : undefined}
                 activeOpacity={active ? 0.7 : 1}
               >
@@ -120,13 +112,14 @@ export default function CalendarScreen() {
           })}
         </View>
 
-        {/* This month's sessions */}
+        {/* Section title */}
         <View style={s.sectionHeader}>
           <Text style={s.sectionTitle}>
-            {'\uD83D\uDCC5'}{' THIS MONTH \u2014 '}{monthSessions.length}{' SESSION'}{monthSessions.length !== 1 ? 'S' : ''}
+            📅 THIS MONTH — {monthSessions.length} SESSION{monthSessions.length !== 1 ? 'S' : ''}
           </Text>
         </View>
 
+        {/* Session cards or empty state */}
         {monthSessions.length > 0 ? (
           monthSessions.slice(0, 5).map(sess => (
             <SessionCard
@@ -137,14 +130,17 @@ export default function CalendarScreen() {
           ))
         ) : (
           <View style={s.empty}>
-            <Text style={s.emptyIcon}>{'\uD83E\uDDD7'}</Text>
-            <Text style={s.emptyText}>{'No sessions this month yet.\nTime to get on the wall!'}</Text>
+            <Text style={s.emptyIcon}>🧗</Text>
+            <Text style={s.emptyText}>No sessions this month yet.{'\n'}Time to get on the wall!</Text>
           </View>
         )}
 
+        {/* Bottom padding so last card clears the FAB */}
+        <View style={{ height: 80 }} />
+
       </ScrollView>
 
-      {/* FAB — gold hexagon matching preview */}
+      {/* FAB — climbing hold shape */}
       <TouchableOpacity
         style={s.fab}
         onPress={() => router.push('/(tabs)/log')}
@@ -159,22 +155,19 @@ export default function CalendarScreen() {
 
 const s = StyleSheet.create({
   safe:           { flex: 1, backgroundColor: colors.bg },
-  scroll:         { paddingBottom: 100 },
+  scroll:         { paddingBottom: 0 },
 
-  // Header
   header:         { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 8 },
   headerTitle:    { fontSize: 30, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   accent:         { color: colors.accent },
   headerSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
   accentLine:     { height: 2, marginHorizontal: spacing.lg, marginBottom: 8, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
 
-  // Month nav
   monthNav:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.lg, marginBottom: 8 },
   navBtn:         { width: 36, height: 36, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(106,90,205,0.18)' },
   navBtnText:     { color: colors.text, fontSize: 22, lineHeight: 26 },
   monthTitle:     { fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
 
-  // Calendar grid — bordered card
   gridCard:       {
     flexDirection: 'row',
     flexWrap: 'wrap',
@@ -187,41 +180,39 @@ const s = StyleSheet.create({
     padding: 10,
     gap: 3,
   },
-  dayName:        { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '700', color: colors.text3, textTransform: 'uppercase', paddingBottom: 8, letterSpacing: 0.5 },
+  dayName:        { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '700', color: colors.text3, paddingBottom: 8, letterSpacing: 0.5 },
   dayCell:        { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
   dayCellActive:  { backgroundColor: '#6A5ACD' },
+  dayCellToday:   { borderWidth: 1.5, borderColor: colors.accent },
   dayNum:         { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
   dayNumActive:   { color: '#fff', fontWeight: '700' },
   dayNumToday:    { color: colors.accent, fontWeight: '800' },
 
-  // Section header
   sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: 14, paddingBottom: 10 },
   sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.accent, letterSpacing: 1.5, textTransform: 'uppercase' },
 
-  // Empty state
   empty:          { alignItems: 'center', paddingVertical: 36 },
   emptyIcon:      { fontSize: 40, opacity: 0.3 },
   emptyText:      { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
 
-  // FAB — climbing hold shape (asymmetric rounded blob)
+  // Climbing hold FAB — asymmetric blob, sits just above tab bar
   fab:            {
     position: 'absolute',
-    bottom: 16,  // just above the tab bar
+    bottom: 12,
     right: 20,
     width: 60,
     height: 60,
     backgroundColor: colors.highlight,
-    // Climbing hold: asymmetric border radii to mimic a hold shape
     borderTopLeftRadius: 32,
     borderTopRightRadius: 18,
     borderBottomLeftRadius: 22,
     borderBottomRightRadius: 36,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: colors.highlight,
-    shadowOpacity: 0.55,
-    shadowRadius: 14,
-    shadowOffset: { width: 2, height: 4 },
+    shadowColor: '#000',
+    shadowOpacity: 0.25,
+    shadowRadius: 10,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 10,
     transform: [{ rotate: '-12deg' }],
   },

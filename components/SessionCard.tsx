@@ -28,8 +28,6 @@ export default function SessionCard({ session, onPress }: Props) {
     return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
   };
 
-  const completedRoutes = session.routes.filter(r => r.completed);
-
   return (
     <TouchableOpacity style={s.card} onPress={onPress} activeOpacity={0.75}>
       <View style={s.header}>
@@ -51,7 +49,7 @@ export default function SessionCard({ session, onPress }: Props) {
           {session.routes.slice(0, 7).map((r, i) => (
             <View key={i} style={[s.pill, r.completed ? s.pillDone : s.pillFail]}>
               <Text style={[s.pillText, r.completed && s.pillTextDone]}>
-                {r.grade} {r.completed ? '\u2713' : '\u25cb'}
+                {r.grade} {r.completed ? '✓' : '○'}
               </Text>
             </View>
           ))}
@@ -63,14 +61,14 @@ export default function SessionCard({ session, onPress }: Props) {
         </View>
       )}
 
-      {/* Edit button matching preview */}
+      {/* Edit button — literal pencil emoji, no escape sequences */}
       <View style={s.actions}>
         <TouchableOpacity
           style={s.editBtn}
           onPress={() => router.push(`/session/${session.id}`)}
           activeOpacity={0.7}
         >
-          <Text style={s.editBtnText}>{'\u270F\uFE0F Edit Session'}</Text>
+          <Text style={s.editBtnText}>✏️ Edit Session</Text>
         </TouchableOpacity>
       </View>
     </TouchableOpacity>
