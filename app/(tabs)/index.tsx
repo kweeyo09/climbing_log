@@ -227,7 +227,8 @@ const s = StyleSheet.create({
 
   // flex:1 so this takes all remaining vertical space below the fixed grid
   calSection:  { flex: 1 },
-  calSectionContent: { paddingBottom: TAB_BAR_HEIGHT + 80 },
+  // paddingBottom just enough to clear the FAB (62px tall) + 8px breathing room
+  calSectionContent: { paddingBottom: TAB_BAR_HEIGHT + 70 },
 
   sectionTitle: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
 
@@ -235,25 +236,28 @@ const s = StyleSheet.create({
   emptyIcon:   { fontSize: 40, opacity: 0.3 },
   emptyText:   { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
 
-  // FAB: pinned just above the tab bar (TAB_BAR_HEIGHT + 12)
+  // FAB: 8px above the tab bar, jagged climbing-hold shape via extreme mixed radii
   fab:         {
     position: 'absolute',
-    bottom: TAB_BAR_HEIGHT + 12,   // 78 + 12 = 90 — sits just above tab bar
+    bottom: TAB_BAR_HEIGHT + 8,    // 78 + 8 = 86 — tight above tab bar
     right: 20,
-    width: 62,
-    height: 58,
+    width: 58,
+    height: 54,
     backgroundColor: colors.highlight,
-    borderTopLeftRadius: 32,
-    borderTopRightRadius: 18,
-    borderBottomRightRadius: 36,
-    borderBottomLeftRadius: 22,
+    // Jagged climbing-hold: each corner is a very different radius
+    borderTopLeftRadius: 28,
+    borderTopRightRadius: 8,
+    borderBottomRightRadius: 30,
+    borderBottomLeftRadius: 12,
+    // Slight rotation adds organic feel
+    transform: [{ rotate: '-8deg' }],
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#E8C547',
-    shadowOpacity: 0.5,
-    shadowRadius: 18,
-    shadowOffset: { width: 0, height: 4 },
+    shadowOpacity: 0.55,
+    shadowRadius: 14,
+    shadowOffset: { width: 0, height: 3 },
     elevation: 10,
   },
-  fabIcon:     { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32 },
+  fabIcon:     { color: '#1a1612', fontSize: 26, fontWeight: '300', lineHeight: 30, transform: [{ rotate: '8deg' }] },
 });
