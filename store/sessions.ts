@@ -4,6 +4,9 @@
  * Zustand is a lightweight state management library. Think of this store as
  * a globally accessible object with both data (sessions, loading) and methods
  * (loadSessions, addSession, etc.) that any component can subscribe to.
+ *
+ * Supabase cloud sync is optional — the app works fully offline when
+ * EXPO_PUBLIC_SUPABASE_URL / EXPO_PUBLIC_SUPABASE_ANON_KEY are not set.
  */
 
 import { create } from 'zustand';
@@ -34,7 +37,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   sessions: [],
   loading:  true,
 
-  /** Load all sessions from the local SQLite database on app start */
+  /** Load all sessions from the local database on app start */
   loadSessions: async () => {
     set({ loading: true });
     try {
@@ -53,11 +56,10 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       synced:       false,
       user_id:      undefined,
       ...input,
-      // Give each route a unique id and attach the session id
       routes: input.routes.map((r, i) => ({
         ...r,
         id:         `${Date.now()}-${i}`,
-        session_id: '', // set below
+        session_id: '',
       })),
     };
     session.routes = session.routes.map(r => ({
@@ -73,11 +75,11 @@ export const useSessionStore = create<SessionState>((set, get) => ({
       ),
     }));
 
-    // Fire-and-forget sync (offline? it'll sync next time)
+    // Fire-and-forget sync (skipped silently if Supabase is not configured)
     get().syncToCloud().catch(() => {});
   },
 
-  /** Update an existing session locally (re-uses dbInsertSession with INSERT OR REPLACE) */
+  /** Update an existing session locally */
   updateSession: async (id, input) => {
     const existing = get().sessions.find(s => s.id === id);
     if (!existing) return;
@@ -91,7 +93,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         session_id: id,
       })),
     };
-    await dbInsertSession(updated); // INSERT OR REPLACE handles the update
+    await dbInsertSession(updated);
     set(state => ({
       sessions: state.sessions
         .map(s => s.id === id ? updated : s)
@@ -100,17 +102,21 @@ export const useSessionStore = create<SessionState>((set, get) => ({
     get().syncToCloud().catch(() => {});
   },
 
-  /** Delete locally and from Supabase */
+  /** Delete locally and from Supabase (if configured) */
   deleteSession: async (id) => {
     await dbDeleteSession(id);
     set(state => ({ sessions: state.sessions.filter(s => s.id !== id) }));
 
-    // Best-effort remote delete
-    supabase.from('sessions').delete().eq('id', id).then(() => {});
+    // Best-effort remote delete — only when Supabase is configured
+    if (supabase) {
+      supabase.from('sessions').delete().eq('id', id).then(() => {});
+    }
   },
 
-  /** Push any un-synced sessions to Supabase */
+  /** Push any un-synced sessions to Supabase — silently skipped if not configured */
   syncToCloud: async () => {
+    if (!supabase) return; // Supabase not configured — skip silently
+
     const { data: { user } } = await supabase.auth.getUser();
     if (!user) return; // not logged in — skip
 
@@ -128,7 +134,7 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         created_at:   session.created_at,
       });
 
-      if (sErr) continue; // skip routes if session failed
+      if (sErr) continue;
 
       for (const route of session.routes) {
         await supabase.from('routes').upsert({
