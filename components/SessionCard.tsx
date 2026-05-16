@@ -1,7 +1,18 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
+import { useRouter } from 'expo-router';
 import { getTopGrade } from '../constants/grades';
 import { colors, spacing, radius } from '../constants/theme';
 import type { Session } from '../types';
+
+/** Show only "Venue, City" — strip street/postcode like the preview HTML */
+function shortLocation(loc: string): string {
+  if (!loc) return loc;
+  const parts = loc.split(',').map(p => p.trim()).filter(Boolean);
+  if (parts.length <= 2) return loc;
+  const venue = parts[0];
+  const city  = parts.slice(1).find(p => p.length > 3 && !/^\d+$/.test(p) && !/^[A-Z]{1,2}\d/.test(p));
+  return city ? `${venue}, ${city}` : venue;
+}
 
 interface Props {
   session: Session;
@@ -9,6 +20,7 @@ interface Props {
 }
 
 export default function SessionCard({ session, onPress }: Props) {
+  const router   = useRouter();
   const topGrade = getTopGrade(session.routes, session.grade_system);
 
   const fmtDate = (ds: string) => {
@@ -21,7 +33,7 @@ export default function SessionCard({ session, onPress }: Props) {
   return (
     <TouchableOpacity style={s.card} onPress={onPress} activeOpacity={0.75}>
       <View style={s.header}>
-        <Text style={s.location}>{session.location}</Text>
+        <Text style={s.location} numberOfLines={1}>{shortLocation(session.location)}</Text>
         <Text style={s.date}>{fmtDate(session.date)}</Text>
       </View>
 
@@ -39,7 +51,7 @@ export default function SessionCard({ session, onPress }: Props) {
           {session.routes.slice(0, 7).map((r, i) => (
             <View key={i} style={[s.pill, r.completed ? s.pillDone : s.pillFail]}>
               <Text style={[s.pillText, r.completed && s.pillTextDone]}>
-                {r.grade} {r.completed ? '✓' : '○'}
+                {r.grade} {r.completed ? '\u2713' : '\u25cb'}
               </Text>
             </View>
           ))}
@@ -50,6 +62,17 @@ export default function SessionCard({ session, onPress }: Props) {
           )}
         </View>
       )}
+
+      {/* Edit button matching preview */}
+      <View style={s.actions}>
+        <TouchableOpacity
+          style={s.editBtn}
+          onPress={() => router.push(`/session/${session.id}`)}
+          activeOpacity={0.7}
+        >
+          <Text style={s.editBtnText}>\u270F\uFE0F Edit Session</Text>
+        </TouchableOpacity>
+      </View>
     </TouchableOpacity>
   );
 }
@@ -68,4 +91,7 @@ const s = StyleSheet.create({
   pillFail:     { opacity: 0.5 },
   pillText:     { fontSize: 11, fontWeight: '600', color: colors.text2 },
   pillTextDone: { color: colors.success },
+  actions:      { flexDirection: 'row', marginTop: 10 },
+  editBtn:      { flexDirection: 'row', alignItems: 'center', gap: 4, backgroundColor: 'rgba(106,90,205,0.12)', borderWidth: 1, borderColor: 'rgba(106,90,205,0.32)', borderRadius: 7, paddingHorizontal: 9, paddingVertical: 4 },
+  editBtnText:  { fontSize: 11, fontWeight: '700', color: colors.accent, letterSpacing: 0.3 },
 });

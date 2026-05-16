@@ -1,3 +1,11 @@
+/**
+ * Calendar screen — matches the preview HTML exactly.
+ * Key visual elements:
+ *  - "ASCENTA 🧗" header in accent purple
+ *  - Bordered accent grid card with filled purple day cells
+ *  - "📅 THIS MONTH" section title in accent colour
+ *  - Gold hexagonal FAB
+ */
 import { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable,
@@ -54,11 +62,11 @@ export default function CalendarScreen() {
     <SafeAreaView style={s.safe}>
       <ScrollView contentContainerStyle={s.scroll}>
 
-        {/* Header */}
+        {/* Header — "ASCENTA 🧗" matching preview */}
         <View style={s.header}>
           <Text style={s.headerTitle}>
             <Text style={s.accent}>ASCENTA</Text>
-            {' 🧗'}
+            {' \uD83E\uDDD7'}
           </Text>
           <Text style={s.headerSub}>{MONTHS[month]} {year}</Text>
         </View>
@@ -75,19 +83,19 @@ export default function CalendarScreen() {
           </Pressable>
         </View>
 
-        {/* Calendar grid — bordered card matching preview */}
+        {/* Calendar grid — bordered accent card matching preview */}
         <View style={s.gridCard}>
           {DAY_NAMES.map((d, i) => (
             <Text key={i} style={s.dayName}>{d}</Text>
           ))}
 
           {/* Empty cells before the first day */}
-          {Array(firstWeekDay).fill(null).map((_, i) => (
+          {Array.from({ length: firstWeekDay }).map((_, i) => (
             <View key={`e${i}`} style={s.dayCell} />
           ))}
 
           {/* Day cells */}
-          {Array(daysInMonth).fill(null).map((_, i) => {
+          {Array.from({ length: daysInMonth }).map((_, i) => {
             const day     = i + 1;
             const daySess = sessionsForDay(day);
             const active  = daySess.length > 0;
@@ -97,7 +105,7 @@ export default function CalendarScreen() {
               <TouchableOpacity
                 key={day}
                 style={[s.dayCell, active && s.dayCellActive]}
-                onPress={() => active && router.push(`/session/${daySess[0].id}`)}
+                onPress={() => active ? router.push(`/session/${daySess[0].id}`) : undefined}
                 activeOpacity={active ? 0.7 : 1}
               >
                 <Text style={[
@@ -115,7 +123,7 @@ export default function CalendarScreen() {
         {/* This month's sessions */}
         <View style={s.sectionHeader}>
           <Text style={s.sectionTitle}>
-            📅 THIS MONTH — {monthSessions.length} SESSION{monthSessions.length !== 1 ? 'S' : ''}
+            {'\uD83D\uDCC5'}{' THIS MONTH \u2014 '}{monthSessions.length}{' SESSION'}{monthSessions.length !== 1 ? 'S' : ''}
           </Text>
         </View>
 
@@ -129,14 +137,14 @@ export default function CalendarScreen() {
           ))
         ) : (
           <View style={s.empty}>
-            <Text style={s.emptyIcon}>🧗</Text>
-            <Text style={s.emptyText}>No sessions this month yet.{'\n'}Time to get on the wall!</Text>
+            <Text style={s.emptyIcon}>{'\uD83E\uDDD7'}</Text>
+            <Text style={s.emptyText}>{'No sessions this month yet.\nTime to get on the wall!'}</Text>
           </View>
         )}
 
       </ScrollView>
 
-      {/* FAB quick-log button */}
+      {/* FAB — gold hexagon matching preview */}
       <TouchableOpacity
         style={s.fab}
         onPress={() => router.push('/(tabs)/log')}
@@ -151,28 +159,66 @@ export default function CalendarScreen() {
 
 const s = StyleSheet.create({
   safe:           { flex: 1, backgroundColor: colors.bg },
-  scroll:         { paddingBottom: 32 },
-  header:         { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 12 },
-  headerTitle:    { fontSize: 32, fontWeight: '900', color: colors.text, letterSpacing: 1 },
+  scroll:         { paddingBottom: 100 },
+
+  // Header
+  header:         { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 8 },
+  headerTitle:    { fontSize: 30, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   accent:         { color: colors.accent },
-  headerSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
-  accentLine:     { height: 2, marginHorizontal: spacing.lg, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
-  monthNav:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.lg, marginBottom: 14 },
-  navBtn:         { width: 36, height: 36, backgroundColor: colors.surface, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
-  navBtnText:     { color: colors.text, fontSize: 20 },
-  monthTitle:     { fontSize: 16, fontWeight: '700', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
-  gridCard:       { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: spacing.lg, marginBottom: 12, borderWidth: 2, borderColor: colors.accentBorder, borderRadius: radius.lg, backgroundColor: 'rgba(106,90,205,0.06)', padding: 10, gap: 3 },
+  headerSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
+  accentLine:     { height: 2, marginHorizontal: spacing.lg, marginBottom: 8, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
+
+  // Month nav
+  monthNav:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: spacing.lg, marginBottom: 8 },
+  navBtn:         { width: 36, height: 36, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(106,90,205,0.18)' },
+  navBtnText:     { color: colors.text, fontSize: 22, lineHeight: 26 },
+  monthTitle:     { fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
+
+  // Calendar grid — bordered card
+  gridCard:       {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginHorizontal: spacing.lg,
+    marginBottom: 12,
+    borderWidth: 2,
+    borderColor: 'rgba(106,90,205,0.32)',
+    borderRadius: radius.lg,
+    backgroundColor: 'rgba(106,90,205,0.06)',
+    padding: 10,
+    gap: 3,
+  },
   dayName:        { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '700', color: colors.text3, textTransform: 'uppercase', paddingBottom: 8, letterSpacing: 0.5 },
-  dayCell:        { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
-  dayCellActive:  { backgroundColor: colors.accent },
+  dayCell:        { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  dayCellActive:  { backgroundColor: '#6A5ACD' },
   dayNum:         { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
   dayNumActive:   { color: '#fff', fontWeight: '700' },
   dayNumToday:    { color: colors.accent, fontWeight: '800' },
-  fab:            { position: 'absolute', bottom: 24, right: 20, width: 62, height: 58, borderRadius: 28, backgroundColor: colors.highlight, alignItems: 'center', justifyContent: 'center', shadowColor: colors.highlight, shadowOpacity: 0.5, shadowRadius: 18, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
-  fabIcon:        { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
-  sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.sm },
+
+  // Section header
+  sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: 14, paddingBottom: 10 },
   sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.accent, letterSpacing: 1.5, textTransform: 'uppercase' },
-  empty:          { alignItems: 'center', paddingVertical: 48 },
-  emptyIcon:      { fontSize: 44, opacity: 0.3 },
+
+  // Empty state
+  empty:          { alignItems: 'center', paddingVertical: 36 },
+  emptyIcon:      { fontSize: 40, opacity: 0.3 },
   emptyText:      { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
+
+  // FAB — gold hexagon shape
+  fab:            {
+    position: 'absolute',
+    bottom: 90,
+    right: 20,
+    width: 62,
+    height: 58,
+    backgroundColor: colors.highlight,
+    borderRadius: 28,
+    alignItems: 'center',
+    justifyContent: 'center',
+    shadowColor: colors.highlight,
+    shadowOpacity: 0.5,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 4 },
+    elevation: 8,
+  },
+  fabIcon:        { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
 });
