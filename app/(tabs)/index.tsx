@@ -1,28 +1,27 @@
 /**
  * Calendar screen — pixel-perfect match to preview HTML.
  *
- * Key CSS values from preview (all literal, no unicode escapes):
- * .cal-hdr{padding:10px 20px 6px;}
- * .cal-title{font-size:30px;font-weight:900;letter-spacing:.5px;}
- * .cal-title .bl{color:var(--accent);}
- * .cal-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
- * .cal-accent{height:2px;margin:0 20px 8px;background:var(--accent);opacity:.6;}
- * .month-nav{padding:0 20px 8px;}
- * .nav-btn{width:36px;height:36px;background:rgba(255,255,255,.55);border:1px solid rgba(106,90,205,0.18);border-radius:8px;}
- * .cal-grid{grid-template-columns:repeat(7,1fr);gap:3px;padding:10px;margin:0 16px 12px;
- *   border:2px solid var(--accentBdr);border-radius:var(--rl);background:rgba(106,90,205,0.06);}
- * .day-name{font-size:10px;font-weight:700;color:var(--text3);padding-bottom:8px;letter-spacing:.5px;}
- * .day-cell{aspect-ratio:1;border-radius:8px;}
- * .day-cell.has-sess{background:#6A5ACD;}
- * .day-num{font-size:14px;font-weight:500;color:var(--text2);}
- * .day-num.today{color:var(--accent);font-weight:800;}
- * .day-num.has-sess{color:#fff;font-weight:700;}
- * .section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);padding:0 20px 10px;}
- * FAB: bottom:90px;right:20px;width:62px;height:58px;clip-path:polygon(18% 0%,82% 4%,100% 28%,96% 72%,78% 100%,22% 98%,4% 74%,0% 30%)
+ * ROOT CAUSE OF SQUASH: Using flexWrap + aspectRatio on day cells means the
+ * grid height is dynamic and gets compressed by flex layout when sessions appear.
+ *
+ * FIX: Compute an explicit pixel height for the grid using useWindowDimensions,
+ * then set it as a hardcoded `height` on calGrid. The grid can NEVER flex or shrink.
+ *
+ * Layout structure (top-down, no flex fighting):
+ *   SafeAreaView (flex:1, bg)
+ *     calHdr          — fixed height
+ *     calAccent       — fixed 2px
+ *     monthNav        — fixed height
+ *     calGrid         — FIXED PIXEL HEIGHT (computed once from screen width)
+ *     ScrollView      — flex:1, takes all remaining space
+ *       sectionTitle
+ *       session cards
+ *     FAB             — position:absolute, bottom = tab bar height + 12
  */
 import { useState } from 'react';
 import {
   View, Text, ScrollView, StyleSheet, TouchableOpacity, Pressable,
+  useWindowDimensions,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -36,9 +35,13 @@ const MONTHS = [
 ];
 const DAY_NAMES = ['S','M','T','W','T','F','S'];
 
+// Tab bar height from _layout.tsx
+const TAB_BAR_HEIGHT = 78;
+
 export default function CalendarScreen() {
   const router   = useRouter();
   const sessions = useSessionStore(st => st.sessions);
+  const { width } = useWindowDimensions();
 
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
@@ -55,6 +58,23 @@ export default function CalendarScreen() {
 
   const daysInMonth  = new Date(year, month + 1, 0).getDate();
   const firstWeekDay = new Date(year, month, 1).getDay();
+
+  // Compute the number of grid rows needed (day-names row + week rows)
+  const totalCells = firstWeekDay + daysInMonth;
+  const weekRows   = Math.ceil(totalCells / 7);
+  const gridRows   = 1 + weekRows; // 1 header row + week rows
+
+  // Compute exact pixel height for the grid:
+  //   gridWidth = screen width - 2*16 (horizontal margin) - 2*10 (padding) - 2*2 (border)
+  //   cellWidth = (gridWidth - 6*3) / 7   (6 gaps of 3px between 7 columns)
+  //   dayNameRowH = cellWidth * 0.6 + 8   (approx, text is smaller)
+  //   cellH = cellWidth (square, aspect-ratio:1)
+  //   totalH = padding*2 + dayNameRowH + weekRows*cellWidth + (weekRows)*3 (row gaps)
+  const gridInnerWidth = width - 32 - 20 - 4; // margins + padding + border
+  const cellSize       = Math.floor((gridInnerWidth - 6 * 3) / 7);
+  const dayNameRowH    = 10 + 8; // font-size:10 + paddingBottom:8
+  const gridHeight     = 10 + 10 + dayNameRowH + weekRows * cellSize + (weekRows - 1) * 3 + 4;
+  // 10 top padding + 10 bottom padding + header row + week rows + row gaps + border
 
   const dateStr = (day: number) =>
     `${year}-${String(month + 1).padStart(2, '0')}-${String(day).padStart(2, '0')}`;
@@ -79,7 +99,7 @@ export default function CalendarScreen() {
           <Text style={s.bl}>ASCENTA</Text>
           <Text> 🧗</Text>
         </Text>
-        <Text style={s.calSub}>{MONTHS[month]} {year}</Text>
+        <Text style={s.calSub}>{MONTHS[month].toUpperCase()} {year}</Text>
       </View>
 
       {/* cal-accent line */}
@@ -96,13 +116,15 @@ export default function CalendarScreen() {
         </Pressable>
       </View>
 
-      {/* cal-grid — fixed 7-column grid */}
-      <View style={s.calGrid}>
+      {/* cal-grid — FIXED PIXEL HEIGHT, never flexes */}
+      <View style={[s.calGrid, { height: gridHeight }]}>
         {DAY_NAMES.map((d, i) => (
-          <Text key={i} style={s.dayName}>{d}</Text>
+          <View key={`dn${i}`} style={{ width: cellSize, alignItems: 'center', paddingBottom: 8 }}>
+            <Text style={s.dayName}>{d}</Text>
+          </View>
         ))}
         {Array.from({ length: firstWeekDay }).map((_, i) => (
-          <View key={`e${i}`} style={s.dayCell} />
+          <View key={`e${i}`} style={{ width: cellSize, height: cellSize }} />
         ))}
         {Array.from({ length: daysInMonth }).map((_, i) => {
           const day     = i + 1;
@@ -112,7 +134,11 @@ export default function CalendarScreen() {
           return (
             <TouchableOpacity
               key={day}
-              style={[s.dayCell, active && s.dayCellActive]}
+              style={[
+                s.dayCell,
+                { width: cellSize, height: cellSize },
+                active && s.dayCellActive,
+              ]}
               onPress={() => active ? router.push(`/session/${daySess[0].id}`) : undefined}
               activeOpacity={active ? 0.7 : 1}
             >
@@ -128,14 +154,14 @@ export default function CalendarScreen() {
         })}
       </View>
 
-      {/* cal-section — scrollable sessions list */}
+      {/* cal-section — flex:1 takes all remaining space below the grid */}
       <ScrollView style={s.calSection} contentContainerStyle={s.calSectionContent}>
         <Text style={s.sectionTitle}>
-          📅 THIS MONTH — {monthSessions.length} SESSION{monthSessions.length !== 1 ? 'S' : ''}
+          {'📅 THIS MONTH — ' + monthSessions.length + ' SESSION' + (monthSessions.length !== 1 ? 'S' : '')}
         </Text>
 
         {monthSessions.length > 0 ? (
-          monthSessions.slice(0, 5).map(sess => (
+          monthSessions.slice(0, 10).map(sess => (
             <SessionCard
               key={sess.id}
               session={sess}
@@ -145,12 +171,12 @@ export default function CalendarScreen() {
         ) : (
           <View style={s.emptyState}>
             <Text style={s.emptyIcon}>🧗</Text>
-            <Text style={s.emptyText}>No sessions this month yet.{'\n'}Time to get on the wall!</Text>
+            <Text style={s.emptyText}>{'No sessions this month yet.\nTime to get on the wall!'}</Text>
           </View>
         )}
       </ScrollView>
 
-      {/* FAB — climbing hold polygon, exact preview values */}
+      {/* FAB — position:absolute, bottom = TAB_BAR_HEIGHT + 12 so it sits just above the tab bar */}
       <TouchableOpacity
         style={s.fab}
         onPress={() => router.push('/(tabs)/log')}
@@ -164,28 +190,21 @@ export default function CalendarScreen() {
 }
 
 const s = StyleSheet.create({
-  safe:           { flex: 1, backgroundColor: colors.bg },
+  safe:        { flex: 1, backgroundColor: colors.bg },
 
-  // .cal-hdr{padding:10px 20px 6px;}
-  calHdr:         { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
-  // .cal-title{font-size:30px;font-weight:900;letter-spacing:.5px;}
-  calTitle:       { fontSize: 30, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
-  // .cal-title .bl{color:var(--accent);}
-  bl:             { color: colors.accent },
-  // .cal-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
-  calSub:         { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
-  // .cal-accent{height:2px;margin:0 20px 8px;background:var(--accent);opacity:.6;}
-  calAccent:      { height: 2, marginHorizontal: 20, marginBottom: 8, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
+  calHdr:      { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
+  calTitle:    { fontSize: 30, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
+  bl:          { color: colors.accent },
+  calSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
+  calAccent:   { height: 2, marginHorizontal: 20, marginBottom: 8, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
 
-  // .month-nav{display:flex;align-items:center;justify-content:space-between;padding:0 20px 8px;}
-  monthNav:       { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 8 },
-  // .nav-btn{width:36px;height:36px;background:rgba(255,255,255,.55);border:1px solid rgba(106,90,205,0.18);border-radius:8px;}
-  navBtn:         { width: 36, height: 36, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(106,90,205,0.18)' },
-  navBtnText:     { color: colors.text, fontSize: 22, lineHeight: 26 },
-  monthTitle:     { fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
+  monthNav:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 8 },
+  navBtn:      { width: 36, height: 36, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(106,90,205,0.18)' },
+  navBtnText:  { color: colors.text, fontSize: 22, lineHeight: 26 },
+  monthTitle:  { fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
 
-  // .cal-grid{gap:3px;padding:10px;margin:0 16px 12px;border:2px solid var(--accentBdr);border-radius:var(--rl);background:rgba(106,90,205,0.06);}
-  calGrid:        {
+  // Grid: horizontal layout with wrap. Height is set dynamically via inline style.
+  calGrid:     {
     flexDirection: 'row',
     flexWrap: 'wrap',
     marginHorizontal: 16,
@@ -196,36 +215,30 @@ const s = StyleSheet.create({
     backgroundColor: 'rgba(106,90,205,0.06)',
     padding: 10,
     gap: 3,
+    // NO flex here — height is set via inline style to prevent squashing
   },
-  // .day-name{font-size:10px;font-weight:700;color:var(--text3);padding-bottom:8px;letter-spacing:.5px;}
-  dayName:        { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '700', color: colors.text3, paddingBottom: 8, letterSpacing: 0.5 },
-  // .day-cell{aspect-ratio:1;border-radius:8px;}
-  dayCell:        { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
-  // .day-cell.has-sess{background:#6A5ACD;}
-  dayCellActive:  { backgroundColor: '#6A5ACD' },
-  // .day-num{font-size:14px;font-weight:500;color:var(--text2);}
-  dayNum:         { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
-  // .day-num.has-sess{color:#fff;font-weight:700;}
-  dayNumActive:   { color: '#fff', fontWeight: '700' },
-  // .day-num.today{color:var(--accent);font-weight:800;}
-  dayNumToday:    { color: colors.accent, fontWeight: '800' },
 
-  // .cal-section{flex:1;overflow-y:auto;}
-  calSection:     { flex: 1 },
-  calSectionContent: { paddingBottom: 100 },
+  dayName:     { fontSize: 10, fontWeight: '700', color: colors.text3, letterSpacing: 0.5 },
+  dayCell:     { alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
+  dayCellActive: { backgroundColor: '#6A5ACD' },
+  dayNum:      { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
+  dayNumActive: { color: '#fff', fontWeight: '700' },
+  dayNumToday: { color: colors.accent, fontWeight: '800' },
 
-  // .section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);padding:0 20px 10px;}
-  sectionTitle:   { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
+  // flex:1 so this takes all remaining vertical space below the fixed grid
+  calSection:  { flex: 1 },
+  calSectionContent: { paddingBottom: TAB_BAR_HEIGHT + 80 },
 
-  // .empty-state
-  emptyState:     { alignItems: 'center', paddingVertical: 36 },
-  emptyIcon:      { fontSize: 40, opacity: 0.3 },
-  emptyText:      { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
+  sectionTitle: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
 
-  // FAB — exact preview clip-path shape, bottom:90px to sit above tab bar
-  fab:            {
+  emptyState:  { alignItems: 'center', paddingVertical: 36 },
+  emptyIcon:   { fontSize: 40, opacity: 0.3 },
+  emptyText:   { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
+
+  // FAB: pinned just above the tab bar (TAB_BAR_HEIGHT + 12)
+  fab:         {
     position: 'absolute',
-    bottom: 90,
+    bottom: TAB_BAR_HEIGHT + 12,   // 78 + 12 = 90 — sits just above tab bar
     right: 20,
     width: 62,
     height: 58,
@@ -236,11 +249,11 @@ const s = StyleSheet.create({
     borderBottomLeftRadius: 22,
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: 'rgba(232,197,71,0.50)',
-    shadowOpacity: 1,
+    shadowColor: '#E8C547',
+    shadowOpacity: 0.5,
     shadowRadius: 18,
     shadowOffset: { width: 0, height: 4 },
     elevation: 10,
   },
-  fabIcon:        { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32 },
+  fabIcon:     { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32 },
 });
