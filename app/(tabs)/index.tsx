@@ -57,7 +57,7 @@ export default function CalendarScreen() {
         {/* Header */}
         <View style={s.header}>
           <Text style={s.headerTitle}>
-            <Text style={s.accent}>SEND</Text>LOG
+            <Text style={s.accent}>ASCENTA</Text>
           </Text>
           <Text style={s.headerSub}>{MONTHS[month]} {year}</Text>
         </View>
@@ -165,7 +165,7 @@ const s = StyleSheet.create({
   dayNumActive:   { color: colors.accent, fontWeight: '700' },
   dayNumToday:    { color: colors.accent, fontWeight: '700' },
   dot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  fab:            { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: '#F14400', alignItems: 'center', justifyContent: 'center', shadowColor: '#F14400', shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  fab:            { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: colors.highlight, alignItems: 'center', justifyContent: 'center', shadowColor: colors.highlight, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
   fabIcon:        { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
   sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.sm },
   sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.text3, letterSpacing: 1.5 },

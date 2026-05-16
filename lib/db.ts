@@ -1,14 +1,14 @@
 /**
  * Local persistence layer using AsyncStorage.
  * Replaces expo-sqlite to avoid native binary build issues on Windows/dev.
- * Data is stored as JSON under the key sendlog_sessions.
+ * Data is stored as JSON under the key ascenta_sessions.
  * All function signatures are identical to the original db.ts so no other
  * files need to change.
  */
 import AsyncStorage from "@react-native-async-storage/async-storage";
 import type { Session } from "../types";
 
-const SESSIONS_KEY = "sendlog_sessions";
+const SESSIONS_KEY = "ascenta_sessions";
 
 async function readAll(): Promise<Session[]> {
   try {
