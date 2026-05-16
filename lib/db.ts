@@ -13,7 +13,10 @@ const SESSIONS_KEY = "ascenta_sessions";
 async function readAll(): Promise<Session[]> {
   try {
     const raw = await AsyncStorage.getItem(SESSIONS_KEY);
-    return JSON.parse(raw) as Session[];
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    // Guard against corrupted / non-array data
+    return Array.isArray(parsed) ? parsed : [];
   } catch {
     return [];
   }

@@ -85,8 +85,8 @@ export default function LogScreen() {
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={s.header}>
-          <Text style={s.headerTitle}>LOG SESSION</Text>
-          <Text style={s.headerSub}>Record your climb</Text>
+          <Text style={s.headerTitle}>✏️ LOG SESSION</Text>
+          <Text style={s.headerSub}>Record your climb 🧗</Text>
         </View>
         <View style={s.accentLine} />
 
@@ -94,7 +94,7 @@ export default function LogScreen() {
 
           {/* Date */}
           <View style={s.field}>
-            <Text style={s.label}>DATE</Text>
+            <Text style={s.label}>📆 DATE</Text>
             <TextInput
               style={s.input}
               value={date}
@@ -107,13 +107,16 @@ export default function LogScreen() {
 
           {/* Location */}
           <View style={s.field}>
-            <Text style={s.label}>LOCATION / GYM</Text>
+            <Text style={s.label}>
+              📍 LOCATION / GYM
+              <Text style={s.placesBadge}>  PLACES</Text>
+            </Text>
             <LocationSearch value={location} onChange={setLocation} />
           </View>
 
           {/* Duration */}
           <View style={s.field}>
-            <Text style={s.label}>DURATION (MINUTES)</Text>
+            <Text style={s.label}>⏱️ DURATION (MINUTES)</Text>
             <TextInput
               style={s.input}
               value={duration}
@@ -127,7 +130,7 @@ export default function LogScreen() {
 
           {/* Grade system toggle */}
           <View style={s.field}>
-            <Text style={s.label}>GRADE SYSTEM</Text>
+            <Text style={s.label}>🎯 GRADE SYSTEM</Text>
             <View style={s.toggle}>
               {(['french', 'v'] as GradeSystem[]).map(sys => (
                 <Pressable
@@ -136,7 +139,7 @@ export default function LogScreen() {
                   onPress={() => switchGradeSystem(sys)}
                 >
                   <Text style={[s.toggleBtnText, gradeSystem === sys && s.toggleBtnTextOn]}>
-                    {sys === 'french' ? 'French  6a…' : 'V-Scale  V3…'}
+                    {sys === 'french' ? '🇫🇷 French 6a…' : '🇺🇸 V-Scale V3…'}
                   </Text>
                 </Pressable>
               ))}
@@ -145,7 +148,7 @@ export default function LogScreen() {
 
           {/* Routes */}
           <View style={s.field}>
-            <Text style={s.label}>ROUTES ({routes.length})</Text>
+            <Text style={s.label}>🪨 ROUTES ({routes.length})</Text>
             {routes.map(route => (
               <RouteEntry
                 key={route.tempId}
@@ -161,13 +164,13 @@ export default function LogScreen() {
               />
             ))}
             <TouchableOpacity style={s.addRouteBtn} onPress={addRoute} activeOpacity={0.7}>
-              <Text style={s.addRouteBtnText}>+ Add Route</Text>
+              <Text style={s.addRouteBtnText}>＋ Add Route</Text>
             </TouchableOpacity>
           </View>
 
           {/* Reflections */}
           <View style={s.field}>
-            <Text style={s.label}>REFLECTIONS</Text>
+            <Text style={s.label}>💭 REFLECTIONS</Text>
             <TextInput
               style={[s.input, s.textarea]}
               value={reflections}
@@ -181,8 +184,10 @@ export default function LogScreen() {
           </View>
 
           <TouchableOpacity style={s.saveBtn} onPress={handleSave} activeOpacity={0.85}>
-            <Text style={s.saveBtnText}>SAVE SESSION</Text>
+            <Text style={s.saveBtnText}>💾 SAVE SESSION</Text>
           </TouchableOpacity>
+
+          <View style={{ height: 16 }} />
 
         </View>
       </ScrollView>
@@ -194,21 +199,23 @@ const s = StyleSheet.create({
   safe:            { flex: 1, backgroundColor: colors.bg },
   scroll:          { paddingBottom: 40 },
   header:          { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 12 },
-  headerTitle:     { fontSize: 32, fontWeight: '900', color: colors.text, letterSpacing: 1 },
+  headerTitle:     { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   headerSub:       { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   accentLine:      { height: 2, marginHorizontal: spacing.lg, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
   form:            { paddingHorizontal: spacing.lg },
   field:           { marginBottom: spacing.lg },
   label:           { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, marginBottom: 7 },
+  placesBadge:     { fontSize: 9, color: colors.accent, fontWeight: '700' },
   input:           { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
-  textarea:        { height: 96, textAlignVertical: 'top' },
+  textarea:        { height: 88, textAlignVertical: 'top' },
   toggle:          { flexDirection: 'row', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: 4, gap: 4 },
-  toggleBtn:       { flex: 1, paddingVertical: 10, borderRadius: radius.sm, alignItems: 'center' },
+  toggleBtn:       { flex: 1, paddingVertical: 9, borderRadius: radius.sm, alignItems: 'center' },
   toggleBtnOn:     { backgroundColor: colors.accent },
   toggleBtnText:   { fontSize: 12, fontWeight: '700', color: colors.text2, textTransform: 'uppercase', letterSpacing: 0.5 },
   toggleBtnTextOn: { color: '#fff' },
-  addRouteBtn:     { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderStyle: 'dashed', borderRadius: radius.md, padding: spacing.md, alignItems: 'center' },
-  addRouteBtnText: { fontSize: 13, fontWeight: '700', color: colors.text2, letterSpacing: 0.5 },
-  saveBtn:         { backgroundColor: colors.accent, borderRadius: radius.lg, padding: spacing.md + 2, alignItems: 'center', marginTop: 4 },
+  // Gold dashed add-route button matching preview
+  addRouteBtn:     { backgroundColor: 'transparent', borderWidth: 2, borderStyle: 'dashed', borderColor: colors.highlight, borderRadius: 13, padding: 12, alignItems: 'center' },
+  addRouteBtnText: { fontSize: 13, fontWeight: '800', color: colors.highlight, letterSpacing: 0.5 },
+  saveBtn:         { backgroundColor: colors.accent, borderRadius: radius.lg, padding: 17, alignItems: 'center', marginTop: 4 },
   saveBtnText:     { fontSize: 16, fontWeight: '900', color: '#fff', letterSpacing: 1.5 },
 });

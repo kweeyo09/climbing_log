@@ -58,6 +58,7 @@ export default function CalendarScreen() {
         <View style={s.header}>
           <Text style={s.headerTitle}>
             <Text style={s.accent}>ASCENTA</Text>
+            {' 🧗'}
           </Text>
           <Text style={s.headerSub}>{MONTHS[month]} {year}</Text>
         </View>
@@ -74,8 +75,8 @@ export default function CalendarScreen() {
           </Pressable>
         </View>
 
-        {/* Calendar grid */}
-        <View style={s.grid}>
+        {/* Calendar grid — bordered card matching preview */}
+        <View style={s.gridCard}>
           {DAY_NAMES.map((d, i) => (
             <Text key={i} style={s.dayName}>{d}</Text>
           ))}
@@ -99,10 +100,13 @@ export default function CalendarScreen() {
                 onPress={() => active && router.push(`/session/${daySess[0].id}`)}
                 activeOpacity={active ? 0.7 : 1}
               >
-                <Text style={[s.dayNum, active && s.dayNumActive, tod && s.dayNumToday]}>
+                <Text style={[
+                  s.dayNum,
+                  active && s.dayNumActive,
+                  tod && !active && s.dayNumToday,
+                ]}>
                   {day}
                 </Text>
-                {active && <View style={s.dot} />}
               </TouchableOpacity>
             );
           })}
@@ -111,7 +115,7 @@ export default function CalendarScreen() {
         {/* This month's sessions */}
         <View style={s.sectionHeader}>
           <Text style={s.sectionTitle}>
-            THIS MONTH — {monthSessions.length} SESSION{monthSessions.length !== 1 ? 'S' : ''}
+            📅 THIS MONTH — {monthSessions.length} SESSION{monthSessions.length !== 1 ? 'S' : ''}
           </Text>
         </View>
 
@@ -157,18 +161,17 @@ const s = StyleSheet.create({
   navBtn:         { width: 36, height: 36, backgroundColor: colors.surface, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.border },
   navBtnText:     { color: colors.text, fontSize: 20 },
   monthTitle:     { fontSize: 16, fontWeight: '700', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
-  grid:           { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: spacing.md, gap: 3 },
+  gridCard:       { flexDirection: 'row', flexWrap: 'wrap', marginHorizontal: spacing.lg, marginBottom: 12, borderWidth: 2, borderColor: colors.accentBorder, borderRadius: radius.lg, backgroundColor: 'rgba(106,90,205,0.06)', padding: 10, gap: 3 },
   dayName:        { width: '14.28%', textAlign: 'center', fontSize: 10, fontWeight: '700', color: colors.text3, textTransform: 'uppercase', paddingBottom: 8, letterSpacing: 0.5 },
   dayCell:        { width: '14.28%', aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: radius.sm },
-  dayCellActive:  { backgroundColor: colors.accentDim, borderWidth: 1, borderColor: colors.accentBorder },
-  dayNum:         { fontSize: 13, fontWeight: '500', color: colors.text2 },
-  dayNumActive:   { color: colors.accent, fontWeight: '700' },
-  dayNumToday:    { color: colors.accent, fontWeight: '700' },
-  dot:            { width: 4, height: 4, borderRadius: 2, backgroundColor: colors.accent, marginTop: 2 },
-  fab:            { position: 'absolute', bottom: 24, right: 24, width: 56, height: 56, borderRadius: 28, backgroundColor: colors.highlight, alignItems: 'center', justifyContent: 'center', shadowColor: colors.highlight, shadowOpacity: 0.4, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
-  fabIcon:        { color: '#fff', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
+  dayCellActive:  { backgroundColor: colors.accent },
+  dayNum:         { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
+  dayNumActive:   { color: '#fff', fontWeight: '700' },
+  dayNumToday:    { color: colors.accent, fontWeight: '800' },
+  fab:            { position: 'absolute', bottom: 24, right: 20, width: 62, height: 58, borderRadius: 28, backgroundColor: colors.highlight, alignItems: 'center', justifyContent: 'center', shadowColor: colors.highlight, shadowOpacity: 0.5, shadowRadius: 18, shadowOffset: { width: 0, height: 4 }, elevation: 8 },
+  fabIcon:        { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, marginTop: -2 },
   sectionHeader:  { paddingHorizontal: spacing.lg, paddingTop: spacing.lg, paddingBottom: spacing.sm },
-  sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.text3, letterSpacing: 1.5 },
+  sectionTitle:   { fontSize: 10, fontWeight: '700', color: colors.accent, letterSpacing: 1.5, textTransform: 'uppercase' },
   empty:          { alignItems: 'center', paddingVertical: 48 },
   emptyIcon:      { fontSize: 44, opacity: 0.3 },
   emptyText:      { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },

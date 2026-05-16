@@ -15,11 +15,11 @@ interface Props {
   onRemove:      () => void;
 }
 
-const STYLE_SHORT: Record<string, string> = {
-  'Lead':       'Lead',
-  'Top Rope':   'TR',
-  'Boulder':    'Boulder',
-  'Auto-belay': 'Auto',
+const STYLE_EMOJI: Record<string, string> = {
+  'Lead':       '🧗 Lead',
+  'Top Rope':   '🔄 Top Rope',
+  'Boulder':    '🤸 Boulder',
+  'Auto-belay': '🤖 Auto-belay',
 };
 
 interface PickerModalProps {
@@ -73,7 +73,7 @@ export default function RouteEntry({
 
       {/* Style selector */}
       <TouchableOpacity style={[s.pickerWrap, s.styleWrap]} onPress={() => setStyleOpen(true)} activeOpacity={0.8}>
-        <Text style={s.pickerText}>{STYLE_SHORT[style] ?? style}</Text>
+        <Text style={s.pickerText}>{STYLE_EMOJI[style] ?? style}</Text>
         <Text style={s.caret}>▾</Text>
       </TouchableOpacity>
 
@@ -107,7 +107,7 @@ export default function RouteEntry({
         selected={style}
         onSelect={onStyleChange}
         onClose={() => setStyleOpen(false)}
-        label={v => v}
+        label={v => STYLE_EMOJI[v] ?? v}
       />
     </View>
   );

@@ -13,7 +13,7 @@ export default function HistoryScreen() {
   return (
     <SafeAreaView style={s.safe}>
       <View style={s.header}>
-        <Text style={s.headerTitle}>SESSIONS</Text>
+        <Text style={s.headerTitle}>📋 SESSIONS</Text>
         <Text style={s.headerSub}>{sessions.length} total session{sessions.length !== 1 ? 's' : ''}</Text>
       </View>
       <View style={s.accentLine} />
@@ -47,7 +47,7 @@ export default function HistoryScreen() {
 const s = StyleSheet.create({
   safe:        { flex: 1, backgroundColor: colors.bg },
   header:      { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 12 },
-  headerTitle: { fontSize: 32, fontWeight: '900', color: colors.text, letterSpacing: 1 },
+  headerTitle: { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   headerSub:   { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   accentLine:  { height: 2, marginHorizontal: spacing.lg, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
   list:        { paddingTop: 4, paddingBottom: 32 },
