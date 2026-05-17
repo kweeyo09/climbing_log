@@ -18,6 +18,7 @@ export interface Session {
   duration: number;      // minutes
   grade_system: GradeSystem;
   reflections: string;
+  photo_uri?: string | null;
   routes: Route[];
   created_at: string;
   synced?: boolean;
@@ -30,5 +31,6 @@ export type NewSessionInput = {
   duration: number;
   grade_system: GradeSystem;
   reflections: string;
+  photo_uri?: string | null;
   routes: Array<Omit<Route, 'id' | 'session_id'>>;
 };

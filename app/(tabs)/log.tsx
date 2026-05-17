@@ -8,6 +8,7 @@ import { useRouter } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
 import RouteEntry from '../../components/RouteEntry';
 import LocationSearch from '../../components/LocationSearch';
+import PhotoCapture from '../../components/PhotoCapture';
 import { CLIMB_STYLES, getGrades } from '../../constants/grades';
 import { colors, spacing, radius } from '../../constants/theme';
 import type { GradeSystem, ClimbStyle } from '../../types';
@@ -30,6 +31,7 @@ export default function LogScreen() {
   const [duration,    setDuration]    = useState('');
   const [gradeSystem, setGradeSystem] = useState<GradeSystem>('french');
   const [routes,      setRoutes]      = useState<DraftRoute[]>([]);
+  const [photoUri,    setPhotoUri]    = useState<string | null>(null);
   const [reflections, setReflections] = useState('');
 
   const grades = getGrades(gradeSystem);
@@ -65,6 +67,7 @@ export default function LogScreen() {
       duration:     parseInt(duration, 10) || 0,
       grade_system: gradeSystem,
       reflections:  reflections.trim(),
+      photo_uri:    photoUri,
       routes:       routes.map(({ grade, style, completed }) => ({
         grade, style, completed,
       })),
@@ -75,6 +78,7 @@ export default function LogScreen() {
     setDuration('');
     setGradeSystem('french');
     setRoutes([]);
+    setPhotoUri(null);
     setReflections('');
 
     router.push('/(tabs)/history');
@@ -166,6 +170,16 @@ export default function LogScreen() {
             <TouchableOpacity style={s.addRouteBtn} onPress={addRoute} activeOpacity={0.7}>
               <Text style={s.addRouteBtnText}>＋ Add Route</Text>
             </TouchableOpacity>
+          </View>
+
+          {/* Photo */}
+          <View style={s.field}>
+            <PhotoCapture
+              value={photoUri}
+              onChange={setPhotoUri}
+              label="📷 Photo"
+              helperText="Optional. Take one clear photo to remember the session."
+            />
           </View>
 
           {/* Reflections */}

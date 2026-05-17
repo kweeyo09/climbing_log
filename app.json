@@ -14,7 +14,10 @@
     "assetBundlePatterns": ["**/*"],
     "ios": {
       "supportsTablet": false,
-      "bundleIdentifier": "com.kweeyo09.ascenta"
+      "bundleIdentifier": "com.kweeyo09.ascenta",
+      "infoPlist": {
+        "NSCameraUsageDescription": "Ascenta needs camera access so you can add a photo to your climbing session."
+      }
     },
     "android": {
       "adaptiveIcon": {
