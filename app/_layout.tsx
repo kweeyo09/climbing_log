@@ -1,4 +1,5 @@
 import { useEffect, useState } from 'react';
+import { Platform, StyleSheet, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSessionStore } from '../store/sessions';
@@ -24,7 +25,7 @@ export default function RootLayout() {
     init();
   }, []);
 
-  return (
+  const app = (
     <>
       <StatusBar style="dark" />
       <Stack screenOptions={{ headerShown: false }}>
@@ -37,4 +38,30 @@ export default function RootLayout() {
       </Stack>
     </>
   );
+
+  if (Platform.OS !== 'web') {
+    return app;
+  }
+
+  return (
+    <View style={styles.webPreviewShell}>
+      <View style={styles.webPreviewFrame}>{app}</View>
+    </View>
+  );
 }
+
+const styles = StyleSheet.create({
+  webPreviewShell: {
+    flex: 1,
+    width: '100%',
+    alignItems: 'center',
+    backgroundColor: '#d9d0c0',
+  },
+  webPreviewFrame: {
+    flex: 1,
+    width: '100%',
+    maxWidth: 430,
+    overflow: 'hidden',
+    backgroundColor: '#efe7d8',
+  },
+});

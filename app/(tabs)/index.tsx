@@ -42,6 +42,7 @@ export default function CalendarScreen() {
   const router   = useRouter();
   const sessions = useSessionStore(st => st.sessions);
   const { width } = useWindowDimensions();
+  const mobileFrameWidth = Math.min(width, 430);
 
   const today = new Date();
   const [month, setMonth] = useState(today.getMonth());
@@ -70,7 +71,7 @@ export default function CalendarScreen() {
   //   dayNameRowH = cellWidth * 0.6 + 8   (approx, text is smaller)
   //   cellH = cellWidth (square, aspect-ratio:1)
   //   totalH = padding*2 + dayNameRowH + weekRows*cellWidth + (weekRows)*3 (row gaps)
-  const gridInnerWidth = width - 32 - 20 - 4; // margins + padding + border
+  const gridInnerWidth = mobileFrameWidth - 32 - 20 - 4; // margins + padding + border
   const cellSize       = Math.floor((gridInnerWidth - 6 * 3) / 7);
   const dayNameRowH    = 10 + 8; // font-size:10 + paddingBottom:8
   const gridHeight     = 10 + 10 + dayNameRowH + weekRows * cellSize + (weekRows - 1) * 3 + 4;
@@ -182,6 +183,8 @@ export default function CalendarScreen() {
         onPress={() => router.push('/(tabs)/log')}
         activeOpacity={0.85}
       >
+        <View style={s.fabShardTop} />
+        <View style={s.fabShardSide} />
         <Text style={s.fabIcon}>+</Text>
       </TouchableOpacity>
 
@@ -236,28 +239,48 @@ const s = StyleSheet.create({
   emptyIcon:   { fontSize: 40, opacity: 0.3 },
   emptyText:   { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20, marginTop: 8 },
 
-  // FAB: 8px above the tab bar, jagged climbing-hold shape via extreme mixed radii
+  // FAB: low, organic climbing-hold shape with uneven edges and layered facets.
   fab:         {
     position: 'absolute',
-    bottom: TAB_BAR_HEIGHT + 8,    // 78 + 8 = 86 — tight above tab bar
-    right: 20,
-    width: 58,
-    height: 54,
+    bottom: TAB_BAR_HEIGHT - 10,
+    right: 18,
+    width: 64,
+    height: 58,
     backgroundColor: colors.highlight,
-    // Jagged climbing-hold: each corner is a very different radius
-    borderTopLeftRadius: 28,
-    borderTopRightRadius: 8,
-    borderBottomRightRadius: 30,
-    borderBottomLeftRadius: 12,
-    // Slight rotation adds organic feel
-    transform: [{ rotate: '-8deg' }],
+    borderTopLeftRadius: 18,
+    borderTopRightRadius: 5,
+    borderBottomRightRadius: 26,
+    borderBottomLeftRadius: 9,
+    transform: [{ rotate: '-11deg' }, { skewX: '-4deg' }],
     alignItems: 'center',
     justifyContent: 'center',
     shadowColor: '#E8C547',
-    shadowOpacity: 0.55,
-    shadowRadius: 14,
-    shadowOffset: { width: 0, height: 3 },
+    shadowOpacity: 0.5,
+    shadowRadius: 16,
+    shadowOffset: { width: 0, height: 4 },
     elevation: 10,
+    overflow: 'hidden',
   },
-  fabIcon:     { color: '#1a1612', fontSize: 26, fontWeight: '300', lineHeight: 30, transform: [{ rotate: '8deg' }] },
+  fabShardTop: {
+    position: 'absolute',
+    top: -7,
+    left: 18,
+    width: 30,
+    height: 18,
+    backgroundColor: '#F3D743',
+    borderRadius: 4,
+    transform: [{ rotate: '18deg' }],
+  },
+  fabShardSide: {
+    position: 'absolute',
+    right: -8,
+    bottom: 10,
+    width: 20,
+    height: 24,
+    backgroundColor: '#DDBB23',
+    borderRadius: 5,
+    transform: [{ rotate: '-20deg' }],
+    opacity: 0.65,
+  },
+  fabIcon:     { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, transform: [{ rotate: '11deg' }, { skewX: '4deg' }] },
 });
