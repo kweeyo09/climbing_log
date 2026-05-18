@@ -89,22 +89,6 @@ climbing-log/
 
 ---
 
-## Permanent website deployment
-
-The app can be exported as a static Expo web build and deployed to GitHub Pages.
-
-```bash
-# Build the static website into dist/
-npm run web:export
-
-# Deploy dist/ to the gh-pages branch
-npm run deploy
-```
-
-The production site is configured for the GitHub Pages project path `/climbing_log` through `expo.experiments.baseUrl` in `app.json`. Because Expo generates asset paths with underscores, the deployment script uses `--nojekyll` so GitHub Pages serves the generated files correctly.
-
----
-
 ## Building for real devices
 
 You need the EAS CLI (Expo Application Services — Expo's cloud build tool):

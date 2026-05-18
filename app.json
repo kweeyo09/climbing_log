@@ -31,8 +31,7 @@
     ],
     "scheme": "ascenta",
     "experiments": {
-      "typedRoutes": true,
-      "baseUrl": "/climbing_log"
+      "typedRoutes": true
     }
   }
 }
