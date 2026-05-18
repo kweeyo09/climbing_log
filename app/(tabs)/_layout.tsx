@@ -4,6 +4,11 @@ import { colors } from '../../constants/theme';
 
 type IoniconsName = React.ComponentProps<typeof Ionicons>['name'];
 
+const TAB_BAR_HEIGHT = 78;
+const TAB_BAR_PADDING_TOP = 10;
+const TAB_BAR_PADDING_BOTTOM = 20;
+const LOG_TAB_VERTICAL_OFFSET = 10;
+
 const TAB_CONFIG: Array<{
   name:    string;
   title:   string;
@@ -24,9 +29,9 @@ export default function TabLayout() {
         tabBarStyle: {
           backgroundColor: colors.card,
           borderTopColor:  colors.border,
-          height:          78,
-          paddingBottom:   20,
-          paddingTop:      10,
+          height:          TAB_BAR_HEIGHT,
+          paddingBottom:   TAB_BAR_PADDING_BOTTOM,
+          paddingTop:      TAB_BAR_PADDING_TOP,
         },
         tabBarActiveTintColor:   colors.accent,
         tabBarInactiveTintColor: colors.text3,
@@ -51,6 +56,9 @@ export default function TabLayout() {
                 color={color}
               />
             ),
+            tabBarItemStyle: tab.name === 'log'
+              ? { transform: [{ translateY: LOG_TAB_VERTICAL_OFFSET }] }
+              : undefined,
           }}
         />
       ))}
