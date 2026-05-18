@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import {
   View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity,
-  Pressable, Alert,
+  Pressable, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
@@ -33,6 +33,7 @@ export default function LogScreen() {
   const [routes,      setRoutes]      = useState<DraftRoute[]>([]);
   const [photoUri,    setPhotoUri]    = useState<string | null>(null);
   const [reflections, setReflections] = useState('');
+  const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   const grades = getGrades(gradeSystem);
 
@@ -57,14 +58,29 @@ export default function LogScreen() {
   };
 
   const handleSave = async () => {
-    if (!location.trim()) {
-      Alert.alert('Missing location', 'Please enter where you climbed.');
+    const trimmedLocation = location.trim();
+    const trimmedDuration = duration.trim();
+    const durationMinutes = parseInt(trimmedDuration, 10);
+
+    const missingFields: string[] = [];
+    if (!trimmedLocation) missingFields.push('location');
+    if (!trimmedDuration || Number.isNaN(durationMinutes) || durationMinutes <= 0) {
+      missingFields.push('duration');
+    }
+
+    if (missingFields.length > 0) {
+      setValidationMessage(
+        missingFields.length === 2
+          ? 'Please enter a location and duration before saving your session.'
+          : `Please enter a ${missingFields[0]} before saving your session.`,
+      );
       return;
     }
+
     await addSession({
       date,
-      location:     location.trim(),
-      duration:     parseInt(duration, 10) || 0,
+      location:     trimmedLocation,
+      duration:     durationMinutes,
       grade_system: gradeSystem,
       reflections:  reflections.trim(),
       photo_uri:    photoUri,
@@ -205,6 +221,27 @@ export default function LogScreen() {
 
         </View>
       </ScrollView>
+
+      <Modal
+        visible={validationMessage !== null}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setValidationMessage(null)}
+      >
+        <View style={s.modalOverlay}>
+          <View style={s.modalCard} accessibilityRole="alert">
+            <Text style={s.modalTitle}>Missing information</Text>
+            <Text style={s.modalText}>{validationMessage}</Text>
+            <TouchableOpacity
+              style={s.modalButton}
+              onPress={() => setValidationMessage(null)}
+              activeOpacity={0.85}
+            >
+              <Text style={s.modalButtonText}>OK</Text>
+            </TouchableOpacity>
+          </View>
+        </View>
+      </Modal>
     </SafeAreaView>
   );
 }
@@ -232,4 +269,10 @@ const s = StyleSheet.create({
   addRouteBtnText: { fontSize: 13, fontWeight: '800', color: colors.highlight, letterSpacing: 0.5 },
   saveBtn:         { backgroundColor: colors.accent, borderRadius: radius.lg, padding: 17, alignItems: 'center', marginTop: 4 },
   saveBtnText:     { fontSize: 16, fontWeight: '900', color: '#fff', letterSpacing: 1.5 },
+  modalOverlay:    { flex: 1, backgroundColor: 'rgba(31, 26, 22, 0.42)', alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  modalCard:       { width: '100%', maxWidth: 340, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10 },
+  modalTitle:      { fontSize: 18, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
+  modalText:       { fontSize: 14, lineHeight: 20, color: colors.text2, marginBottom: spacing.lg },
+  modalButton:     { backgroundColor: colors.accent, borderRadius: radius.md, paddingVertical: 12, alignItems: 'center' },
+  modalButtonText: { fontSize: 14, fontWeight: '900', color: '#fff', letterSpacing: 1 },
 });

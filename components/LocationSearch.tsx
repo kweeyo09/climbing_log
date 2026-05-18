@@ -147,7 +147,7 @@ const s = StyleSheet.create({
   inputRow:        { flexDirection: 'row', alignItems: 'center' },
   input:           { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
   spinner:         { position: 'absolute', right: 14 },
-  dropdown:        { position: 'absolute', top: '100%', left: 0, right: 0, backgroundColor: '#fff', borderWidth: 1, borderColor: '#d0ccc4', borderTopWidth: 0, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, zIndex: 999, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 8, marginTop: 0 },
+  dropdown:        { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d0ccc4', borderTopWidth: 0, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, zIndex: 999, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 8, marginTop: -1, marginBottom: spacing.sm, overflow: 'hidden' },
   suggestion:      { paddingHorizontal: spacing.md, paddingVertical: 10 },
   suggestionBorder:{ borderTopWidth: 1, borderTopColor: '#f0ece4' },
   suggestionMain:  { fontSize: 13, fontWeight: '600', color: '#333' },
