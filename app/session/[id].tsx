@@ -81,7 +81,7 @@ export default function SessionDetailScreen() {
     <SafeAreaView style={s.safe} edges={['top']}>
       <View style={s.topBar}>
         <TouchableOpacity style={s.navIcon} onPress={() => router.back()} accessibilityRole="button" accessibilityLabel="Back to previous screen">
-          <Ionicons name="chevron-back" size={31} color="#A855F7" />
+          <Ionicons name="chevron-back" size={27} color="#A855F7" />
         </TouchableOpacity>
         <Text style={s.navTitle}>SESSION</Text>
         <TouchableOpacity
@@ -101,7 +101,7 @@ export default function SessionDetailScreen() {
             <Text style={s.heroTitle} numberOfLines={2}>{shortLocation(session.location).toUpperCase()}</Text>
             <Text style={s.heroDate}>{formatDate(session.date)}</Text>
             <View style={s.backedPill}>
-              <Ionicons name="cloud-done-outline" size={22} color={colors.accent} />
+              <Ionicons name="cloud-done-outline" size={19} color={colors.accent} />
               <Text style={s.backedText}>{session.synced === false ? 'SAVED LOCAL' : 'BACKED UP'}</Text>
             </View>
           </View>
@@ -178,44 +178,44 @@ const s = StyleSheet.create({
   notFound: { color: '#FFFFFF', fontSize: 20, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
   notFoundButton: { backgroundColor: colors.accent, borderRadius: 16, paddingHorizontal: 22, paddingVertical: 12 },
   notFoundButtonText: { color: '#FFFFFF', fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
-  topBar: { height: 58, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#050506' },
-  navIcon: { width: 50, height: 50, alignItems: 'flex-start', justifyContent: 'center' },
-  navTitle: { color: '#FFFFFF', fontSize: 22, lineHeight: 26, letterSpacing: 0.5, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  editHit: { width: 50, height: 50, alignItems: 'flex-end', justifyContent: 'center' },
-  editText: { color: '#A855F7', fontSize: 20, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
+  topBar: { height: 54, paddingHorizontal: 18, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', backgroundColor: '#050506' },
+  navIcon: { width: 44, height: 44, alignItems: 'flex-start', justifyContent: 'center' },
+  navTitle: { color: '#FFFFFF', fontSize: 24, lineHeight: 27, letterSpacing: 0.25, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold },
+  editHit: { width: 44, height: 44, alignItems: 'flex-end', justifyContent: 'center' },
+  editText: { color: '#A855F7', fontSize: 18, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium },
   scroll: { flex: 1, backgroundColor: '#050506' },
-  content: { paddingBottom: 184 },
-  hero: { height: 390, justifyContent: 'flex-end', marginBottom: -16 },
+  content: { paddingBottom: 166 },
+  hero: { height: 360, justifyContent: 'flex-end', marginBottom: -14 },
   heroImage: { width: '100%', height: '100%' },
   heroShade: { ...StyleSheet.absoluteFillObject, backgroundColor: 'rgba(0,0,0,0.35)' },
-  heroCopy: { paddingHorizontal: 22, paddingBottom: 42 },
-  heroTitle: { color: '#FFFFFF', fontSize: 32, lineHeight: 36, letterSpacing: -0.8, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  heroDate: { color: 'rgba(255,255,255,0.72)', fontSize: 18, lineHeight: 23, marginTop: 3, letterSpacing: 0.2, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium },
-  backedPill: { alignSelf: 'flex-start', marginTop: 11, flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: '#F1E8FF', borderRadius: 8, paddingHorizontal: 12, paddingVertical: 8 },
-  backedText: { color: colors.accent, fontSize: 16, letterSpacing: 0.7, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  heroCopy: { paddingHorizontal: 20, paddingBottom: 38 },
+  heroTitle: { color: '#FFFFFF', fontSize: 34, lineHeight: 37, letterSpacing: -0.15, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold },
+  heroDate: { color: 'rgba(255,255,255,0.72)', fontSize: 16, lineHeight: 21, marginTop: 2, letterSpacing: 0.2, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium },
+  backedPill: { alignSelf: 'flex-start', marginTop: 10, flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: '#F1E8FF', borderRadius: 8, paddingHorizontal: 10, paddingVertical: 7 },
+  backedText: { color: colors.accent, fontSize: 15, letterSpacing: 0.6, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold },
 
-  metricsCard: { marginHorizontal: 18, marginTop: 0, marginBottom: 12, minHeight: 96, borderRadius: 18, borderWidth: 1, borderColor: '#35323C', backgroundColor: 'rgba(18,19,23,0.92)', flexDirection: 'row', alignItems: 'center', paddingVertical: 15, paddingHorizontal: 8 },
+  metricsCard: { marginHorizontal: 18, marginTop: 0, marginBottom: 11, minHeight: 86, borderRadius: 16, borderWidth: 1, borderColor: '#35323C', backgroundColor: 'rgba(18,19,23,0.92)', flexDirection: 'row', alignItems: 'center', paddingVertical: 12, paddingHorizontal: 8 },
   metricBlock: { flex: 1, alignItems: 'center' },
-  metricLabel: { color: '#A8A4AF', fontSize: 14, lineHeight: 18, letterSpacing: 0.9, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
-  metricValue: { color: '#FFFFFF', fontSize: 29, lineHeight: 36, marginTop: 10, letterSpacing: -0.5, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  metricValueAccent: { color: '#A855F7', fontSize: 36, lineHeight: 40, marginTop: 6, letterSpacing: -0.6, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  divider: { width: 1, height: 64, backgroundColor: '#383540' },
+  metricLabel: { color: '#A8A4AF', fontSize: 14, lineHeight: 17, letterSpacing: 0.8, fontFamily: typography.family.label, fontWeight: typography.weight.medium },
+  metricValue: { color: '#FFFFFF', fontSize: 25, lineHeight: 31, marginTop: 8, letterSpacing: -0.4, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  metricValueAccent: { color: '#A855F7', fontSize: 32, lineHeight: 36, marginTop: 5, letterSpacing: -0.5, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  divider: { width: 1, height: 56, backgroundColor: '#383540' },
 
-  darkCard: { marginHorizontal: 18, marginBottom: 12, borderRadius: 18, borderWidth: 1, borderColor: '#34313A', backgroundColor: 'rgba(17,18,22,0.94)', padding: 16 },
-  sectionTitle: { color: '#FFFFFF', fontSize: 20, lineHeight: 24, letterSpacing: 0.4, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, marginBottom: 14 },
-  breakdownGrid: { flexDirection: 'row', gap: 10 },
-  gradeTile: { flex: 1, minHeight: 96, borderRadius: 12, borderWidth: 1, borderColor: '#393640', backgroundColor: '#191A1F', alignItems: 'center', paddingVertical: 10, paddingHorizontal: 6 },
-  gradeText: { fontSize: 24, lineHeight: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, letterSpacing: -0.3 },
-  gradeCount: { color: '#C9C5D0', fontSize: 15, lineHeight: 20, marginTop: 4, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium },
-  progressTrack: { width: '100%', height: 7, borderRadius: 6, backgroundColor: '#303039', overflow: 'hidden', marginTop: 13 },
+  darkCard: { marginHorizontal: 18, marginBottom: 11, borderRadius: 16, borderWidth: 1, borderColor: '#34313A', backgroundColor: 'rgba(17,18,22,0.94)', padding: 14 },
+  sectionTitle: { color: '#FFFFFF', fontSize: 22, lineHeight: 25, letterSpacing: 0.2, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, marginBottom: 12 },
+  breakdownGrid: { flexDirection: 'row', gap: 8 },
+  gradeTile: { flex: 1, minHeight: 82, borderRadius: 11, borderWidth: 1, borderColor: '#393640', backgroundColor: '#191A1F', alignItems: 'center', paddingVertical: 9, paddingHorizontal: 5 },
+  gradeText: { fontSize: 21, lineHeight: 25, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, letterSpacing: -0.25 },
+  gradeCount: { color: '#C9C5D0', fontSize: 14, lineHeight: 18, marginTop: 3, fontFamily: typography.family.label, fontWeight: typography.weight.medium },
+  progressTrack: { width: '100%', height: 6, borderRadius: 6, backgroundColor: '#303039', overflow: 'hidden', marginTop: 11 },
   progressFill: { height: '100%', borderRadius: 6 },
-  notesText: { color: '#C9C5D0', fontSize: 17, lineHeight: 23, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
-  galleryRow: { marginHorizontal: 18, flexDirection: 'row', gap: 6, marginBottom: 18 },
-  galleryImage: { flex: 1, height: 118, borderRadius: 9, borderWidth: 1, borderColor: '#34313A', backgroundColor: '#191A1F' },
+  notesText: { color: '#C9C5D0', fontSize: 15, lineHeight: 21, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
+  galleryRow: { marginHorizontal: 18, flexDirection: 'row', gap: 6, marginBottom: 16 },
+  galleryImage: { flex: 1, height: 104, borderRadius: 8, borderWidth: 1, borderColor: '#34313A', backgroundColor: '#191A1F' },
 
-  actionDock: { position: 'absolute', left: 14, right: 14, bottom: 0, borderTopLeftRadius: 20, borderTopRightRadius: 20, backgroundColor: 'rgba(14,15,19,0.98)', borderWidth: 1, borderBottomWidth: 0, borderColor: '#27242D', paddingHorizontal: 14, paddingTop: 17, paddingBottom: 28 },
-  addRouteButton: { height: 55, borderRadius: 8, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
-  addRouteText: { color: '#FFFFFF', fontSize: 23, lineHeight: 28, letterSpacing: 0.8, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  editSessionButton: { alignItems: 'center', justifyContent: 'center', paddingTop: 18, paddingBottom: 2 },
-  editSessionText: { color: '#A855F7', fontSize: 18, lineHeight: 23, letterSpacing: 1.2, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  actionDock: { position: 'absolute', left: 14, right: 14, bottom: 0, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: 'rgba(14,15,19,0.98)', borderWidth: 1, borderBottomWidth: 0, borderColor: '#27242D', paddingHorizontal: 13, paddingTop: 14, paddingBottom: 24 },
+  addRouteButton: { height: 48, borderRadius: 8, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
+  addRouteText: { color: '#FFFFFF', fontSize: 20, lineHeight: 25, letterSpacing: 0.7, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  editSessionButton: { alignItems: 'center', justifyContent: 'center', paddingTop: 15, paddingBottom: 2 },
+  editSessionText: { color: '#A855F7', fontSize: 16, lineHeight: 21, letterSpacing: 1.05, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
 });

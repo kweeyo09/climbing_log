@@ -35,8 +35,10 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.headerRow}>
           <Text style={s.screenTitle}>Profile</Text>
-          <View style={s.brandMark}>
-            <Text style={s.brandMarkText}>A</Text>
+          <View style={s.brandMark} accessibilityLabel="Ascenta logo mark">
+            <View style={s.logoStrokeLeft} />
+            <View style={s.logoStrokeRight} />
+            <View style={s.logoStrokeCross} />
           </View>
         </View>
 
@@ -50,20 +52,20 @@ export default function ProfileScreen() {
             <Text style={s.name}>Angel</Text>
             <Text style={s.handle}>@angelclimbs</Text>
             <View style={s.applePill}>
-              <Ionicons name="logo-apple" size={18} color={colors.accentDark} />
+              <Ionicons name="logo-apple" size={16} color={colors.accentDark} />
               <Text style={s.appleText}>Signed in with Apple</Text>
             </View>
           </View>
-          <Ionicons name="chevron-forward" size={28} color={colors.text2} />
+          <Ionicons name="chevron-forward" size={24} color={colors.text2} />
         </TouchableOpacity>
 
         <View style={s.syncCard}>
           <View style={s.cloudPanel}>
             <View style={s.cloudOrbit} />
             <View style={s.cloudShape}>
-              <Ionicons name="cloud" size={96} color={colors.accent} />
+              <Ionicons name="cloud" size={78} color={colors.accent} />
               <View style={s.checkBadge}>
-                <Ionicons name="checkmark" size={26} color={colors.accent} />
+                <Ionicons name="checkmark" size={22} color={colors.accent} />
               </View>
             </View>
           </View>
@@ -76,7 +78,7 @@ export default function ProfileScreen() {
             </View>
             <View style={s.syncRule} />
             <View style={s.photoBackupRow}>
-              <Ionicons name="image-outline" size={30} color={colors.accentDark} />
+              <Ionicons name="image-outline" size={26} color={colors.accentDark} />
               <Text style={s.photoBackupText}>Photos <Text style={s.photoBackupNumber}>{backedUpPhotoCount || photoCount}</Text> backed up</Text>
             </View>
           </View>
@@ -92,16 +94,16 @@ export default function ProfileScreen() {
               accessibilityRole="button"
               accessibilityLabel={item.label}
             >
-              <Ionicons name={item.icon} size={31} color={item.destructive ? colors.error : colors.accentDark} />
+              <Ionicons name={item.icon} size={27} color={item.destructive ? colors.error : colors.accentDark} />
               <Text style={[s.menuLabel, item.destructive && s.menuLabelDestructive]}>{item.label}</Text>
-              <Ionicons name="chevron-forward" size={23} color={colors.text2} />
+              <Ionicons name="chevron-forward" size={20} color={colors.text2} />
             </TouchableOpacity>
           ))}
         </View>
 
         <View style={s.privacyNote}>
           <View style={s.privacyShield}>
-            <Ionicons name="shield" size={34} color={colors.accentDark} />
+            <Ionicons name="shield" size={28} color={colors.accentDark} />
           </View>
           <Text style={s.privacyText}>Your gym notes and photos stay private unless you choose to share.</Text>
         </View>
@@ -112,41 +114,43 @@ export default function ProfileScreen() {
 
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { paddingHorizontal: 20, paddingTop: 8, paddingBottom: 112 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 18 },
-  screenTitle: { fontSize: 56, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -2.1, lineHeight: 62 },
-  brandMark: { width: 58, height: 58, alignItems: 'center', justifyContent: 'center' },
-  brandMarkText: { fontSize: 58, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accent, lineHeight: 62, transform: [{ skewX: '-7deg' }] },
-  profileCard: { minHeight: 154, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 24, borderWidth: 1, borderColor: colors.border, padding: 18, gap: 18, marginBottom: 14, shadowColor: colors.shadow, shadowOpacity: 0.045, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
-  avatarWrap: { width: 100, height: 100, borderRadius: 50, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
-  avatar: { width: 88, height: 88, borderRadius: 44, backgroundColor: colors.accentDark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
-  avatarLetter: { fontSize: 48, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: '#EDE9FE', lineHeight: 52 },
+  scroll: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 112 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  screenTitle: { fontSize: 52, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -1.8, lineHeight: 54 },
+  brandMark: { width: 48, height: 48, position: 'relative' },
+  logoStrokeLeft: { position: 'absolute', left: 10, bottom: 4, width: 3, height: 42, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '18deg' }] },
+  logoStrokeRight: { position: 'absolute', right: 10, bottom: 4, width: 3, height: 42, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '-18deg' }] },
+  logoStrokeCross: { position: 'absolute', left: 17, bottom: 15, width: 18, height: 3, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '-24deg' }] },
+  profileCard: { minHeight: 136, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 22, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 16, marginBottom: 14, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  avatarWrap: { width: 86, height: 86, borderRadius: 43, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
+  avatar: { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.accentDark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
+  avatarLetter: { fontSize: 38, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, color: '#EDE9FE', lineHeight: 42 },
   profileCopy: { flex: 1 },
-  name: { fontSize: 34, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -1, lineHeight: 38 },
-  handle: { fontSize: 19, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.accentDark, marginTop: 4, marginBottom: 12 },
-  applePill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 9, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 13, paddingHorizontal: 12, paddingVertical: 8 },
-  appleText: { fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
-  syncCard: { minHeight: 194, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.accentDim, borderRadius: 24, borderWidth: 1, borderColor: colors.accentBorder, padding: 18, marginBottom: 14, overflow: 'hidden' },
-  cloudPanel: { width: 132, height: 132, alignItems: 'center', justifyContent: 'center' },
-  cloudOrbit: { position: 'absolute', width: 126, height: 126, borderRadius: 63, borderWidth: 1.5, borderColor: colors.accentBorder, borderStyle: 'dashed' },
-  cloudShape: { width: 120, height: 100, alignItems: 'center', justifyContent: 'center' },
-  checkBadge: { position: 'absolute', bottom: 15, width: 48, height: 48, borderRadius: 24, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.accentBorder, alignItems: 'center', justifyContent: 'center', shadowColor: colors.shadow, shadowOpacity: 0.1, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
-  syncDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.accentBorder, marginHorizontal: 18 },
+  name: { fontSize: 34, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -0.8, lineHeight: 34 },
+  handle: { fontSize: 18, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.accentDark, marginTop: 3, marginBottom: 10 },
+  applePill: { alignSelf: 'flex-start', flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 7 },
+  appleText: { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium, color: colors.text },
+  syncCard: { minHeight: 168, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.accentDim, borderRadius: 22, borderWidth: 1, borderColor: colors.accentBorder, padding: 16, marginBottom: 14, overflow: 'hidden' },
+  cloudPanel: { width: 108, height: 108, alignItems: 'center', justifyContent: 'center' },
+  cloudOrbit: { position: 'absolute', width: 104, height: 104, borderRadius: 52, borderWidth: 1.2, borderColor: colors.accentBorder, borderStyle: 'dashed' },
+  cloudShape: { width: 96, height: 82, alignItems: 'center', justifyContent: 'center' },
+  checkBadge: { position: 'absolute', bottom: 12, width: 40, height: 40, borderRadius: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.accentBorder, alignItems: 'center', justifyContent: 'center', shadowColor: colors.shadow, shadowOpacity: 0.08, shadowRadius: 7, shadowOffset: { width: 0, height: 3 }, elevation: 2 },
+  syncDivider: { width: 1, alignSelf: 'stretch', backgroundColor: colors.accentBorder, marginHorizontal: 15 },
   syncCopy: { flex: 1 },
-  syncTitle: { fontSize: 24, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accentDark, letterSpacing: -0.5, lineHeight: 29 },
-  syncStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 9, marginTop: 10 },
-  statusDot: { width: 10, height: 10, borderRadius: 5, backgroundColor: colors.accent },
-  syncStatus: { fontSize: 16, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
-  syncRule: { height: 1, backgroundColor: colors.accentBorder, marginVertical: 16 },
-  photoBackupRow: { flexDirection: 'row', alignItems: 'center', gap: 16 },
-  photoBackupText: { flex: 1, fontSize: 18, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text, lineHeight: 24 },
-  photoBackupNumber: { color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy },
-  menuCard: { backgroundColor: colors.card, borderRadius: 24, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginBottom: 18, shadowColor: colors.shadow, shadowOpacity: 0.035, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 2 },
-  menuRow: { minHeight: 72, flexDirection: 'row', alignItems: 'center', gap: 18, paddingHorizontal: 20 },
+  syncTitle: { fontSize: 24, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.accentDark, letterSpacing: -0.4, lineHeight: 26 },
+  syncStatusRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  statusDot: { width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
+  syncStatus: { fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium, color: colors.text },
+  syncRule: { height: 1, backgroundColor: colors.accentBorder, marginVertical: 13 },
+  photoBackupRow: { flexDirection: 'row', alignItems: 'center', gap: 13 },
+  photoBackupText: { flex: 1, fontSize: 16, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium, color: colors.text, lineHeight: 22 },
+  photoBackupNumber: { color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
+  menuCard: { backgroundColor: colors.card, borderRadius: 22, borderWidth: 1, borderColor: colors.border, overflow: 'hidden', marginBottom: 16, shadowColor: colors.shadow, shadowOpacity: 0.03, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
+  menuRow: { minHeight: 62, flexDirection: 'row', alignItems: 'center', gap: 16, paddingHorizontal: 18 },
   menuDivider: { borderBottomWidth: 1, borderBottomColor: colors.border },
-  menuLabel: { flex: 1, fontSize: 20, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
+  menuLabel: { flex: 1, fontSize: 20, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text },
   menuLabelDestructive: { color: colors.error },
-  privacyNote: { flexDirection: 'row', alignItems: 'center', gap: 14, paddingHorizontal: 18, paddingBottom: 6 },
-  privacyShield: { width: 50, height: 50, borderRadius: 16, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentDim },
-  privacyText: { flex: 1, fontSize: 16, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2, lineHeight: 22 },
+  privacyNote: { flexDirection: 'row', alignItems: 'center', gap: 12, paddingHorizontal: 16, paddingBottom: 6 },
+  privacyShield: { width: 42, height: 42, borderRadius: 14, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentDim },
+  privacyText: { flex: 1, fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.medium, color: colors.text2, lineHeight: 20 },
 });

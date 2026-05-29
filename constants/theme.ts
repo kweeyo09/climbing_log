@@ -7,16 +7,50 @@
  */
 import { Platform } from 'react-native';
 
-const clashDisplayFamily = Platform.select({
-  web: '"Clash Display", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  default: 'ClashDisplay',
+const interRegularFamily = Platform.select({
+  web: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'Inter-Regular',
+});
+
+const interMediumFamily = Platform.select({
+  web: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'Inter-Medium',
+});
+
+const interSemiBoldFamily = Platform.select({
+  web: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'Inter-SemiBold',
+});
+
+const interBoldFamily = Platform.select({
+  web: 'Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'Inter-Bold',
+});
+
+const barlowCondensedRegularFamily = Platform.select({
+  web: '"Barlow Condensed", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'BarlowCondensed-Regular',
+});
+
+const barlowCondensedSemiBoldFamily = Platform.select({
+  web: '"Barlow Condensed", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'BarlowCondensed-SemiBold',
+});
+
+const barlowCondensedBoldFamily = Platform.select({
+  web: '"Barlow Condensed", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'BarlowCondensed-Bold',
 });
 
 export const typography = {
   family: {
-    regular: clashDisplayFamily,
-    semibold: clashDisplayFamily,
-    bold: clashDisplayFamily,
+    regular: interRegularFamily,
+    medium: interMediumFamily,
+    semibold: interSemiBoldFamily,
+    bold: interBoldFamily,
+    label: barlowCondensedSemiBoldFamily,
+    labelRegular: barlowCondensedRegularFamily,
+    labelBold: barlowCondensedBoldFamily,
   },
   weight: {
     regular: '400' as const,

@@ -35,8 +35,16 @@ export default function RootLayout() {
   const router = useRouter();
   const [checked, setChecked] = useState(false);
   const [fontsLoaded] = useFonts({
-    ClashDisplay: require('../assets/fonts/ClashDisplay-Variable.ttf'),
-    'Clash Display': require('../assets/fonts/ClashDisplay-Variable.ttf'),
+    'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
+    'Inter-Medium': require('../assets/fonts/Inter-Medium.ttf'),
+    'Inter-SemiBold': require('../assets/fonts/Inter-SemiBold.ttf'),
+    'Inter-Bold': require('../assets/fonts/Inter-Bold.ttf'),
+    Inter: require('../assets/fonts/Inter-Regular.ttf'),
+    'BarlowCondensed-Regular': require('../assets/fonts/BarlowCondensed-Regular.ttf'),
+    'BarlowCondensed-Medium': require('../assets/fonts/BarlowCondensed-Medium.ttf'),
+    'BarlowCondensed-SemiBold': require('../assets/fonts/BarlowCondensed-SemiBold.ttf'),
+    'BarlowCondensed-Bold': require('../assets/fonts/BarlowCondensed-Bold.ttf'),
+    'Barlow Condensed': require('../assets/fonts/BarlowCondensed-Regular.ttf'),
   });
 
   useEffect(() => {

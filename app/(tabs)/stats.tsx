@@ -92,30 +92,30 @@ export default function StatsScreen() {
         <View style={s.headerRow}>
           <Text style={s.screenTitle}>Progress</Text>
           <View style={s.rangePill}>
-            <Ionicons name="calendar-outline" size={18} color={colors.accentDark} />
+            <Ionicons name="calendar-outline" size={16} color={colors.accentDark} />
             <Text style={s.rangeText}>Last 30 days</Text>
-            <Ionicons name="chevron-down" size={17} color={colors.accentDark} />
+            <Ionicons name="chevron-down" size={15} color={colors.accentDark} />
           </View>
         </View>
 
         <View style={s.metricRow}>
           <View style={[s.metricCard, s.metricUnderline]}>
             <View style={s.metricIconBubble}>
-              <Ionicons name="triangle-outline" size={22} color={colors.accent} />
+              <Ionicons name="triangle-outline" size={18} color={colors.accent} />
             </View>
             <Text style={s.metricLabel}>Sessions</Text>
             <Text style={s.metricValue}>{sessions.length}</Text>
           </View>
           <View style={[s.metricCard, s.metricUnderlineStrong]}>
             <View style={s.metricIconBubbleStrong}>
-              <Ionicons name="time-outline" size={23} color={colors.accentDark} />
+              <Ionicons name="time-outline" size={19} color={colors.accentDark} />
             </View>
             <Text style={s.metricLabel}>Hours</Text>
             <Text style={s.metricValue}>{formatHours(totalMins)}</Text>
           </View>
           <View style={[s.metricCard, s.metricUnderline]}>
             <View style={s.metricIconBubble}>
-              <Ionicons name="flag-outline" size={22} color={colors.accent} />
+              <Ionicons name="flag-outline" size={18} color={colors.accent} />
             </View>
             <Text style={s.metricLabel}>Sends</Text>
             <Text style={s.metricValue}>{completedRoutes}</Text>
@@ -126,7 +126,7 @@ export default function StatsScreen() {
           <View style={s.sectionHeaderRow}>
             <Text style={s.sectionTitle}>Grade progression</Text>
             <View style={s.bestPill}>
-              <Ionicons name="star" size={15} color={colors.accent} />
+              <Ionicons name="star" size={13} color={colors.accent} />
               <Text style={s.bestPillText}>New best {newBest}</Text>
             </View>
           </View>
@@ -185,7 +185,7 @@ export default function StatsScreen() {
               return (
                 <View key={item.label} style={s.mixRow}>
                   <View style={index === 0 ? s.mixIconBubble : s.mixIconBubbleStrong}>
-                    <Ionicons name={item.icon} size={19} color={index === 0 ? colors.accent : colors.accentDark} />
+                    <Ionicons name={item.icon} size={16} color={index === 0 ? colors.accent : colors.accentDark} />
                   </View>
                   <Text style={s.mixLabel}>{item.label}</Text>
                   <View style={s.mixTrack}>
@@ -203,7 +203,7 @@ export default function StatsScreen() {
           <View style={s.bestRow}>
             <View style={s.bestItem}>
               <View style={s.bestIconBubble}>
-                <Ionicons name="triangle-outline" size={21} color={colors.accent} />
+                <Ionicons name="triangle-outline" size={17} color={colors.accent} />
               </View>
               <Text style={s.bestLabel}>Hardest send</Text>
               <Text style={s.bestValue}>{topVGrade}</Text>
@@ -211,7 +211,7 @@ export default function StatsScreen() {
             <View style={s.bestDivider} />
             <View style={s.bestItem}>
               <View style={s.bestIconBubbleStrong}>
-                <Ionicons name="timer-outline" size={21} color={colors.accentDark} />
+                <Ionicons name="timer-outline" size={17} color={colors.accentDark} />
               </View>
               <Text style={s.bestLabel}>Longest session</Text>
               <Text style={s.bestValueStrong}>{Math.floor(longestSession / 60)}h {longestSession % 60}m</Text>
@@ -219,7 +219,7 @@ export default function StatsScreen() {
             <View style={s.bestDivider} />
             <View style={s.bestItem}>
               <View style={s.bestIconBubble}>
-                <Ionicons name="bar-chart" size={21} color={colors.accent} />
+                <Ionicons name="bar-chart" size={17} color={colors.accent} />
               </View>
               <Text style={s.bestLabel}>Most routes</Text>
               <Text style={s.bestValue}>{mostRoutes}</Text>
@@ -240,52 +240,52 @@ export default function StatsScreen() {
 
 const s = StyleSheet.create({
   safe: { flex: 1, backgroundColor: colors.bg },
-  scroll: { paddingHorizontal: 20, paddingBottom: 112, paddingTop: 8 },
-  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
-  screenTitle: { fontSize: 52, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -1.8, lineHeight: 58 },
-  rangePill: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 17, paddingHorizontal: 13, paddingVertical: 11, shadowColor: colors.shadow, shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 2 },
-  rangeText: { fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
-  metricRow: { flexDirection: 'row', gap: 12, marginBottom: 18 },
-  metricCard: { flex: 1, minHeight: 154, backgroundColor: colors.card, borderRadius: 18, borderWidth: 1, borderColor: colors.border, padding: 14, shadowColor: colors.shadow, shadowOpacity: 0.05, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2, overflow: 'hidden' },
-  metricUnderline: { borderBottomColor: colors.accent, borderBottomWidth: 3 },
-  metricUnderlineStrong: { borderBottomColor: colors.accentDark, borderBottomWidth: 3 },
-  metricIconBubble: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentDim, marginBottom: 16 },
-  metricIconBubbleStrong: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, marginBottom: 16 },
-  metricLabel: { fontSize: 18, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2, marginBottom: 8 },
-  metricValue: { fontSize: 42, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -1.1, lineHeight: 46 },
-  card: { backgroundColor: colors.card, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 18, marginBottom: 18, shadowColor: colors.shadow, shadowOpacity: 0.045, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
-  sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14 },
-  sectionTitle: { fontSize: 24, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -0.7, lineHeight: 28 },
-  bestPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accentDim, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8 },
-  bestPillText: { fontSize: 14, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent },
-  chartWrap: { height: 210, position: 'relative', marginTop: 2, overflow: 'hidden' },
+  scroll: { paddingHorizontal: 20, paddingBottom: 112, paddingTop: 6 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
+  screenTitle: { fontSize: 52, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -1.6, lineHeight: 54 },
+  rangePill: { flexDirection: 'row', alignItems: 'center', gap: 7, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 15, paddingHorizontal: 11, paddingVertical: 9, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 10, shadowOffset: { width: 0, height: 4 }, elevation: 2 },
+  rangeText: { fontSize: 15, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text },
+  metricRow: { flexDirection: 'row', gap: 10, marginBottom: 16 },
+  metricCard: { flex: 1, minHeight: 132, backgroundColor: colors.card, borderRadius: 17, borderWidth: 1, borderColor: colors.border, padding: 12, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 2, overflow: 'hidden' },
+  metricUnderline: { borderBottomColor: colors.accent, borderBottomWidth: 2 },
+  metricUnderlineStrong: { borderBottomColor: colors.accentDark, borderBottomWidth: 2 },
+  metricIconBubble: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentDim, marginBottom: 12 },
+  metricIconBubbleStrong: { width: 34, height: 34, borderRadius: 17, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, marginBottom: 12 },
+  metricLabel: { fontSize: 18, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2, marginBottom: 6 },
+  metricValue: { fontSize: 36, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -0.9, lineHeight: 40 },
+  card: { backgroundColor: colors.card, borderRadius: 18, borderWidth: 1, borderColor: colors.border, padding: 16, marginBottom: 16, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 12 },
+  sectionTitle: { fontSize: 24, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -0.5, lineHeight: 25 },
+  bestPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentDim, borderRadius: 11, paddingHorizontal: 9, paddingVertical: 7 },
+  bestPillText: { fontSize: 14, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.accent },
+  chartWrap: { height: 186, position: 'relative', marginTop: 0, overflow: 'hidden' },
   gridLine: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  gridLabel: { width: 28, fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
+  gridLabel: { width: 26, fontSize: 13, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2 },
   gridRule: { flex: 1, borderTopWidth: 1, borderStyle: 'dashed', borderColor: colors.border },
-  lineShade: { position: 'absolute', left: 34, right: 2, bottom: 18, height: 98, backgroundColor: colors.accentDim, borderTopLeftRadius: 22, borderTopRightRadius: 22, opacity: 0.8 },
-  lineSegment: { position: 'absolute', height: 3, backgroundColor: colors.accentDark, borderRadius: 3, marginLeft: 30, transformOrigin: 'left center' as any },
-  point: { position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accentDark, marginLeft: 26, marginTop: -2 },
-  pointActive: { width: 17, height: 17, borderRadius: 9, backgroundColor: colors.accent, borderWidth: 4, borderColor: '#EDE9FE', marginLeft: 22, marginTop: -7 },
-  axisRow: { flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 44, paddingRight: 2, marginTop: -8 },
-  axisLabel: { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
-  mixList: { gap: 13, marginTop: 16 },
-  mixRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
-  mixIconBubble: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center' },
-  mixIconBubbleStrong: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' },
-  mixLabel: { width: 76, fontSize: 17, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
-  mixTrack: { flex: 1, height: 12, borderRadius: 8, backgroundColor: colors.surface, overflow: 'hidden' },
+  lineShade: { position: 'absolute', left: 32, right: 2, bottom: 17, height: 84, backgroundColor: colors.accentDim, borderTopLeftRadius: 20, borderTopRightRadius: 20, opacity: 0.75 },
+  lineSegment: { position: 'absolute', height: 2.5, backgroundColor: colors.accentDark, borderRadius: 3, marginLeft: 28, transformOrigin: 'left center' as any },
+  point: { position: 'absolute', width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accentDark, marginLeft: 25, marginTop: -2 },
+  pointActive: { width: 15, height: 15, borderRadius: 8, backgroundColor: colors.accent, borderWidth: 3, borderColor: '#EDE9FE', marginLeft: 21, marginTop: -6 },
+  axisRow: { flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 42, paddingRight: 2, marginTop: -7 },
+  axisLabel: { fontSize: 13, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2 },
+  mixList: { gap: 12, marginTop: 14 },
+  mixRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
+  mixIconBubble: { width: 31, height: 31, borderRadius: 9, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center' },
+  mixIconBubbleStrong: { width: 31, height: 31, borderRadius: 9, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' },
+  mixLabel: { width: 72, fontSize: 17, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text },
+  mixTrack: { flex: 1, height: 10, borderRadius: 7, backgroundColor: colors.surface, overflow: 'hidden' },
   mixFill: { height: '100%', borderRadius: 8, backgroundColor: colors.accent },
   mixFillStrong: { height: '100%', borderRadius: 8, backgroundColor: colors.accentDark },
-  mixPct: { width: 44, textAlign: 'right', fontSize: 17, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text },
-  bestRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 14 },
+  mixPct: { width: 40, textAlign: 'right', fontSize: 15, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, color: colors.text },
+  bestRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 12 },
   bestItem: { flex: 1, alignItems: 'center' },
-  bestIconBubble: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  bestIconBubbleStrong: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
-  bestLabel: { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2, textAlign: 'center', minHeight: 30 },
-  bestValue: { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accent, lineHeight: 32, letterSpacing: -0.5 },
-  bestValueStrong: { fontSize: 27, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accentDark, lineHeight: 32, letterSpacing: -0.8 },
-  bestDivider: { width: 1, backgroundColor: colors.border, marginHorizontal: 8 },
-  empty: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 18, alignItems: 'center' },
-  emptyTitle: { fontSize: 20, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, marginBottom: 4 },
+  bestIconBubble: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center', marginBottom: 7 },
+  bestIconBubbleStrong: { width: 34, height: 34, borderRadius: 17, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginBottom: 7 },
+  bestLabel: { fontSize: 12, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2, textAlign: 'center', minHeight: 28 },
+  bestValue: { fontSize: 24, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, color: colors.accent, lineHeight: 28, letterSpacing: -0.4 },
+  bestValueStrong: { fontSize: 23, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, color: colors.accentDark, lineHeight: 28, letterSpacing: -0.6 },
+  bestDivider: { width: 1, backgroundColor: colors.border, marginHorizontal: 7 },
+  empty: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16, alignItems: 'center' },
+  emptyTitle: { fontSize: 22, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, marginBottom: 4 },
   emptyText: { fontSize: 13, color: colors.text2, textAlign: 'center', lineHeight: 20 },
 });

@@ -63,8 +63,8 @@ export default function TabLayout() {
         tabBarInactiveTintColor: colors.text2,
         tabBarLabelStyle: {
           fontSize: 11.5,
-          fontFamily: typography.family.regular,
-          fontWeight: typography.weight.regular,
+          fontFamily: typography.family.label,
+          fontWeight: typography.weight.semibold,
           letterSpacing: 0,
           lineHeight: 15,
           marginBottom: 0,
