@@ -121,9 +121,9 @@ const s = StyleSheet.create({
   pickerText:     { color: colors.text, fontSize: 13, fontFamily: typography.family.regular, fontWeight: typography.weight.medium },
   caret:          { color: colors.text3, fontSize: 10, marginLeft: 2 },
   toggle:         { width: 34, height: 34, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
-  toggleDone:     { backgroundColor: colors.successDim, borderColor: colors.successBdr },
+  toggleDone:     { backgroundColor: colors.accentDim, borderColor: colors.accentBorder },
   toggleText:     { fontSize: 14, color: colors.text3 },
-  toggleTextDone: { color: colors.success, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
+  toggleTextDone: { color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
   remove:         { width: 26, height: 26, alignItems: 'center', justifyContent: 'center', borderRadius: 6 },
   removeText:     { fontSize: 18, color: colors.text3, lineHeight: 20 },
 });

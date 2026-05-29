@@ -37,15 +37,15 @@ export const colors = {
   border:       '#E4DDF5',
 
   accent:       '#7C3AED',
-  accent2:      '#A855F7',
+  accent2:      '#7C3AED',
   accentDark:   '#3B0764',
   accentDim:    'rgba(124,58,237,0.10)',
   accentBorder: 'rgba(124,58,237,0.32)',
   accentBdr:    'rgba(124,58,237,0.32)',
 
-  highlight:    '#A855F7',
-  highlightDim: 'rgba(168,85,247,0.12)',
-  highlightBdr: 'rgba(168,85,247,0.34)',
+  highlight:    '#7C3AED',
+  highlightDim: 'rgba(124,58,237,0.10)',
+  highlightBdr: 'rgba(124,58,237,0.32)',
 
   success:      '#16A34A',
   successDim:   'rgba(22,163,74,0.10)',

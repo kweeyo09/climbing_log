@@ -1,26 +1,6 @@
-/**
- * SessionCard — matches preview HTML .sess-card exactly.
- *
- * Preview CSS reference:
- * .sess-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);
- *   padding:14px;margin:0 16px 10px;border-left:3px solid var(--accent);}
- * .card-hdr{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px;}
- * .card-loc{font-size:15px;font-weight:700;color:var(--text);flex:1;}
- * .card-date{font-size:11px;color:var(--text2);margin-left:8px;margin-top:2px;white-space:nowrap;}
- * .card-stats{display:flex;gap:10px;align-items:center;}
- * .card-stat{font-size:12px;color:var(--text2);font-weight:500;}
- * .pills{display:flex;flex-wrap:wrap;gap:5px;margin-top:8px;}
- * .pill{background:var(--surface);border:1px solid var(--border);border-radius:5px;padding:2px 7px;
- *   font-size:11px;font-weight:600;color:var(--text2);}
- * .pill.done{background:var(--okDim);border-color:var(--okBdr);color:var(--ok);}
- * .pill.fail{opacity:.5;}
- *
- * NOTE: Edit button is NOT shown here — it only appears on the detail screen.
- */
-import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
-import { useRouter } from 'expo-router';
+import { View, Text, StyleSheet, TouchableOpacity, Image } from 'react-native';
 import { getTopGrade } from '../constants/grades';
-import { colors, typography } from '../constants/theme';
+import { colors, radius, typography } from '../constants/theme';
 import type { Session } from '../types';
 
 function shortLocation(loc: string): string {
@@ -28,8 +8,13 @@ function shortLocation(loc: string): string {
   const parts = loc.split(',').map(p => p.trim()).filter(Boolean);
   if (parts.length <= 2) return loc;
   const venue = parts[0];
-  const city  = parts.slice(1).find(p => p.length > 3 && !/^\d+$/.test(p) && !/^[A-Z]{1,2}\d/.test(p));
+  const city = parts.slice(1).find(p => p.length > 3 && !/^\d+$/.test(p) && !/^[A-Z]{1,2}\d/.test(p));
   return city ? `${venue}, ${city}` : venue;
+}
+
+function fmtDate(ds: string) {
+  const d = new Date(ds + 'T12:00');
+  return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short' });
 }
 
 interface Props {
@@ -39,43 +24,68 @@ interface Props {
 
 export default function SessionCard({ session, onPress }: Props) {
   const topGrade = getTopGrade(session.routes, session.grade_system);
-
-  const fmtDate = (ds: string) => {
-    const d = new Date(ds + 'T12:00');
-    return d.toLocaleDateString('en-GB', { day: 'numeric', month: 'short', year: 'numeric' });
-  };
+  const sentRoutes = session.routes.filter(route => route.completed).length;
+  const coverPhoto = session.photo_uris?.[0];
+  const syncLabel = session.synced ? 'Backed up' : 'On device';
 
   return (
-    <TouchableOpacity style={s.card} onPress={onPress} activeOpacity={0.85}>
-      {/* card-hdr */}
-      <View style={s.cardHdr}>
-        <Text style={s.cardLoc} numberOfLines={1}>{shortLocation(session.location)}</Text>
-        <Text style={s.cardDate}>{fmtDate(session.date)}</Text>
-      </View>
-
-      {/* card-stats */}
-      <View style={s.cardStats}>
-        {session.duration > 0 && (
-          <Text style={s.cardStat}>⏱ {session.duration}min</Text>
+    <TouchableOpacity
+      style={s.card}
+      onPress={onPress}
+      activeOpacity={0.88}
+      accessibilityRole="button"
+      accessibilityLabel={`Open climbing session at ${shortLocation(session.location)} on ${fmtDate(session.date)}`}
+    >
+      <View style={s.topRow}>
+        {coverPhoto ? (
+          <Image source={{ uri: coverPhoto }} style={s.cover} resizeMode="cover" />
+        ) : (
+          <View style={s.coverFallback}>
+            <Text style={s.coverFallbackText}>A</Text>
+          </View>
         )}
-        <Text style={s.cardStat}>🧗 {session.routes.length} routes</Text>
-        {topGrade && <Text style={s.cardStat}>🏆 {topGrade}</Text>}
-        {!session.synced && <Text style={s.unsyncedDot}>●</Text>}
+
+        <View style={s.content}>
+          <View style={s.metaRow}>
+            <Text style={s.date}>{fmtDate(session.date)}</Text>
+            <View style={[s.syncPill, !session.synced && s.syncPillLocal]}>
+              <Text style={[s.syncText, !session.synced && s.syncTextLocal]}>{syncLabel}</Text>
+            </View>
+          </View>
+
+          <Text style={s.location} numberOfLines={2}>{shortLocation(session.location)}</Text>
+
+          <View style={s.metricsRow}>
+            {session.duration > 0 && (
+              <View style={s.metric}>
+                <Text style={s.metricValue}>{session.duration}</Text>
+                <Text style={s.metricLabel}>MIN</Text>
+              </View>
+            )}
+            <View style={s.metric}>
+              <Text style={s.metricValue}>{sentRoutes}/{session.routes.length}</Text>
+              <Text style={s.metricLabel}>SENDS</Text>
+            </View>
+            {topGrade && (
+              <View style={s.metric}>
+                <Text style={s.metricValue}>{topGrade}</Text>
+                <Text style={s.metricLabel}>TOP</Text>
+              </View>
+            )}
+          </View>
+        </View>
       </View>
 
-      {/* pills */}
       {session.routes.length > 0 && (
-        <View style={s.pills}>
-          {session.routes.slice(0, 7).map((r, i) => (
-            <View key={i} style={[s.pill, r.completed ? s.pillDone : s.pillFail]}>
-              <Text style={[s.pillText, r.completed && s.pillTextDone]}>
-                {r.grade} {r.completed ? '✓' : '○'}
-              </Text>
+        <View style={s.gradeStrip}>
+          {session.routes.slice(0, 6).map((route, index) => (
+            <View key={`${route.grade}-${index}`} style={[s.gradePill, route.completed && s.gradePillDone]}>
+              <Text style={[s.gradeText, route.completed && s.gradeTextDone]}>{route.grade}</Text>
             </View>
           ))}
-          {session.routes.length > 7 && (
-            <View style={s.pill}>
-              <Text style={s.pillText}>+{session.routes.length - 7}</Text>
+          {session.routes.length > 6 && (
+            <View style={s.gradePill}>
+              <Text style={s.gradeText}>+{session.routes.length - 6}</Text>
             </View>
           )}
         </View>
@@ -85,38 +95,115 @@ export default function SessionCard({ session, onPress }: Props) {
 }
 
 const s = StyleSheet.create({
-  // .sess-card
-  card:         {
+  card: {
     backgroundColor: colors.card,
     borderWidth: 1,
     borderColor: colors.border,
-    borderRadius: 16,          // --rl
-    padding: 14,               // matches preview padding:14px
-    marginHorizontal: 16,      // matches preview margin:0 16px 10px
-    marginBottom: 10,
-    borderLeftWidth: 3,
-    borderLeftColor: colors.accent,
+    borderRadius: 22,
+    marginHorizontal: 16,
+    marginBottom: 12,
+    padding: 12,
+    shadowColor: colors.shadow,
+    shadowOpacity: 0.08,
+    shadowRadius: 18,
+    shadowOffset: { width: 0, height: 8 },
+    elevation: 3,
   },
-  // .card-hdr
-  cardHdr:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 },
-  // .card-loc
-  cardLoc:      { fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text, flex: 1 },
-  // .card-date
-  cardDate:     { fontSize: 11, color: colors.text2, marginLeft: 8, marginTop: 2 },
-  // .card-stats
-  cardStats:    { flexDirection: 'row', gap: 10, alignItems: 'center' },
-  // .card-stat
-  cardStat:     { fontSize: 12, color: colors.text2, fontFamily: typography.family.regular, fontWeight: typography.weight.medium },
-  unsyncedDot:  { fontSize: 8, color: colors.text3, marginLeft: 'auto' },
-  // .pills
-  pills:        { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 8 },
-  // .pill
-  pill:         { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: 5, paddingHorizontal: 7, paddingVertical: 2 },
-  // .pill.done
-  pillDone:     { backgroundColor: colors.successDim, borderColor: colors.successBdr },
-  // .pill.fail
-  pillFail:     { opacity: 0.5 },
-  pillText:     { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
-  // .pill.done color
-  pillTextDone: { color: colors.success },
+  topRow: { flexDirection: 'row', gap: 12 },
+  cover: { width: 86, height: 98, borderRadius: 18, backgroundColor: colors.surface },
+  coverFallback: {
+    width: 86,
+    height: 98,
+    borderRadius: 18,
+    backgroundColor: colors.accentDim,
+    borderWidth: 1,
+    borderColor: colors.accentBorder,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
+  coverFallbackText: {
+    fontSize: 34,
+    fontFamily: typography.family.bold,
+    fontWeight: typography.weight.heavy,
+    color: colors.accent,
+  },
+  content: { flex: 1, minHeight: 98 },
+  metaRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', gap: 8, marginBottom: 6 },
+  date: {
+    fontSize: 11,
+    fontFamily: typography.family.semibold,
+    fontWeight: typography.weight.bold,
+    color: colors.text3,
+    letterSpacing: 1,
+    textTransform: 'uppercase',
+  },
+  syncPill: {
+    borderRadius: 999,
+    backgroundColor: colors.accentDim,
+    borderWidth: 1,
+    borderColor: colors.accentBorder,
+    paddingHorizontal: 8,
+    paddingVertical: 3,
+  },
+  syncPillLocal: { backgroundColor: colors.accentDim, borderColor: colors.accentBorder },
+  syncText: {
+    fontSize: 9,
+    fontFamily: typography.family.semibold,
+    fontWeight: typography.weight.bold,
+    color: colors.accent,
+    letterSpacing: 0.6,
+    textTransform: 'uppercase',
+  },
+  syncTextLocal: { color: colors.accent },
+  location: {
+    fontSize: 19,
+    fontFamily: typography.family.bold,
+    fontWeight: typography.weight.heavy,
+    color: colors.text,
+    lineHeight: 23,
+    letterSpacing: -0.2,
+    marginBottom: 10,
+  },
+  metricsRow: { flexDirection: 'row', alignItems: 'center', gap: 10, marginTop: 'auto' },
+  metric: { flex: 1 },
+  metricValue: {
+    fontSize: 18,
+    fontFamily: typography.family.bold,
+    fontWeight: typography.weight.heavy,
+    color: colors.accentDark,
+    lineHeight: 21,
+  },
+  metricLabel: {
+    fontSize: 9,
+    fontFamily: typography.family.semibold,
+    fontWeight: typography.weight.bold,
+    color: colors.text3,
+    letterSpacing: 0.8,
+    marginTop: 1,
+  },
+  gradeStrip: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    gap: 6,
+    marginTop: 12,
+    paddingTop: 10,
+    borderTopWidth: 1,
+    borderTopColor: colors.border,
+  },
+  gradePill: {
+    backgroundColor: colors.surface,
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: radius.sm,
+    paddingHorizontal: 8,
+    paddingVertical: 4,
+  },
+  gradePillDone: { backgroundColor: colors.accentDim, borderColor: colors.accentBorder },
+  gradeText: {
+    fontSize: 11,
+    fontFamily: typography.family.semibold,
+    fontWeight: typography.weight.bold,
+    color: colors.text2,
+  },
+  gradeTextDone: { color: colors.accent },
 });

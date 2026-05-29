@@ -53,7 +53,7 @@ export default function RootLayout() {
     init();
   }, []);
 
-  if (!fontsLoaded) {
+  if (!fontsLoaded && Platform.OS !== 'web') {
     return <View style={styles.loadingShell} />;
   }
 

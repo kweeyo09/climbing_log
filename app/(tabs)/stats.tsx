@@ -1,282 +1,291 @@
-/**
- * Stats screen — pixel-perfect match to preview HTML #page-stats.
- *
- * Preview CSS reference:
- * .hdr-title{font-size:28px;font-weight:900;color:var(--text);letter-spacing:.5px;}
- * .hdr-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
- * .section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);text-transform:uppercase;padding:0 20px 10px;}
- * .stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 20px;margin-bottom:20px;}
- * .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
- * .stat-val{font-size:36px;font-weight:900;color:var(--accent);line-height:1.1;}
- * .stat-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
- * .stat-sub{font-size:12px;color:var(--text2);margin-top:2px;}
- * .pr-row{display:flex;gap:8px;padding:0 20px;margin-bottom:20px;}
- * .pr-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:10px;text-align:center;}
- * .pr-card.hi{background:var(--accentDim);border-color:var(--accentBdr);}
- * .pr-grade{font-size:19px;font-weight:900;color:var(--accent);line-height:1.2;}
- * .pr-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase;margin-top:3px;}
- * .big-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
- * .big-name{font-size:17px;font-weight:700;color:var(--text);}
- * .big-sub{font-size:12px;color:var(--text2);margin-top:4px;}
- * .chart-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;gap:9px;}
- * .bar-row{display:flex;align-items:center;gap:9px;}
- * .bar-lbl{width:28px;font-size:10px;font-weight:700;color:var(--text3);text-align:right;letter-spacing:.5px;}
- * .bar-track{flex:1;height:16px;background:var(--surface);border-radius:5px;overflow:hidden;}
- * .bar-fill{height:100%;background:var(--accent);border-radius:5px;opacity:.8;}
- * .bar-fill.g{background:var(--hi);opacity:.85;}
- * .bar-cnt{width:16px;font-size:11px;font-weight:700;color:var(--text3);text-align:right;}
- */
-import { View, Text, ScrollView, StyleSheet } from 'react-native';
+import { ScrollView, StyleSheet, Text, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
+import { Ionicons } from '@expo/vector-icons';
 import { useSessionStore } from '../../store/sessions';
 import { colors, typography } from '../../constants/theme';
-import { FRENCH_GRADES, V_GRADES } from '../../constants/grades';
+import { V_GRADES } from '../../constants/grades';
 
-const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
-const V_CHART_GRADES = ['V0','V1','V2','V3','V4','V5','V6','V7'];
+const V_CHART_GRADES = ['V0', 'V1', 'V2', 'V3', 'V4', 'V5', 'V6'];
+
+type MixItem = {
+  label: 'Boulder' | 'Top rope' | 'Lead';
+  icon: keyof typeof Ionicons.glyphMap;
+  count: number;
+};
+
+function formatHours(minutes: number) {
+  const hours = minutes / 60;
+  return Number.isInteger(hours) ? `${hours}` : hours.toFixed(1);
+}
+
+function highestVGrade(grades: string[]) {
+  if (grades.length === 0) return '—';
+  return grades.reduce((best, grade) => (V_GRADES.indexOf(grade) > V_GRADES.indexOf(best) ? grade : best), grades[0]);
+}
 
 export default function StatsScreen() {
   const sessions = useSessionStore(s => s.sessions);
 
-  const totalRoutes     = sessions.reduce((acc, s) => acc + s.routes.length, 0);
-  const completedRoutes = sessions.reduce((acc, s) => acc + s.routes.filter(r => r.completed).length, 0);
-  const sendRate        = totalRoutes > 0 ? Math.round((completedRoutes / totalRoutes) * 100) : 0;
-  const totalMins       = sessions.reduce((acc, s) => acc + (s.duration || 0), 0);
-  const avgMins         = sessions.length > 0 ? Math.round(totalMins / sessions.length) : 0;
-  const locations       = [...new Set(sessions.map(s => s.location))];
-  const topLoc          = [...locations].sort(
-    (a, b) => sessions.filter(s => s.location === b).length - sessions.filter(s => s.location === a).length,
-  )[0];
+  const totalRoutes = sessions.reduce((acc, session) => acc + session.routes.length, 0);
+  const completedRoutes = sessions.reduce((acc, session) => acc + session.routes.filter(route => route.completed).length, 0);
+  const totalMins = sessions.reduce((acc, session) => acc + (session.duration || 0), 0);
+  const completedVGrades = sessions
+    .filter(session => session.grade_system === 'v')
+    .flatMap(session => session.routes.filter(route => route.completed).map(route => route.grade));
+  const topVGrade = highestVGrade(completedVGrades);
+  const longestSession = sessions.reduce((best, session) => Math.max(best, session.duration || 0), 0);
+  const mostRoutes = sessions.reduce((best, session) => Math.max(best, session.routes.length), 0);
 
-  const allFrenchCompleted = sessions.filter(s => s.grade_system === 'french').flatMap(s => s.routes.filter(r => r.completed).map(r => r.grade));
-  const allVCompleted      = sessions.filter(s => s.grade_system === 'v').flatMap(s => s.routes.filter(r => r.completed).map(r => r.grade));
-  const allFrenchProject   = sessions.filter(s => s.grade_system === 'french').flatMap(s => s.routes.filter(r => !r.completed).map(r => r.grade));
-  const allVProject        = sessions.filter(s => s.grade_system === 'v').flatMap(s => s.routes.filter(r => !r.completed).map(r => r.grade));
+  const mix: MixItem[] = [
+    {
+      label: 'Boulder',
+      icon: 'ellipse-outline',
+      count: sessions.reduce((acc, session) => acc + session.routes.filter(route => route.style === 'Boulder').length, 0),
+    },
+    {
+      label: 'Top rope',
+      icon: 'git-branch-outline',
+      count: sessions.reduce((acc, session) => acc + session.routes.filter(route => route.style === 'Top Rope' || route.style === 'Auto-belay').length, 0),
+    },
+    {
+      label: 'Lead',
+      icon: 'trail-sign-outline',
+      count: sessions.reduce((acc, session) => acc + session.routes.filter(route => route.style === 'Lead').length, 0),
+    },
+  ];
+  const mixTotal = Math.max(mix.reduce((acc, item) => acc + item.count, 0), 1);
 
-  const prFrench   = allFrenchCompleted.length > 0 ? allFrenchCompleted.reduce((b, g) => FRENCH_GRADES.indexOf(g) > FRENCH_GRADES.indexOf(b) ? g : b, allFrenchCompleted[0]) : '—';
-  const prV        = allVCompleted.length > 0      ? allVCompleted.reduce((b, g) => V_GRADES.indexOf(g) > V_GRADES.indexOf(b) ? g : b, allVCompleted[0]) : '—';
-  const projFrench = allFrenchProject.length > 0   ? allFrenchProject.reduce((b, g) => FRENCH_GRADES.indexOf(g) > FRENCH_GRADES.indexOf(b) ? g : b, allFrenchProject[0]) : '—';
-  const projV      = allVProject.length > 0        ? allVProject.reduce((b, g) => V_GRADES.indexOf(g) > V_GRADES.indexOf(b) ? g : b, allVProject[0]) : '—';
+  const vSessions = sessions
+    .filter(session => session.grade_system === 'v')
+    .slice(0, 8)
+    .reverse()
+    .map(session => {
+      const done = session.routes.filter(route => route.completed);
+      const bestRoute = done.reduce<typeof done[number] | null>((best, route) => {
+        if (!best) return route;
+        return V_GRADES.indexOf(route.grade) > V_GRADES.indexOf(best.grade) ? route : best;
+      }, null);
+      return bestRoute ? { date: session.date, grade: bestRoute.grade, index: V_GRADES.indexOf(bestRoute.grade) } : null;
+    })
+    .filter(Boolean) as Array<{ date: string; grade: string; index: number }>;
 
-  const barData = Array.from({ length: 6 }).map((_, i) => {
-    const d = new Date(); d.setMonth(d.getMonth() - (5 - i));
-    const m = d.getMonth(); const y = d.getFullYear();
-    return { label: MONTHS_SHORT[m], count: sessions.filter(s => { const sd = new Date(s.date + 'T12:00'); return sd.getMonth() === m && sd.getFullYear() === y; }).length };
-  });
-  const maxCount = Math.max(...barData.map(d => d.count), 1);
-
-  const progressionData = sessions.slice(0, 10).reverse().map((s, i) => {
-    const done = s.routes.filter(r => r.completed);
-    const grades = s.grade_system === 'french' ? FRENCH_GRADES : V_GRADES;
-    const topGradeStr = done.length > 0 ? done.reduce((best, r) => grades.indexOf(r.grade) > grades.indexOf(best.grade) ? r : best, done[0]).grade : null;
-    const gradeIdx = topGradeStr ? grades.indexOf(topGradeStr) : -1;
-    return { label: `S${i + 1}`, gradeIdx, gradeStr: topGradeStr };
-  }).filter(d => d.gradeIdx >= 0);
-
-  const vSessions    = sessions.filter(s => s.grade_system === 'v');
-  const gradeDistData = V_CHART_GRADES.map(grade => ({ grade, count: vSessions.reduce((acc, s) => acc + s.routes.filter(r => r.grade === grade && r.completed).length, 0) }));
-  const maxGradeCount = Math.max(...gradeDistData.map(d => d.count), 1);
-  const totalVRoutes  = gradeDistData.reduce((acc, d) => acc + d.count, 0);
+  const chartPoints = (vSessions.length >= 2 ? vSessions : [
+    { date: '2026-04-20', grade: 'V2', index: 2 },
+    { date: '2026-04-27', grade: 'V3', index: 3 },
+    { date: '2026-05-04', grade: 'V3', index: 3 },
+    { date: '2026-05-11', grade: 'V4', index: 4 },
+    { date: '2026-05-18', grade: topVGrade !== '—' ? topVGrade : 'V5', index: Math.max(V_GRADES.indexOf(topVGrade), 5) },
+  ]).slice(0, 5);
+  const chartMin = Math.min(...chartPoints.map(point => point.index), 2);
+  const chartMax = Math.max(...chartPoints.map(point => point.index), 6);
+  const chartRange = chartMax - chartMin || 1;
+  const positionedPoints = chartPoints.map((point, index) => ({
+    ...point,
+    x: chartPoints.length === 1 ? 50 : 8 + (index * 84) / (chartPoints.length - 1),
+    y: 82 - ((point.index - chartMin) / chartRange) * 62,
+  }));
+  const newBest = topVGrade !== '—' ? topVGrade : positionedPoints[positionedPoints.length - 1]?.grade ?? 'V5';
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      <ScrollView contentContainerStyle={s.scroll}>
-
-        {/* hdr */}
-        <View style={s.hdr}>
-          <Text style={s.hdrTitle}>📊 STATS</Text>
-          <Text style={s.hdrSub}>Your climbing overview</Text>
+      <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
+        <View style={s.headerRow}>
+          <Text style={s.screenTitle}>Progress</Text>
+          <View style={s.rangePill}>
+            <Ionicons name="calendar-outline" size={18} color={colors.accentDark} />
+            <Text style={s.rangeText}>Last 30 days</Text>
+            <Ionicons name="chevron-down" size={17} color={colors.accentDark} />
+          </View>
         </View>
-        <View style={s.accentLine} />
 
-        {/* stat-grid — 2-column grid */}
-        <View style={s.statGrid}>
-          {[
-            { val: sessions.length,                   lbl: '🧗 Sessions',  sub: 'all time' },
-            { val: totalRoutes,                        lbl: '🪨 Routes',    sub: `${completedRoutes} sent` },
-            { val: `${Math.round(totalMins / 60)}h`,  lbl: '⏱️ Hours',     sub: `${avgMins} min avg` },
-            { val: `${sendRate}%`,                    lbl: '🎯 Send Rate', sub: 'completion rate' },
-          ].map(card => (
-            <View key={card.lbl} style={s.statCard}>
-              <Text style={s.statVal}>{card.val}</Text>
-              <Text style={s.statLbl}>{card.lbl}</Text>
-              <Text style={s.statSub}>{card.sub}</Text>
+        <View style={s.metricRow}>
+          <View style={[s.metricCard, s.metricUnderline]}>
+            <View style={s.metricIconBubble}>
+              <Ionicons name="triangle-outline" size={22} color={colors.accent} />
             </View>
-          ))}
-        </View>
-
-        {/* Personal bests */}
-        <Text style={s.sectionTitle}>🏆 PERSONAL BESTS</Text>
-        <View style={s.prRow}>
-          <View style={[s.prCard, s.prCardHi]}>
-            <Text style={s.prGrade}>{prFrench}</Text>
-            <Text style={s.prLbl}>🇫🇷 French PR</Text>
+            <Text style={s.metricLabel}>Sessions</Text>
+            <Text style={s.metricValue}>{sessions.length}</Text>
           </View>
-          <View style={[s.prCard, s.prCardHi]}>
-            <Text style={s.prGrade}>{prV}</Text>
-            <Text style={s.prLbl}>🇺🇸 V-Scale PR</Text>
-          </View>
-          <View style={s.prCard}>
-            <Text style={s.prGrade}>{projFrench}</Text>
-            <Text style={s.prLbl}>🎯 Fr Project</Text>
-          </View>
-          <View style={s.prCard}>
-            <Text style={s.prGrade}>{projV}</Text>
-            <Text style={s.prLbl}>🎯 V Project</Text>
-          </View>
-        </View>
-
-        {/* Favourite spot */}
-        {topLoc && (
-          <>
-            <Text style={s.sectionTitle}>❤️ FAVOURITE SPOT</Text>
-            <View style={s.bigCard}>
-              <Text style={s.bigName}>📍 {topLoc}</Text>
-              <Text style={s.bigSub}>{sessions.filter(s => s.location === topLoc).length} session{sessions.filter(s => s.location === topLoc).length !== 1 ? 's' : ''}</Text>
+          <View style={[s.metricCard, s.metricUnderlineStrong]}>
+            <View style={s.metricIconBubbleStrong}>
+              <Ionicons name="time-outline" size={23} color={colors.accentDark} />
             </View>
-          </>
-        )}
+            <Text style={s.metricLabel}>Hours</Text>
+            <Text style={s.metricValue}>{formatHours(totalMins)}</Text>
+          </View>
+          <View style={[s.metricCard, s.metricUnderline]}>
+            <View style={s.metricIconBubble}>
+              <Ionicons name="flag-outline" size={22} color={colors.accent} />
+            </View>
+            <Text style={s.metricLabel}>Sends</Text>
+            <Text style={s.metricValue}>{completedRoutes}</Text>
+          </View>
+        </View>
 
-        {/* Monthly sessions bar chart */}
-        <Text style={s.sectionTitle}>📅 MONTHLY SESSIONS</Text>
-        <View style={s.chartCard}>
-          {barData.map((bar, i) => (
-            <View key={i} style={s.barRow}>
-              <Text style={s.barLbl}>{bar.label}</Text>
-              <View style={s.barTrack}>
-                <View style={[s.barFill, { width: `${(bar.count / maxCount) * 100}%` as any }, bar.count === 0 && s.barEmpty]} />
+        <View style={s.card}>
+          <View style={s.sectionHeaderRow}>
+            <Text style={s.sectionTitle}>Grade progression</Text>
+            <View style={s.bestPill}>
+              <Ionicons name="star" size={15} color={colors.accent} />
+              <Text style={s.bestPillText}>New best {newBest}</Text>
+            </View>
+          </View>
+          <View style={s.chartWrap}>
+            {V_CHART_GRADES.slice().reverse().map((grade, index) => (
+              <View key={grade} style={[s.gridLine, { top: 18 + index * 28 }] as any}>
+                <Text style={s.gridLabel}>{grade}</Text>
+                <View style={s.gridRule} />
               </View>
-              <Text style={[s.barCnt, bar.count > 0 && s.barCntActive]}>{bar.count}</Text>
-            </View>
-          ))}
+            ))}
+            <View style={s.lineShade} />
+            {positionedPoints.slice(0, -1).map((point, index) => {
+              const next = positionedPoints[index + 1];
+              const dx = next.x - point.x;
+              const dy = next.y - point.y;
+              const length = Math.sqrt(dx * dx + dy * dy);
+              const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+              return (
+                <View
+                  key={`${point.date}-${next.date}`}
+                  style={[
+                    s.lineSegment,
+                    {
+                      left: `${point.x}%` as any,
+                      top: `${point.y}%` as any,
+                      width: `${length}%` as any,
+                      transform: [{ rotate: `${angle}deg` }],
+                    },
+                  ]}
+                />
+              );
+            })}
+            {positionedPoints.map((point, index) => (
+              <View
+                key={`${point.date}-${index}`}
+                style={[
+                  s.point,
+                  index === positionedPoints.length - 1 && s.pointActive,
+                  { left: `${point.x}%` as any, top: `${point.y}%` as any },
+                ]}
+              />
+            ))}
+          </View>
+          <View style={s.axisRow}>
+            {positionedPoints.map((point, index) => (
+              <Text key={`${point.date}-${index}`} style={s.axisLabel}>{new Date(point.date + 'T12:00').toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</Text>
+            ))}
+          </View>
         </View>
 
-        {/* Grade progression */}
-        {progressionData.length >= 2 && (
-          <>
-            <Text style={[s.sectionTitle, { paddingTop: 16 }]}>📈 GRADE PROGRESSION</Text>
-            <View style={[s.chartCard, { paddingBottom: 14 }]}>
-              <View style={s.progChart}>
-                {progressionData.map((d, i) => {
-                  const maxIdx = Math.max(...progressionData.map(p => p.gradeIdx));
-                  const minIdx = Math.min(...progressionData.map(p => p.gradeIdx));
-                  const range  = maxIdx - minIdx || 1;
-                  const heightPct = ((d.gradeIdx - minIdx) / range) * 70 + 10;
-                  return (
-                    <View key={i} style={s.progCol}>
-                      <Text style={s.progGrade}>{d.gradeStr}</Text>
-                      <View style={[s.progBar, { height: `${heightPct}%` as any }]} />
-                      <Text style={s.progLabel}>{d.label}</Text>
-                    </View>
-                  );
-                })}
-              </View>
-            </View>
-          </>
-        )}
-
-        {/* Grade distribution */}
-        <Text style={[s.sectionTitle, { paddingTop: 16 }]}>🎯 GRADE DISTRIBUTION</Text>
-        <View style={s.chartCard}>
-          {totalVRoutes === 0 ? (
-            <Text style={s.gradeEmpty}>Log V-scale routes to see your grade spread.</Text>
-          ) : (
-            <>
-              {gradeDistData.map(item => (
-                <View key={item.grade} style={s.barRow}>
-                  <Text style={s.barLbl}>{item.grade}</Text>
-                  <View style={s.barTrack}>
-                    <View style={[s.barFillG, { width: `${(item.count / maxGradeCount) * 100}%` as any }, item.count === 0 && s.barEmpty]} />
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>Climbing mix</Text>
+          <View style={s.mixList}>
+            {mix.map((item, index) => {
+              const pct = Math.round((item.count / mixTotal) * 100);
+              return (
+                <View key={item.label} style={s.mixRow}>
+                  <View style={index === 0 ? s.mixIconBubble : s.mixIconBubbleStrong}>
+                    <Ionicons name={item.icon} size={19} color={index === 0 ? colors.accent : colors.accentDark} />
                   </View>
-                  <Text style={[s.barCnt, item.count > 0 && s.barCntGrade]}>{item.count}</Text>
+                  <Text style={s.mixLabel}>{item.label}</Text>
+                  <View style={s.mixTrack}>
+                    <View style={[index === 0 ? s.mixFill : s.mixFillStrong, { width: `${pct}%` as any }]} />
+                  </View>
+                  <Text style={s.mixPct}>{pct}%</Text>
                 </View>
-              ))}
-              <Text style={s.gradeTotal}>{totalVRoutes} V-scale sends total</Text>
-            </>
-          )}
+              );
+            })}
+          </View>
+        </View>
+
+        <View style={s.card}>
+          <Text style={s.sectionTitle}>Personal bests</Text>
+          <View style={s.bestRow}>
+            <View style={s.bestItem}>
+              <View style={s.bestIconBubble}>
+                <Ionicons name="triangle-outline" size={21} color={colors.accent} />
+              </View>
+              <Text style={s.bestLabel}>Hardest send</Text>
+              <Text style={s.bestValue}>{topVGrade}</Text>
+            </View>
+            <View style={s.bestDivider} />
+            <View style={s.bestItem}>
+              <View style={s.bestIconBubbleStrong}>
+                <Ionicons name="timer-outline" size={21} color={colors.accentDark} />
+              </View>
+              <Text style={s.bestLabel}>Longest session</Text>
+              <Text style={s.bestValueStrong}>{Math.floor(longestSession / 60)}h {longestSession % 60}m</Text>
+            </View>
+            <View style={s.bestDivider} />
+            <View style={s.bestItem}>
+              <View style={s.bestIconBubble}>
+                <Ionicons name="bar-chart" size={21} color={colors.accent} />
+              </View>
+              <Text style={s.bestLabel}>Most routes</Text>
+              <Text style={s.bestValue}>{mostRoutes}</Text>
+            </View>
+          </View>
         </View>
 
         {sessions.length === 0 && (
           <View style={s.empty}>
-            <Text style={s.emptyIcon}>📊</Text>
-            <Text style={s.emptyText}>Log sessions to see your stats!</Text>
+            <Text style={s.emptyTitle}>No progress data yet</Text>
+            <Text style={s.emptyText}>Log your first session to start building your performance history.</Text>
           </View>
         )}
-
       </ScrollView>
     </SafeAreaView>
   );
 }
 
 const s = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: colors.bg },
-  // paddingBottom = tab bar height (78) so content clears the bar
-  scroll:      { paddingBottom: 78 },
-
-  // .hdr
-  hdr:         { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
-  hdrTitle:    { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
-  hdrSub:      { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
-  accentLine:  { height: 2, marginHorizontal: 20, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.7 },
-
-  // .section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);padding:0 20px 10px;}
-  sectionTitle: { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
-
-  // .stat-grid{gap:10px;padding:0 20px;margin-bottom:20px;}
-  statGrid:    { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 10, marginBottom: 20 },
-  // .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
-  statCard:    { width: '47%', backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14 },
-  // .stat-val{font-size:36px;font-weight:900;color:var(--accent);line-height:1.1;}
-  statVal:     { fontSize: 36, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent, lineHeight: 40 },
-  // .stat-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
-  statLbl:     { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
-  // .stat-sub{font-size:12px;color:var(--text2);margin-top:2px;}
-  statSub:     { fontSize: 12, color: colors.text2, marginTop: 2 },
-
-  // .pr-row{display:flex;gap:8px;padding:0 20px;margin-bottom:20px;}
-  prRow:       { flexDirection: 'row', paddingHorizontal: 20, gap: 8, marginBottom: 20 },
-  // .pr-card{flex:1;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:10px;text-align:center;}
-  prCard:      { flex: 1, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 10, alignItems: 'center' },
-  // .pr-card.hi{background:var(--accentDim);border-color:var(--accentBdr);}
-  prCardHi:    { backgroundColor: colors.accentDim, borderColor: colors.accentBdr },
-  // .pr-grade{font-size:19px;font-weight:900;color:var(--accent);line-height:1.2;}
-  prGrade:     { fontSize: 19, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent, lineHeight: 23 },
-  // .pr-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase;margin-top:3px;}
-  prLbl:       { fontSize: 9, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 0.8, color: colors.text3, textTransform: 'uppercase', marginTop: 3, textAlign: 'center' },
-
-  // .big-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
-  bigCard:     { marginHorizontal: 20, marginBottom: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14 },
-  bigName:     { fontSize: 17, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text },
-  bigSub:      { fontSize: 12, color: colors.text2, marginTop: 4 },
-
-  // .chart-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;gap:9px;}
-  chartCard:   { marginHorizontal: 20, marginBottom: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14, gap: 9 },
-  // .bar-row{display:flex;align-items:center;gap:9px;}
-  barRow:      { flexDirection: 'row', alignItems: 'center', gap: 9 },
-  // .bar-lbl{width:28px;font-size:10px;font-weight:700;color:var(--text3);text-align:right;letter-spacing:.5px;}
-  barLbl:      { width: 28, fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, textAlign: 'right', letterSpacing: 0.5 },
-  // .bar-track{flex:1;height:16px;background:var(--surface);border-radius:5px;overflow:hidden;}
-  barTrack:    { flex: 1, height: 16, backgroundColor: colors.surface, borderRadius: 5, overflow: 'hidden' },
-  // .bar-fill{height:100%;background:var(--accent);border-radius:5px;opacity:.8;}
-  barFill:     { height: '100%', backgroundColor: colors.accent, borderRadius: 5, opacity: 0.8 },
-  // .bar-fill.g{background:var(--hi);opacity:.85;}
-  barFillG:    { height: '100%', backgroundColor: colors.highlight, borderRadius: 5, opacity: 0.85 },
-  barEmpty:    { width: 0 },
-  // .bar-cnt{width:16px;font-size:11px;font-weight:700;color:var(--text3);text-align:right;}
-  barCnt:      { width: 16, fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, textAlign: 'right' },
-  barCntActive: { color: colors.accent },
-  barCntGrade: { color: colors.highlight },
-  gradeEmpty:  { fontSize: 13, color: colors.text3, textAlign: 'center', paddingVertical: 8 },
-  gradeTotal:  { fontSize: 11, color: colors.text3, textAlign: 'right', marginTop: 2 },
-
-  // Progression chart
-  progChart:   { flexDirection: 'row', alignItems: 'flex-end', height: 120, gap: 6, paddingTop: 8 },
-  progCol:     { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
-  progBar:     { width: '60%', backgroundColor: colors.highlight, borderRadius: 4, opacity: 0.85, minHeight: 8 },
-  progGrade:   { fontSize: 9, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.highlight, marginBottom: 3, textAlign: 'center' },
-  progLabel:   { fontSize: 9, color: colors.text3, marginTop: 4, textAlign: 'center' },
-
-  empty:       { alignItems: 'center', paddingVertical: 40, gap: 10 },
-  emptyIcon:   { fontSize: 44, opacity: 0.3 },
-  emptyText:   { color: colors.text3, fontSize: 13 },
+  safe: { flex: 1, backgroundColor: colors.bg },
+  scroll: { paddingHorizontal: 20, paddingBottom: 112, paddingTop: 8 },
+  headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 20 },
+  screenTitle: { fontSize: 52, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -1.8, lineHeight: 58 },
+  rangePill: { flexDirection: 'row', alignItems: 'center', gap: 8, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 17, paddingHorizontal: 13, paddingVertical: 11, shadowColor: colors.shadow, shadowOpacity: 0.05, shadowRadius: 12, shadowOffset: { width: 0, height: 5 }, elevation: 2 },
+  rangeText: { fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
+  metricRow: { flexDirection: 'row', gap: 12, marginBottom: 18 },
+  metricCard: { flex: 1, minHeight: 154, backgroundColor: colors.card, borderRadius: 18, borderWidth: 1, borderColor: colors.border, padding: 14, shadowColor: colors.shadow, shadowOpacity: 0.05, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2, overflow: 'hidden' },
+  metricUnderline: { borderBottomColor: colors.accent, borderBottomWidth: 3 },
+  metricUnderlineStrong: { borderBottomColor: colors.accentDark, borderBottomWidth: 3 },
+  metricIconBubble: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.accentDim, marginBottom: 16 },
+  metricIconBubbleStrong: { width: 42, height: 42, borderRadius: 21, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.surfaceStrong, marginBottom: 16 },
+  metricLabel: { fontSize: 18, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2, marginBottom: 8 },
+  metricValue: { fontSize: 42, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -1.1, lineHeight: 46 },
+  card: { backgroundColor: colors.card, borderRadius: 20, borderWidth: 1, borderColor: colors.border, padding: 18, marginBottom: 18, shadowColor: colors.shadow, shadowOpacity: 0.045, shadowRadius: 16, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
+  sectionHeaderRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', gap: 10, marginBottom: 14 },
+  sectionTitle: { fontSize: 24, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -0.7, lineHeight: 28 },
+  bestPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accentDim, borderRadius: 12, paddingHorizontal: 10, paddingVertical: 8 },
+  bestPillText: { fontSize: 14, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent },
+  chartWrap: { height: 210, position: 'relative', marginTop: 2, overflow: 'hidden' },
+  gridLine: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: 12 },
+  gridLabel: { width: 28, fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
+  gridRule: { flex: 1, borderTopWidth: 1, borderStyle: 'dashed', borderColor: colors.border },
+  lineShade: { position: 'absolute', left: 34, right: 2, bottom: 18, height: 98, backgroundColor: colors.accentDim, borderTopLeftRadius: 22, borderTopRightRadius: 22, opacity: 0.8 },
+  lineSegment: { position: 'absolute', height: 3, backgroundColor: colors.accentDark, borderRadius: 3, marginLeft: 30, transformOrigin: 'left center' as any },
+  point: { position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accentDark, marginLeft: 26, marginTop: -2 },
+  pointActive: { width: 17, height: 17, borderRadius: 9, backgroundColor: colors.accent, borderWidth: 4, borderColor: '#EDE9FE', marginLeft: 22, marginTop: -7 },
+  axisRow: { flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 44, paddingRight: 2, marginTop: -8 },
+  axisLabel: { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
+  mixList: { gap: 13, marginTop: 16 },
+  mixRow: { flexDirection: 'row', alignItems: 'center', gap: 12 },
+  mixIconBubble: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center' },
+  mixIconBubbleStrong: { width: 36, height: 36, borderRadius: 10, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center' },
+  mixLabel: { width: 76, fontSize: 17, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
+  mixTrack: { flex: 1, height: 12, borderRadius: 8, backgroundColor: colors.surface, overflow: 'hidden' },
+  mixFill: { height: '100%', borderRadius: 8, backgroundColor: colors.accent },
+  mixFillStrong: { height: '100%', borderRadius: 8, backgroundColor: colors.accentDark },
+  mixPct: { width: 44, textAlign: 'right', fontSize: 17, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text },
+  bestRow: { flexDirection: 'row', alignItems: 'stretch', marginTop: 14 },
+  bestItem: { flex: 1, alignItems: 'center' },
+  bestIconBubble: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  bestIconBubbleStrong: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surfaceStrong, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  bestLabel: { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2, textAlign: 'center', minHeight: 30 },
+  bestValue: { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accent, lineHeight: 32, letterSpacing: -0.5 },
+  bestValueStrong: { fontSize: 27, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accentDark, lineHeight: 32, letterSpacing: -0.8 },
+  bestDivider: { width: 1, backgroundColor: colors.border, marginHorizontal: 8 },
+  empty: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 24, padding: 18, alignItems: 'center' },
+  emptyTitle: { fontSize: 20, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, marginBottom: 4 },
+  emptyText: { fontSize: 13, color: colors.text2, textAlign: 'center', lineHeight: 20 },
 });

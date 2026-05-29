@@ -231,7 +231,7 @@ const s = StyleSheet.create({
   container: { gap: spacing.sm },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
   label: { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3 },
-  status: { fontSize: 9, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, letterSpacing: 1.2, color: colors.success },
+  status: { fontSize: 9, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, letterSpacing: 1.2, color: colors.accent },
   emptyCard: {
     flexDirection: 'row',
     gap: spacing.sm,

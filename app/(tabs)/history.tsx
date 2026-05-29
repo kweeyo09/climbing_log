@@ -1,12 +1,4 @@
-/**
- * Sessions screen — matches preview HTML #page-sessions exactly.
- *
- * Preview CSS:
- * .hdr-title{font-size:28px;font-weight:900;color:var(--text);letter-spacing:.5px;}
- * .hdr-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;}
- * Sessions list uses .sess-card (see SessionCard.tsx)
- */
-import { View, Text, FlatList, StyleSheet } from 'react-native';
+import { View, Text, FlatList, StyleSheet, TouchableOpacity } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
@@ -14,27 +6,32 @@ import SessionCard from '../../components/SessionCard';
 import { colors, typography } from '../../constants/theme';
 
 export default function HistoryScreen() {
-  const router   = useRouter();
+  const router = useRouter();
   const sessions = useSessionStore(s => s.sessions);
-  const loading  = useSessionStore(s => s.loading);
+  const loading = useSessionStore(s => s.loading);
+  const totalRoutes = sessions.reduce((sum, session) => sum + session.routes.length, 0);
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
-      {/* hdr */}
       <View style={s.hdr}>
-        <Text style={s.hdrTitle}>📋 SESSIONS</Text>
-        <Text style={s.hdrSub}>{sessions.length} total session{sessions.length !== 1 ? 's' : ''}</Text>
+        <Text style={s.eyebrow}>ACTIVITY FEED</Text>
+        <Text style={s.hdrTitle}>Sessions</Text>
+        <Text style={s.hdrSub}>{sessions.length} session{sessions.length !== 1 ? 's' : ''} · {totalRoutes} routes tracked</Text>
       </View>
-      <View style={s.accentLine} />
 
       {loading ? (
         <View style={s.empty}>
-          <Text style={s.emptyText}>Loading…</Text>
+          <Text style={s.emptyTitle}>Loading sessions</Text>
+          <Text style={s.emptyText}>Getting your climbing history ready.</Text>
         </View>
       ) : sessions.length === 0 ? (
         <View style={s.empty}>
-          <Text style={s.emptyIcon}>📋</Text>
-          <Text style={s.emptyText}>No sessions yet.{'\n'}Log your first climb!</Text>
+          <View style={s.emptyOrb}><Text style={s.emptyOrbText}>A</Text></View>
+          <Text style={s.emptyTitle}>Build your activity feed</Text>
+          <Text style={s.emptyText}>Every climb you log becomes a session card with routes, photos, grades, and sync status.</Text>
+          <TouchableOpacity style={s.emptyCta} onPress={() => router.push('/(tabs)/log')} activeOpacity={0.85}>
+            <Text style={s.emptyCtaText}>Log your first session</Text>
+          </TouchableOpacity>
         </View>
       ) : (
         <FlatList
@@ -42,11 +39,9 @@ export default function HistoryScreen() {
           keyExtractor={item => item.id}
           contentContainerStyle={s.list}
           renderItem={({ item }) => (
-            <SessionCard
-              session={item}
-              onPress={() => router.push(`/session/${item.id}`)}
-            />
+            <SessionCard session={item} onPress={() => router.push(`/session/${item.id}`)} />
           )}
+          showsVerticalScrollIndicator={false}
         />
       )}
     </SafeAreaView>
@@ -54,16 +49,17 @@ export default function HistoryScreen() {
 }
 
 const s = StyleSheet.create({
-  safe:        { flex: 1, backgroundColor: colors.bg },
-  // .hdr matches preview .hdr class padding
-  hdr:         { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
-  // .hdr-title{font-size:28px;font-weight:900;color:var(--text);letter-spacing:.5px;}
-  hdrTitle:    { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
-  // .hdr-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
-  hdrSub:      { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
-  accentLine:  { height: 2, marginHorizontal: 20, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
-  list:        { paddingTop: 4, paddingBottom: 32 },
-  empty:       { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },
-  emptyIcon:   { fontSize: 44, opacity: 0.3 },
-  emptyText:   { color: colors.text3, fontSize: 13, textAlign: 'center', lineHeight: 20 },
+  safe: { flex: 1, backgroundColor: colors.bg },
+  hdr: { paddingHorizontal: 20, paddingTop: 12, paddingBottom: 16 },
+  eyebrow: { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.accent, letterSpacing: 1.7, textTransform: 'uppercase', marginBottom: 6 },
+  hdrTitle: { fontSize: 34, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: -0.7, lineHeight: 38 },
+  hdrSub: { fontSize: 13, color: colors.text3, marginTop: 4 },
+  list: { paddingTop: 2, paddingBottom: 104 },
+  empty: { flex: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 34, gap: 10 },
+  emptyOrb: { width: 72, height: 72, borderRadius: 26, backgroundColor: colors.accentDim, borderWidth: 1, borderColor: colors.accentBorder, alignItems: 'center', justifyContent: 'center', marginBottom: 8 },
+  emptyOrbText: { fontSize: 34, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.accent },
+  emptyTitle: { fontSize: 23, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, textAlign: 'center', letterSpacing: -0.4 },
+  emptyText: { color: colors.text2, fontSize: 14, textAlign: 'center', lineHeight: 21, maxWidth: 300 },
+  emptyCta: { backgroundColor: colors.accent, borderRadius: 18, paddingHorizontal: 20, paddingVertical: 13, marginTop: 10 },
+  emptyCtaText: { color: colors.inverseText, fontSize: 14, fontFamily: typography.family.bold, fontWeight: typography.weight.bold },
 });
