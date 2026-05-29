@@ -8,6 +8,12 @@ import { colors, typography } from '../../constants/theme';
 
 const TAB_BAR_HEIGHT = 92;
 const DEMO_IMAGE: ImageSourcePropType = require('../../assets/mockups/indoor_bouldering_activity.jpg');
+const STAT_ICONS: Record<WeeklyStatIcon, ImageSourcePropType> = {
+  sessions: require('../../assets/icons/stat_sessions.png'),
+  duration: require('../../assets/icons/stat_clock.png'),
+  routes: require('../../assets/icons/stat_routes.png'),
+  hardest: require('../../assets/icons/stat_hardest.png'),
+};
 const AVATAR_IMAGE = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=180&q=80';
 
 function startOfWeek(date: Date) {
@@ -35,49 +41,13 @@ function shortLocation(loc: string): string {
 type WeeklyStatIcon = 'sessions' | 'duration' | 'routes' | 'hardest';
 
 function StatIcon({ variant }: { variant: WeeklyStatIcon }) {
-  if (variant === 'duration') {
-    return (
-      <View style={s.statIconFrame} accessibilityElementsHidden>
-        <View style={s.clockRing} />
-        <View style={s.clockHandVertical} />
-        <View style={s.clockHandHorizontal} />
-      </View>
-    );
-  }
-
-  if (variant === 'routes') {
-    return (
-      <View style={s.statIconFrame} accessibilityElementsHidden>
-        <View style={s.routeLineA} />
-        <View style={s.routeLineB} />
-        <View style={[s.routeNode, s.routeNodeTop]} />
-        <View style={[s.routeNode, s.routeNodeMiddle]} />
-        <View style={[s.routeNode, s.routeNodeBottom]} />
-      </View>
-    );
-  }
-
-  if (variant === 'hardest') {
-    return (
-      <View style={s.statIconFrame} accessibilityElementsHidden>
-        <View style={s.hardestDot} />
-        <View style={s.hardestPeakLeft} />
-        <View style={s.hardestPeakRight} />
-        <View style={s.hardestSmallPeakLeft} />
-        <View style={s.hardestSmallPeakRight} />
-        <View style={s.hardestBase} />
-      </View>
-    );
-  }
-
   return (
-    <View style={s.statIconFrame} accessibilityElementsHidden>
-      <View style={s.sessionsCircle} />
-      <View style={s.sessionsPeakLeft} />
-      <View style={s.sessionsPeakRight} />
-      <View style={s.sessionsSmallPeakLeft} />
-      <View style={s.sessionsSmallPeakRight} />
-    </View>
+    <Image
+      source={STAT_ICONS[variant]}
+      style={s.statIconImage}
+      resizeMode="contain"
+      accessibilityIgnoresInvertColors
+    />
   );
 }
 
@@ -236,32 +206,12 @@ const s = StyleSheet.create({
   weekCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, marginBottom: 16, shadowColor: colors.shadow, shadowOpacity: 0.07, shadowRadius: 12, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
   cardHeading: { fontSize: 19, lineHeight: 23, letterSpacing: 0.2, color: colors.accentDark, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold },
   metricRow: { flexDirection: 'row', alignItems: 'center', marginTop: 17, marginBottom: 16 },
-  statIconFrame: { width: 38, height: 34, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  sessionsCircle: { width: 30, height: 30, borderRadius: 15, borderWidth: 2.7, borderColor: colors.accent, position: 'absolute', top: 2, left: 4 },
-  sessionsPeakLeft: { position: 'absolute', width: 12, height: 3, backgroundColor: colors.accent, left: 10, top: 18, borderRadius: 3, transform: [{ rotate: '35deg' }] },
-  sessionsPeakRight: { position: 'absolute', width: 17, height: 3, backgroundColor: colors.accent, left: 17, top: 16, borderRadius: 3, transform: [{ rotate: '-38deg' }] },
-  sessionsSmallPeakLeft: { position: 'absolute', width: 10, height: 3, backgroundColor: colors.accent, left: 12, top: 20, borderRadius: 3, transform: [{ rotate: '-35deg' }] },
-  sessionsSmallPeakRight: { position: 'absolute', width: 8, height: 3, backgroundColor: colors.accent, left: 9, top: 17, borderRadius: 3, transform: [{ rotate: '-35deg' }] },
-  clockRing: { position: 'absolute', width: 31, height: 31, borderRadius: 16, borderWidth: 2.7, borderColor: colors.accent, left: 4, top: 2 },
-  clockHandVertical: { position: 'absolute', width: 3, height: 11, backgroundColor: colors.accent, left: 18, top: 8, borderRadius: 3 },
-  clockHandHorizontal: { position: 'absolute', width: 10, height: 3, backgroundColor: colors.accent, left: 18, top: 17, borderRadius: 3 },
-  routeLineA: { position: 'absolute', width: 3, height: 17, backgroundColor: colors.accent, left: 13, top: 10, borderRadius: 3, transform: [{ rotate: '-1deg' }] },
-  routeLineB: { position: 'absolute', width: 3, height: 18, backgroundColor: colors.accent, left: 21, top: 7, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
-  routeNode: { position: 'absolute', width: 9, height: 9, borderRadius: 5, borderWidth: 2.7, borderColor: colors.accent, backgroundColor: colors.card },
-  routeNodeTop: { left: 20, top: 3 },
-  routeNodeMiddle: { left: 9, top: 15 },
-  routeNodeBottom: { left: 10, top: 26 },
-  hardestDot: { position: 'absolute', width: 8, height: 8, borderRadius: 4, borderWidth: 2.7, borderColor: colors.accent, left: 18, top: 2, backgroundColor: colors.card },
-  hardestPeakLeft: { position: 'absolute', width: 23, height: 3, backgroundColor: colors.accent, left: 7, top: 23, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
-  hardestPeakRight: { position: 'absolute', width: 20, height: 3, backgroundColor: colors.accent, left: 20, top: 22, borderRadius: 3, transform: [{ rotate: '42deg' }] },
-  hardestSmallPeakLeft: { position: 'absolute', width: 13, height: 3, backgroundColor: colors.accent, left: 6, top: 24, borderRadius: 3, transform: [{ rotate: '42deg' }] },
-  hardestSmallPeakRight: { position: 'absolute', width: 12, height: 3, backgroundColor: colors.accent, left: 17, top: 24, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
-  hardestBase: { position: 'absolute', width: 32, height: 3, backgroundColor: colors.accent, left: 3, top: 30, borderRadius: 3 },
+  statIconImage: { width: 36, height: 36 },
   metricItem: { flex: 1, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
   metricItemWide: { flex: 1.3, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
-  metricValue: { marginTop: 7, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, textAlign: 'center' },
+  metricValue: { marginTop: 4, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, textAlign: 'center' },
   metricCaption: { marginTop: 0, fontSize: 14, lineHeight: 16, color: colors.text2, fontFamily: typography.family.label, fontWeight: typography.weight.medium, textAlign: 'center' },
-  hardestLabel: { marginTop: 4, fontSize: 14, color: colors.text2, fontFamily: typography.family.label, fontWeight: typography.weight.medium, textAlign: 'center' },
+  hardestLabel: { marginTop: 2, fontSize: 14, color: colors.text2, fontFamily: typography.family.label, fontWeight: typography.weight.medium, textAlign: 'center' },
   verticalRule: { width: 1, height: 60, backgroundColor: colors.border, marginHorizontal: 8 },
   logButton: { height: 52, borderRadius: 15, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
   logButtonText: { fontSize: 22, color: colors.inverseText, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, letterSpacing: -0.2 },
