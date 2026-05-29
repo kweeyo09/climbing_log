@@ -22,11 +22,52 @@ interface DraftRoute {
 
 const todayISO = () => new Date().toISOString().split('T')[0];
 
+const MONTHS = [
+  'January', 'February', 'March', 'April', 'May', 'June',
+  'July', 'August', 'September', 'October', 'November', 'December',
+];
+
+const WEEKDAYS = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
+
+function dateFromISO(iso: string): Date {
+  const [year, month, day] = iso.split('-').map(Number);
+  if (!year || !month || !day) return new Date();
+  return new Date(year, month - 1, day, 12);
+}
+
+function isoFromDate(date: Date): string {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, '0');
+  const day = String(date.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+function formatReadableDate(iso: string): string {
+  const parsed = dateFromISO(iso);
+  return parsed.toLocaleDateString('en-GB', {
+    weekday: 'short', day: 'numeric', month: 'long', year: 'numeric',
+  });
+}
+
+function shiftMonth(date: Date, amount: number): Date {
+  return new Date(date.getFullYear(), date.getMonth() + amount, 1, 12);
+}
+
+function calendarDays(monthDate: Date): Date[] {
+  const firstOfMonth = new Date(monthDate.getFullYear(), monthDate.getMonth(), 1, 12);
+  const firstWeekday = firstOfMonth.getDay();
+  return Array.from({ length: 42 }, (_, index) => (
+    new Date(monthDate.getFullYear(), monthDate.getMonth(), index - firstWeekday + 1, 12)
+  ));
+}
+
 export default function LogScreen() {
   const router      = useRouter();
   const addSession  = useSessionStore(s => s.addSession);
 
   const [date,        setDate]        = useState(todayISO());
+  const [calendarOpen,setCalendarOpen]= useState(false);
+  const [calendarMonth, setCalendarMonth] = useState(() => dateFromISO(todayISO()));
   const [location,    setLocation]    = useState('');
   const [duration,    setDuration]    = useState('');
   const [gradeSystem, setGradeSystem] = useState<GradeSystem>('french');
@@ -36,6 +77,19 @@ export default function LogScreen() {
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
   const grades = getGrades(gradeSystem);
+  const selectedDate = dateFromISO(date);
+  const selectedDateISO = isoFromDate(selectedDate);
+  const currentMonthDays = calendarDays(calendarMonth);
+
+  const openCalendar = () => {
+    setCalendarMonth(new Date(selectedDate.getFullYear(), selectedDate.getMonth(), 1, 12));
+    setCalendarOpen(true);
+  };
+
+  const selectDate = (nextDate: Date) => {
+    setDate(isoFromDate(nextDate));
+    setCalendarOpen(false);
+  };
 
   const switchGradeSystem = (sys: GradeSystem) => {
     setGradeSystem(sys);
@@ -90,6 +144,7 @@ export default function LogScreen() {
     });
     // Reset form
     setDate(todayISO());
+    setCalendarMonth(dateFromISO(todayISO()));
     setLocation('');
     setDuration('');
     setGradeSystem('french');
@@ -115,14 +170,19 @@ export default function LogScreen() {
           {/* Date */}
           <View style={s.field}>
             <Text style={s.label}>📆 DATE</Text>
-            <TextInput
-              style={s.input}
-              value={date}
-              onChangeText={setDate}
-              placeholder="YYYY-MM-DD"
-              placeholderTextColor={colors.text3}
-              keyboardAppearance="dark"
-            />
+            <TouchableOpacity
+              style={s.dateButton}
+              onPress={openCalendar}
+              activeOpacity={0.82}
+              accessibilityRole="button"
+              accessibilityLabel={`Choose session date. Current date is ${formatReadableDate(date)}`}
+            >
+              <View>
+                <Text style={s.dateButtonText}>{formatReadableDate(date)}</Text>
+                <Text style={s.dateButtonMeta}>{date}</Text>
+              </View>
+              <Text style={s.dateButtonAction}>Change</Text>
+            </TouchableOpacity>
           </View>
 
           {/* Location */}
@@ -223,6 +283,99 @@ export default function LogScreen() {
       </ScrollView>
 
       <Modal
+        visible={calendarOpen}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setCalendarOpen(false)}
+      >
+        <View style={s.modalOverlay}>
+          <View style={s.calendarCard}>
+            <View style={s.calendarHeader}>
+              <TouchableOpacity
+                style={s.calendarNavButton}
+                onPress={() => setCalendarMonth(current => shiftMonth(current, -1))}
+                accessibilityRole="button"
+                accessibilityLabel="Previous month"
+              >
+                <Text style={s.calendarNavText}>‹</Text>
+              </TouchableOpacity>
+              <View style={s.calendarTitleWrap}>
+                <Text style={s.calendarTitle}>
+                  {MONTHS[calendarMonth.getMonth()]} {calendarMonth.getFullYear()}
+                </Text>
+                <Text style={s.calendarSubtitle}>Pick your session date</Text>
+              </View>
+              <TouchableOpacity
+                style={s.calendarNavButton}
+                onPress={() => setCalendarMonth(current => shiftMonth(current, 1))}
+                accessibilityRole="button"
+                accessibilityLabel="Next month"
+              >
+                <Text style={s.calendarNavText}>›</Text>
+              </TouchableOpacity>
+            </View>
+
+            <View style={s.weekdayRow}>
+              {WEEKDAYS.map((day, index) => (
+                <Text key={`${day}-${index}`} style={s.weekdayText}>{day}</Text>
+              ))}
+            </View>
+
+            <View style={s.calendarGrid}>
+              {currentMonthDays.map(day => {
+                const dayISO = isoFromDate(day);
+                const isSelected = dayISO === selectedDateISO;
+                const isToday = dayISO === todayISO();
+                const isOutsideMonth = day.getMonth() !== calendarMonth.getMonth();
+                return (
+                  <TouchableOpacity
+                    key={dayISO}
+                    style={[
+                      s.dayButton,
+                      isToday && s.dayButtonToday,
+                      isSelected && s.dayButtonSelected,
+                    ]}
+                    onPress={() => selectDate(day)}
+                    activeOpacity={0.78}
+                    accessibilityRole="button"
+                    accessibilityLabel={`Select ${formatReadableDate(dayISO)}`}
+                  >
+                    <Text
+                      style={[
+                        s.dayButtonText,
+                        isOutsideMonth && s.dayButtonTextMuted,
+                        isToday && s.dayButtonTextToday,
+                        isSelected && s.dayButtonTextSelected,
+                      ]}
+                    >
+                      {day.getDate()}
+                    </Text>
+                  </TouchableOpacity>
+                );
+              })}
+            </View>
+
+            <View style={s.calendarFooter}>
+              <TouchableOpacity
+                style={s.calendarSecondaryButton}
+                onPress={() => selectDate(new Date())}
+                activeOpacity={0.8}
+              >
+                <Text style={s.calendarSecondaryText}>Today</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={s.calendarPrimaryButton}
+                onPress={() => setCalendarOpen(false)}
+                activeOpacity={0.85}
+              >
+                <Text style={s.calendarPrimaryText}>Done</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      </Modal>
+
+      <Modal
         visible={validationMessage !== null}
         transparent
         animationType="fade"
@@ -257,7 +410,11 @@ const s = StyleSheet.create({
   field:           { marginBottom: spacing.lg },
   label:           { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, marginBottom: 7 },
   placesBadge:     { fontSize: 9, color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
-  input:           { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
+  input:           { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
+  dateButton:      { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
+  dateButtonText:  { color: colors.text, fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
+  dateButtonMeta:  { color: colors.text3, fontSize: 11, fontFamily: typography.family.regular, fontWeight: typography.weight.regular, marginTop: 2 },
+  dateButtonAction:{ color: colors.accent, fontSize: 12, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, textTransform: 'uppercase', letterSpacing: 0.8 },
   textarea:        { height: 88, textAlignVertical: 'top' },
   toggle:          { flexDirection: 'row', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: 4, gap: 4 },
   toggleBtn:       { flex: 1, paddingVertical: 9, borderRadius: radius.sm, alignItems: 'center' },
@@ -272,7 +429,29 @@ const s = StyleSheet.create({
   modalOverlay:    { flex: 1, backgroundColor: 'rgba(23, 19, 33, 0.42)', alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
   modalCard:       { width: '100%', maxWidth: 340, backgroundColor: colors.card, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, shadowColor: colors.shadow, shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10 },
   modalTitle:      { fontSize: 18, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, marginBottom: spacing.sm },
-  modalText:       { fontSize: 14, lineHeight: 20, color: colors.text2, marginBottom: spacing.lg },
+  modalText:       { fontSize: 14, lineHeight: 20, color: colors.text2, marginBottom: spacing.lg, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
   modalButton:     { backgroundColor: colors.accent, borderRadius: radius.md, paddingVertical: 12, alignItems: 'center' },
   modalButtonText: { fontSize: 14, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.inverseText, letterSpacing: 1 },
+  calendarCard:    { width: '100%', maxWidth: 372, backgroundColor: colors.card, borderRadius: radius.xl, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, shadowColor: colors.shadow, shadowOpacity: 0.18, shadowRadius: 20, shadowOffset: { width: 0, height: 10 }, elevation: 12 },
+  calendarHeader:  { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: spacing.md },
+  calendarTitleWrap:{ alignItems: 'center', flex: 1 },
+  calendarTitle:   { fontSize: 20, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text },
+  calendarSubtitle:{ marginTop: 2, fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text3, textTransform: 'uppercase', letterSpacing: 1.1 },
+  calendarNavButton:{ width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center' },
+  calendarNavText: { fontSize: 30, lineHeight: 32, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.accent },
+  weekdayRow:      { flexDirection: 'row', marginBottom: spacing.sm },
+  weekdayText:     { flex: 1, textAlign: 'center', fontSize: 11, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text3, letterSpacing: 0.7 },
+  calendarGrid:    { flexDirection: 'row', flexWrap: 'wrap' },
+  dayButton:       { width: `${100 / 7}%`, aspectRatio: 1, alignItems: 'center', justifyContent: 'center', borderRadius: radius.md },
+  dayButtonToday:  { backgroundColor: colors.accentDim },
+  dayButtonSelected:{ backgroundColor: colors.accent },
+  dayButtonText:   { fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
+  dayButtonTextMuted:{ color: colors.text3, opacity: 0.45 },
+  dayButtonTextToday:{ color: colors.accent },
+  dayButtonTextSelected:{ color: colors.inverseText },
+  calendarFooter:  { flexDirection: 'row', gap: spacing.sm, marginTop: spacing.lg },
+  calendarSecondaryButton:{ flex: 1, borderRadius: radius.md, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, paddingVertical: 12, alignItems: 'center' },
+  calendarSecondaryText:{ fontSize: 13, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent, letterSpacing: 0.7, textTransform: 'uppercase' },
+  calendarPrimaryButton:{ flex: 1, borderRadius: radius.md, backgroundColor: colors.accent, paddingVertical: 12, alignItems: 'center' },
+  calendarPrimaryText:{ fontSize: 13, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.inverseText, letterSpacing: 0.7, textTransform: 'uppercase' },
 });
