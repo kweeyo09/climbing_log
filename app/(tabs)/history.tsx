@@ -11,7 +11,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
 import SessionCard from '../../components/SessionCard';
-import { colors } from '../../constants/theme';
+import { colors, typography } from '../../constants/theme';
 
 export default function HistoryScreen() {
   const router   = useRouter();
@@ -58,9 +58,9 @@ const s = StyleSheet.create({
   // .hdr matches preview .hdr class padding
   hdr:         { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
   // .hdr-title{font-size:28px;font-weight:900;color:var(--text);letter-spacing:.5px;}
-  hdrTitle:    { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
+  hdrTitle:    { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
   // .hdr-sub{font-size:11px;font-weight:700;letter-spacing:1.5px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
-  hdrSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
+  hdrSub:      { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   accentLine:  { height: 2, marginHorizontal: 20, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
   list:        { paddingTop: 4, paddingBottom: 32 },
   empty:       { flex: 1, alignItems: 'center', justifyContent: 'center', gap: 10 },

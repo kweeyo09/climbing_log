@@ -27,7 +27,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
 import SessionCard from '../../components/SessionCard';
-import { colors } from '../../constants/theme';
+import { colors, typography } from '../../constants/theme';
 
 const MONTHS = [
   'January','February','March','April','May','June',
@@ -196,15 +196,15 @@ const s = StyleSheet.create({
   safe:        { flex: 1, backgroundColor: colors.bg },
 
   calHdr:      { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
-  calTitle:    { fontSize: 30, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
+  calTitle:    { fontSize: 30, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
   bl:          { color: colors.accent },
-  calSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
+  calSub:      { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 1 },
   calAccent:   { height: 2, marginHorizontal: 20, marginBottom: 8, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
 
   monthNav:    { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', paddingHorizontal: 20, paddingBottom: 8 },
-  navBtn:      { width: 36, height: 36, backgroundColor: 'rgba(255,255,255,0.55)', borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: 'rgba(106,90,205,0.18)' },
+  navBtn:      { width: 36, height: 36, backgroundColor: colors.card, borderRadius: 8, alignItems: 'center', justifyContent: 'center', borderWidth: 1, borderColor: colors.accentBorder },
   navBtnText:  { color: colors.text, fontSize: 22, lineHeight: 26 },
-  monthTitle:  { fontSize: 16, fontWeight: '800', color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
+  monthTitle:  { fontSize: 16, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.text, letterSpacing: 1, textTransform: 'uppercase' },
 
   // Grid: horizontal layout with wrap. Height is set dynamically via inline style.
   calGrid:     {
@@ -213,27 +213,27 @@ const s = StyleSheet.create({
     marginHorizontal: 16,
     marginBottom: 12,
     borderWidth: 2,
-    borderColor: 'rgba(106,90,205,0.32)',
+    borderColor: colors.accentBorder,
     borderRadius: 16,
-    backgroundColor: 'rgba(106,90,205,0.06)',
+    backgroundColor: colors.accentDim,
     padding: 10,
     gap: 3,
     // NO flex here — height is set via inline style to prevent squashing
   },
 
-  dayName:     { fontSize: 10, fontWeight: '700', color: colors.text3, letterSpacing: 0.5 },
+  dayName:     { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, letterSpacing: 0.5 },
   dayCell:     { alignItems: 'center', justifyContent: 'center', borderRadius: 8 },
-  dayCellActive: { backgroundColor: '#6A5ACD' },
-  dayNum:      { fontSize: 14, fontWeight: '500', color: colors.text2, lineHeight: 16 },
-  dayNumActive: { color: '#fff', fontWeight: '700' },
-  dayNumToday: { color: colors.accent, fontWeight: '800' },
+  dayCellActive: { backgroundColor: colors.accent },
+  dayNum:      { fontSize: 14, fontFamily: typography.family.regular, fontWeight: typography.weight.medium, color: colors.text2, lineHeight: 16 },
+  dayNumActive: { color: colors.inverseText, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
+  dayNumToday: { color: colors.accent, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy },
 
   // flex:1 so this takes all remaining vertical space below the fixed grid
   calSection:  { flex: 1 },
   // paddingBottom just enough to clear the FAB (62px tall) + 8px breathing room
   calSectionContent: { paddingBottom: TAB_BAR_HEIGHT + 70 },
 
-  sectionTitle: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
+  sectionTitle: { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
 
   emptyState:  { alignItems: 'center', paddingVertical: 36 },
   emptyIcon:   { fontSize: 40, opacity: 0.3 },
@@ -254,7 +254,7 @@ const s = StyleSheet.create({
     transform: [{ rotate: '-11deg' }, { skewX: '-4deg' }],
     alignItems: 'center',
     justifyContent: 'center',
-    shadowColor: '#E8C547',
+    shadowColor: colors.accent2,
     shadowOpacity: 0.5,
     shadowRadius: 16,
     shadowOffset: { width: 0, height: 4 },
@@ -267,7 +267,7 @@ const s = StyleSheet.create({
     left: 18,
     width: 30,
     height: 18,
-    backgroundColor: '#F3D743',
+    backgroundColor: '#A78BFA',
     borderRadius: 4,
     transform: [{ rotate: '18deg' }],
   },
@@ -277,10 +277,10 @@ const s = StyleSheet.create({
     bottom: 10,
     width: 20,
     height: 24,
-    backgroundColor: '#DDBB23',
+    backgroundColor: colors.accent,
     borderRadius: 5,
     transform: [{ rotate: '-20deg' }],
     opacity: 0.65,
   },
-  fabIcon:     { color: '#1a1612', fontSize: 28, fontWeight: '300', lineHeight: 32, transform: [{ rotate: '11deg' }, { skewX: '4deg' }] },
+  fabIcon:     { color: colors.inverseText, fontSize: 28, fontFamily: typography.family.regular, fontWeight: typography.weight.regular, lineHeight: 32, transform: [{ rotate: '11deg' }, { skewX: '4deg' }] },
 });

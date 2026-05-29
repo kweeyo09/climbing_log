@@ -1,6 +1,6 @@
 import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
-import { colors } from '../../constants/theme';
+import { colors, typography } from '../../constants/theme';
 
 const TAB_BAR_HEIGHT = 82;
 const TAB_BAR_PADDING_TOP = 8;

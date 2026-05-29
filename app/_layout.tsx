@@ -1,10 +1,33 @@
 import { useEffect, useState } from 'react';
-import { Platform, StyleSheet, View } from 'react-native';
+import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useSessionStore } from '../store/sessions';
 import { hasSeenOnboarding } from './onboarding';
 import { useRouter } from 'expo-router';
+import { colors, typography } from '../constants/theme';
+
+const defaultTextStyle = {
+  fontFamily: typography.family.regular,
+  color: colors.text,
+};
+
+(Text as unknown as { defaultProps?: { style?: unknown } }).defaultProps = {
+  ...(Text as unknown as { defaultProps?: { style?: unknown } }).defaultProps,
+  style: [
+    (Text as unknown as { defaultProps?: { style?: unknown } }).defaultProps?.style,
+    defaultTextStyle,
+  ],
+};
+
+(TextInput as unknown as { defaultProps?: { style?: unknown; placeholderTextColor?: string } }).defaultProps = {
+  ...(TextInput as unknown as { defaultProps?: { style?: unknown; placeholderTextColor?: string } }).defaultProps,
+  placeholderTextColor: colors.text3,
+  style: [
+    (TextInput as unknown as { defaultProps?: { style?: unknown } }).defaultProps?.style,
+    defaultTextStyle,
+  ],
+};
 
 export default function RootLayout() {
   const loadSessions = useSessionStore(s => s.loadSessions);
@@ -55,13 +78,13 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    backgroundColor: '#d9d0c0',
+    backgroundColor: '#F0ECFF',
   },
   webPreviewFrame: {
     flex: 1,
     width: '100%',
     maxWidth: 430,
     overflow: 'hidden',
-    backgroundColor: '#efe7d8',
+    backgroundColor: colors.bg,
   },
 });

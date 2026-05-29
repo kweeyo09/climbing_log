@@ -7,7 +7,7 @@ import {
   View, Text, TextInput, TouchableOpacity,
   StyleSheet, ActivityIndicator, ScrollView,
 } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { colors, radius, spacing, typography } from '../constants/theme';
 
 interface NominatimResult {
   place_id: number;
@@ -147,9 +147,9 @@ const s = StyleSheet.create({
   inputRow:        { flexDirection: 'row', alignItems: 'center' },
   input:           { flex: 1, backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
   spinner:         { position: 'absolute', right: 14 },
-  dropdown:        { backgroundColor: '#fff', borderWidth: 1, borderColor: '#d0ccc4', borderTopWidth: 0, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, zIndex: 999, shadowColor: '#000', shadowOpacity: 0.12, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 8, marginTop: -1, marginBottom: spacing.sm, overflow: 'hidden' },
+  dropdown:        { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderTopWidth: 0, borderBottomLeftRadius: 10, borderBottomRightRadius: 10, zIndex: 999, shadowColor: colors.shadow, shadowOpacity: 0.10, shadowRadius: 8, shadowOffset: { width: 0, height: 4 }, elevation: 8, marginTop: -1, marginBottom: spacing.sm, overflow: 'hidden' },
   suggestion:      { paddingHorizontal: spacing.md, paddingVertical: 10 },
-  suggestionBorder:{ borderTopWidth: 1, borderTopColor: '#f0ece4' },
-  suggestionMain:  { fontSize: 13, fontWeight: '600', color: '#333' },
-  suggestionSub:   { fontSize: 11, color: '#888', marginTop: 1 },
+  suggestionBorder:{ borderTopWidth: 1, borderTopColor: colors.border },
+  suggestionMain:  { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text },
+  suggestionSub:   { fontSize: 11, color: colors.text3, marginTop: 1 },
 });

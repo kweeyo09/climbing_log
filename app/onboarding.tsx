@@ -11,7 +11,7 @@ import {
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { colors, spacing, radius } from '../constants/theme';
+import { colors, spacing, radius, typography } from '../constants/theme';
 
 const ONBOARDING_KEY = 'ascenta_onboarding_done';
 
@@ -190,30 +190,30 @@ const s = StyleSheet.create({
   // Body
   body:           { flexGrow: 1, alignItems: 'center', justifyContent: 'center', paddingHorizontal: 28, paddingVertical: 24, textAlign: 'center' },
   icon:           { fontSize: 64, marginBottom: 20, textAlign: 'center' },
-  title:          { fontSize: 26, fontWeight: '900', color: colors.text, letterSpacing: 0.5, marginBottom: 10, lineHeight: 32, textAlign: 'center' },
+  title:          { fontSize: 26, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5, marginBottom: 10, lineHeight: 32, textAlign: 'center' },
   titleHi:        { color: colors.highlight },
   desc:           { fontSize: 15, color: colors.text2, lineHeight: 24, maxWidth: 280, textAlign: 'center' },
 
   // Auth block (sign-in step)
   authBlock:      { width: '100%', marginTop: 20, gap: 10 },
   authBtn:        { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 10, padding: 14, borderRadius: 14 },
-  authApple:      { backgroundColor: '#111' },
-  authAppleText:  { color: '#fff', fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
-  authGoogle:     { backgroundColor: '#fff', borderWidth: 1.5, borderColor: '#e0dbd2' },
-  authGoogleText: { color: '#333', fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
+  authApple:      { backgroundColor: colors.text },
+  authAppleText:  { color: colors.inverseText, fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 0.3 },
+  authGoogle:     { backgroundColor: colors.card, borderWidth: 1.5, borderColor: colors.border },
+  authGoogleText: { color: colors.text, fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 0.3 },
   authEmail:      { backgroundColor: colors.highlight },
-  authEmailText:  { color: '#fff', fontSize: 14, fontWeight: '700', letterSpacing: 0.3 },
+  authEmailText:  { color: colors.inverseText, fontSize: 14, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 0.3 },
   divider:        { flexDirection: 'row', alignItems: 'center', gap: 10 },
   dividerLine:    { flex: 1, height: 1, backgroundColor: colors.border },
-  dividerText:    { fontSize: 12, fontWeight: '600', color: colors.text3 },
+  dividerText:    { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text3 },
   emailInput:     { width: '100%', backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, padding: 13, fontSize: 14, color: colors.text },
-  emailInputError:{ borderColor: '#c0392b' },
-  emailError:     { fontSize: 12, color: '#c0392b', alignSelf: 'flex-start', marginTop: -4 },
+  emailInputError:{ borderColor: colors.error },
+  emailError:     { fontSize: 12, color: colors.error, alignSelf: 'flex-start', marginTop: -4 },
 
   // Footer
   footer:         { paddingHorizontal: spacing.lg, paddingBottom: 32 },
   mainBtn:        { backgroundColor: colors.highlight, borderRadius: radius.lg, padding: 18, alignItems: 'center', marginBottom: 0 },
-  mainBtnText:    { fontSize: 16, fontWeight: '900', color: '#fff', letterSpacing: 1 },
+  mainBtnText:    { fontSize: 16, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.inverseText, letterSpacing: 1 },
   skipBtn:        { padding: 12, alignItems: 'center' },
-  skipText:       { fontSize: 13, color: colors.text3, fontWeight: '600' },
+  skipText:       { fontSize: 13, color: colors.text3, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
 });

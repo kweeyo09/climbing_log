@@ -12,7 +12,7 @@ import {
 import { Ionicons } from '@expo/vector-icons';
 import * as ImagePicker from 'expo-image-picker';
 import { copyPhotoToAppSandbox } from '../lib/photos';
-import { colors, radius, spacing } from '../constants/theme';
+import { colors, radius, spacing, typography } from '../constants/theme';
 
 const MAX_PHOTOS = 10;
 
@@ -165,7 +165,7 @@ export default function PhotoCapture({
                   accessibilityLabel={`Remove photo ${index + 1}`}
                   disabled={isProcessing}
                 >
-                  <Ionicons name="close" size={14} color="#fff" />
+                  <Ionicons name="close" size={14} color={colors.inverseText} />
                 </TouchableOpacity>
               </View>
             ))}
@@ -230,8 +230,8 @@ export default function PhotoCapture({
 const s = StyleSheet.create({
   container: { gap: spacing.sm },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between' },
-  label: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.text3 },
-  status: { fontSize: 9, fontWeight: '800', letterSpacing: 1.2, color: colors.success },
+  label: { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3 },
+  status: { fontSize: 9, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, letterSpacing: 1.2, color: colors.success },
   emptyCard: {
     flexDirection: 'row',
     gap: spacing.sm,
@@ -250,7 +250,7 @@ const s = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
   },
-  addBtnText: { fontSize: 13, fontWeight: '800', color: colors.highlight, letterSpacing: 0.5 },
+  addBtnText: { fontSize: 13, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.highlight, letterSpacing: 0.5 },
   previewCard: {
     backgroundColor: colors.surface,
     borderWidth: 1,
@@ -268,7 +268,7 @@ const s = StyleSheet.create({
     width: 28,
     height: 28,
     borderRadius: 14,
-    backgroundColor: 'rgba(31, 26, 22, 0.78)',
+    backgroundColor: 'rgba(23, 19, 33, 0.78)',
     alignItems: 'center',
     justifyContent: 'center',
   },
@@ -284,7 +284,7 @@ const s = StyleSheet.create({
   },
   secondaryBtn: { backgroundColor: colors.accentDim, borderWidth: 1, borderColor: colors.accentBorder },
   disabledBtn: { opacity: 0.55 },
-  actionText: { fontSize: 13, fontWeight: '800', letterSpacing: 0.5 },
+  actionText: { fontSize: 13, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, letterSpacing: 0.5 },
   secondaryText: { color: colors.accent },
   helper: { fontSize: 12, lineHeight: 17, color: colors.text2 },
 });

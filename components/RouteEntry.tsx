@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, TouchableOpacity, Modal, FlatList, SafeAreaView } from 'react-native';
-import { colors, radius, spacing } from '../constants/theme';
+import { colors, radius, spacing, typography } from '../constants/theme';
 import type { ClimbStyle } from '../types';
 
 interface Props {
@@ -118,22 +118,22 @@ const s = StyleSheet.create({
   pickerWrap:     { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, height: 38, flexDirection: 'row', alignItems: 'center', paddingHorizontal: 8, justifyContent: 'space-between' },
   gradeWrap:      { width: 72 },
   styleWrap:      { flex: 1 },
-  pickerText:     { color: colors.text, fontSize: 13, fontWeight: '500' },
+  pickerText:     { color: colors.text, fontSize: 13, fontFamily: typography.family.regular, fontWeight: typography.weight.medium },
   caret:          { color: colors.text3, fontSize: 10, marginLeft: 2 },
   toggle:         { width: 34, height: 34, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, alignItems: 'center', justifyContent: 'center' },
   toggleDone:     { backgroundColor: colors.successDim, borderColor: colors.successBdr },
   toggleText:     { fontSize: 14, color: colors.text3 },
-  toggleTextDone: { color: colors.success, fontWeight: '700' },
+  toggleTextDone: { color: colors.success, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
   remove:         { width: 26, height: 26, alignItems: 'center', justifyContent: 'center', borderRadius: 6 },
   removeText:     { fontSize: 18, color: colors.text3, lineHeight: 20 },
 });
 
 const m = StyleSheet.create({
-  overlay:             { flex: 1, backgroundColor: 'rgba(0,0,0,0.4)' },
+  overlay:             { flex: 1, backgroundColor: 'rgba(23, 19, 33, 0.42)' },
   sheet:               { backgroundColor: colors.card, borderTopLeftRadius: 20, borderTopRightRadius: 20, maxHeight: '60%', paddingBottom: 20 },
   handle:              { width: 40, height: 4, backgroundColor: colors.border, borderRadius: 2, alignSelf: 'center', marginTop: 10, marginBottom: 6 },
   option:              { paddingVertical: 14, paddingHorizontal: 24, borderBottomWidth: 1, borderBottomColor: colors.border },
   optionSelected:      { backgroundColor: colors.accentDim },
   optionText:          { color: colors.text, fontSize: 16 },
-  optionTextSelected:  { color: colors.accent, fontWeight: '700' },
+  optionTextSelected:  { color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
 });

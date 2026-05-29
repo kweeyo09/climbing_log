@@ -29,7 +29,7 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useSessionStore } from '../../store/sessions';
-import { colors } from '../../constants/theme';
+import { colors, typography } from '../../constants/theme';
 import { FRENCH_GRADES, V_GRADES } from '../../constants/grades';
 
 const MONTHS_SHORT = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
@@ -215,21 +215,21 @@ const s = StyleSheet.create({
 
   // .hdr
   hdr:         { paddingHorizontal: 20, paddingTop: 10, paddingBottom: 6 },
-  hdrTitle:    { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
-  hdrSub:      { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
+  hdrTitle:    { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
+  hdrSub:      { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   accentLine:  { height: 2, marginHorizontal: 20, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.7 },
 
   // .section-title{font-size:10px;font-weight:700;letter-spacing:1.5px;color:var(--accent);padding:0 20px 10px;}
-  sectionTitle: { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
+  sectionTitle: { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.accent, textTransform: 'uppercase', paddingHorizontal: 20, paddingBottom: 10 },
 
   // .stat-grid{gap:10px;padding:0 20px;margin-bottom:20px;}
   statGrid:    { flexDirection: 'row', flexWrap: 'wrap', paddingHorizontal: 20, gap: 10, marginBottom: 20 },
   // .stat-card{background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
   statCard:    { width: '47%', backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14 },
   // .stat-val{font-size:36px;font-weight:900;color:var(--accent);line-height:1.1;}
-  statVal:     { fontSize: 36, fontWeight: '900', color: colors.accent, lineHeight: 40 },
+  statVal:     { fontSize: 36, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent, lineHeight: 40 },
   // .stat-lbl{font-size:10px;font-weight:700;letter-spacing:1px;color:var(--text3);text-transform:uppercase;margin-top:2px;}
-  statLbl:     { fontSize: 10, fontWeight: '700', letterSpacing: 1, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
+  statLbl:     { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   // .stat-sub{font-size:12px;color:var(--text2);margin-top:2px;}
   statSub:     { fontSize: 12, color: colors.text2, marginTop: 2 },
 
@@ -240,13 +240,13 @@ const s = StyleSheet.create({
   // .pr-card.hi{background:var(--accentDim);border-color:var(--accentBdr);}
   prCardHi:    { backgroundColor: colors.accentDim, borderColor: colors.accentBdr },
   // .pr-grade{font-size:19px;font-weight:900;color:var(--accent);line-height:1.2;}
-  prGrade:     { fontSize: 19, fontWeight: '900', color: colors.accent, lineHeight: 23 },
+  prGrade:     { fontSize: 19, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.accent, lineHeight: 23 },
   // .pr-lbl{font-size:9px;font-weight:700;letter-spacing:.8px;color:var(--text3);text-transform:uppercase;margin-top:3px;}
-  prLbl:       { fontSize: 9, fontWeight: '700', letterSpacing: 0.8, color: colors.text3, textTransform: 'uppercase', marginTop: 3, textAlign: 'center' },
+  prLbl:       { fontSize: 9, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 0.8, color: colors.text3, textTransform: 'uppercase', marginTop: 3, textAlign: 'center' },
 
   // .big-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;}
   bigCard:     { marginHorizontal: 20, marginBottom: 20, backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 16, padding: 14 },
-  bigName:     { fontSize: 17, fontWeight: '700', color: colors.text },
+  bigName:     { fontSize: 17, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text },
   bigSub:      { fontSize: 12, color: colors.text2, marginTop: 4 },
 
   // .chart-card{margin:0 20px 20px;background:var(--card);border:1px solid var(--border);border-radius:var(--rl);padding:14px;gap:9px;}
@@ -254,7 +254,7 @@ const s = StyleSheet.create({
   // .bar-row{display:flex;align-items:center;gap:9px;}
   barRow:      { flexDirection: 'row', alignItems: 'center', gap: 9 },
   // .bar-lbl{width:28px;font-size:10px;font-weight:700;color:var(--text3);text-align:right;letter-spacing:.5px;}
-  barLbl:      { width: 28, fontSize: 10, fontWeight: '700', color: colors.text3, textAlign: 'right', letterSpacing: 0.5 },
+  barLbl:      { width: 28, fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, textAlign: 'right', letterSpacing: 0.5 },
   // .bar-track{flex:1;height:16px;background:var(--surface);border-radius:5px;overflow:hidden;}
   barTrack:    { flex: 1, height: 16, backgroundColor: colors.surface, borderRadius: 5, overflow: 'hidden' },
   // .bar-fill{height:100%;background:var(--accent);border-radius:5px;opacity:.8;}
@@ -263,7 +263,7 @@ const s = StyleSheet.create({
   barFillG:    { height: '100%', backgroundColor: colors.highlight, borderRadius: 5, opacity: 0.85 },
   barEmpty:    { width: 0 },
   // .bar-cnt{width:16px;font-size:11px;font-weight:700;color:var(--text3);text-align:right;}
-  barCnt:      { width: 16, fontSize: 11, fontWeight: '700', color: colors.text3, textAlign: 'right' },
+  barCnt:      { width: 16, fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, textAlign: 'right' },
   barCntActive: { color: colors.accent },
   barCntGrade: { color: colors.highlight },
   gradeEmpty:  { fontSize: 13, color: colors.text3, textAlign: 'center', paddingVertical: 8 },
@@ -273,7 +273,7 @@ const s = StyleSheet.create({
   progChart:   { flexDirection: 'row', alignItems: 'flex-end', height: 120, gap: 6, paddingTop: 8 },
   progCol:     { flex: 1, alignItems: 'center', justifyContent: 'flex-end', height: '100%' },
   progBar:     { width: '60%', backgroundColor: colors.highlight, borderRadius: 4, opacity: 0.85, minHeight: 8 },
-  progGrade:   { fontSize: 9, fontWeight: '700', color: colors.highlight, marginBottom: 3, textAlign: 'center' },
+  progGrade:   { fontSize: 9, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.highlight, marginBottom: 3, textAlign: 'center' },
   progLabel:   { fontSize: 9, color: colors.text3, marginTop: 4, textAlign: 'center' },
 
   empty:       { alignItems: 'center', paddingVertical: 40, gap: 10 },

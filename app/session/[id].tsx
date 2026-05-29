@@ -4,7 +4,7 @@ import { useLocalSearchParams, useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSessionStore } from '../../store/sessions';
 import { getTopGrade } from '../../constants/grades';
-import { colors, spacing, radius } from '../../constants/theme';
+import { colors, spacing, radius, typography } from '../../constants/theme';
 
 export default function SessionDetailScreen() {
   const { id }        = useLocalSearchParams<{ id: string }>();
@@ -166,31 +166,31 @@ const s = StyleSheet.create({
   backBtn:         { flexDirection: 'row', alignItems: 'center', gap: 4 },
   backText:        { color: colors.text2, fontSize: 14 },
   editBtn:         { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentDim, borderWidth: 1, borderColor: colors.accentBorder, borderRadius: radius.sm, paddingHorizontal: 10, paddingVertical: 6 },
-  editBtnText:     { fontSize: 12, fontWeight: '700', color: colors.accent },
-  location:        { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
+  editBtnText:     { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.accent },
+  location:        { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
   date:            { fontSize: 13, color: colors.text2, marginTop: 4, marginBottom: spacing.md },
   galleryBlock:    { marginBottom: spacing.md, gap: spacing.sm },
   galleryStrip:    { gap: spacing.sm },
   sessionPhoto:    { width: 260, height: 220, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border },
-  galleryCount:    { fontSize: 11, fontWeight: '700', color: colors.text3, letterSpacing: 0.8 },
+  galleryCount:    { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3, letterSpacing: 0.8 },
   chips:           { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: spacing.lg },
   chip:            { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 6 },
-  chipText:        { fontSize: 13, fontWeight: '600', color: colors.text2 },
+  chipText:        { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
   chipAccent:      { backgroundColor: colors.accentDim, borderColor: colors.accentBorder },
-  chipTextAccent:  { color: colors.accent, fontWeight: '700' },
-  sectionTitle:    { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, marginBottom: spacing.sm },
+  chipTextAccent:  { color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
+  sectionTitle:    { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, marginBottom: spacing.sm },
   routeList:       { gap: 6, marginBottom: spacing.lg },
   routeRow:        { flexDirection: 'row', alignItems: 'center', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: spacing.md, paddingVertical: 10, gap: 12 },
   routeRowDone:    { borderColor: colors.successBdr, backgroundColor: colors.successDim },
   routeRowFail:    { opacity: 0.6 },
-  routeGrade:      { fontSize: 15, fontWeight: '700', color: colors.text2, width: 46 },
+  routeGrade:      { fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text2, width: 46 },
   routeGradeDone:  { color: colors.success },
   routeStyle:      { flex: 1, fontSize: 13, color: colors.text2 },
-  routeStatus:     { fontSize: 12, fontWeight: '700', color: colors.text3 },
+  routeStatus:     { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text3 },
   routeStatusDone: { color: colors.success },
   reflBox:         { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, marginBottom: spacing.lg },
   reflText:        { fontSize: 14, color: colors.text2, lineHeight: 22, fontStyle: 'italic' },
   syncStatus:      { fontSize: 12, color: colors.text3, marginBottom: spacing.lg, textAlign: 'center' },
   deleteBtn:       { flexDirection: 'row', alignItems: 'center', justifyContent: 'center', gap: 8, backgroundColor: colors.errorDim, borderWidth: 1, borderColor: colors.errorBdr, borderRadius: radius.md, padding: spacing.md },
-  deleteBtnText:   { fontSize: 13, fontWeight: '700', color: colors.error, letterSpacing: 0.5 },
+  deleteBtnText:   { fontSize: 13, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.error, letterSpacing: 0.5 },
 });

@@ -10,7 +10,7 @@ import RouteEntry from '../../components/RouteEntry';
 import LocationSearch from '../../components/LocationSearch';
 import PhotoCapture from '../../components/PhotoCapture';
 import { CLIMB_STYLES, getGrades } from '../../constants/grades';
-import { colors, spacing, radius } from '../../constants/theme';
+import { colors, spacing, radius, typography } from '../../constants/theme';
 import type { GradeSystem, ClimbStyle } from '../../types';
 
 interface DraftRoute {
@@ -250,29 +250,29 @@ const s = StyleSheet.create({
   safe:            { flex: 1, backgroundColor: colors.bg },
   scroll:          { paddingBottom: 40 },
   header:          { paddingHorizontal: spacing.lg, paddingTop: spacing.sm, paddingBottom: 12 },
-  headerTitle:     { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
-  headerSub:       { fontSize: 11, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
+  headerTitle:     { fontSize: 28, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, letterSpacing: 0.5 },
+  headerSub:       { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, textTransform: 'uppercase', marginTop: 2 },
   accentLine:      { height: 2, marginHorizontal: spacing.lg, marginBottom: 14, backgroundColor: colors.accent, borderRadius: 1, opacity: 0.6 },
   form:            { paddingHorizontal: spacing.lg },
   field:           { marginBottom: spacing.lg },
-  label:           { fontSize: 10, fontWeight: '700', letterSpacing: 1.5, color: colors.text3, marginBottom: 7 },
-  placesBadge:     { fontSize: 9, color: colors.accent, fontWeight: '700' },
+  label:           { fontSize: 10, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, letterSpacing: 1.5, color: colors.text3, marginBottom: 7 },
+  placesBadge:     { fontSize: 9, color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold },
   input:           { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: spacing.md, color: colors.text, fontSize: 14 },
   textarea:        { height: 88, textAlignVertical: 'top' },
   toggle:          { flexDirection: 'row', backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.md, padding: 4, gap: 4 },
   toggleBtn:       { flex: 1, paddingVertical: 9, borderRadius: radius.sm, alignItems: 'center' },
   toggleBtnOn:     { backgroundColor: colors.accent },
-  toggleBtnText:   { fontSize: 12, fontWeight: '700', color: colors.text2, textTransform: 'uppercase', letterSpacing: 0.5 },
-  toggleBtnTextOn: { color: '#fff' },
+  toggleBtnText:   { fontSize: 12, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text2, textTransform: 'uppercase', letterSpacing: 0.5 },
+  toggleBtnTextOn: { color: colors.inverseText },
   // Gold dashed add-route button matching preview
   addRouteBtn:     { backgroundColor: 'transparent', borderWidth: 2, borderStyle: 'dashed', borderColor: colors.highlight, borderRadius: 13, padding: 12, alignItems: 'center' },
-  addRouteBtnText: { fontSize: 13, fontWeight: '800', color: colors.highlight, letterSpacing: 0.5 },
+  addRouteBtnText: { fontSize: 13, fontFamily: typography.family.bold, fontWeight: typography.weight.heavy, color: colors.highlight, letterSpacing: 0.5 },
   saveBtn:         { backgroundColor: colors.accent, borderRadius: radius.lg, padding: 17, alignItems: 'center', marginTop: 4 },
-  saveBtnText:     { fontSize: 16, fontWeight: '900', color: '#fff', letterSpacing: 1.5 },
-  modalOverlay:    { flex: 1, backgroundColor: 'rgba(31, 26, 22, 0.42)', alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
-  modalCard:       { width: '100%', maxWidth: 340, backgroundColor: colors.surface, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, shadowColor: '#000', shadowOpacity: 0.18, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10 },
-  modalTitle:      { fontSize: 18, fontWeight: '900', color: colors.text, marginBottom: spacing.sm },
+  saveBtnText:     { fontSize: 16, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.inverseText, letterSpacing: 1.5 },
+  modalOverlay:    { flex: 1, backgroundColor: 'rgba(23, 19, 33, 0.42)', alignItems: 'center', justifyContent: 'center', padding: spacing.lg },
+  modalCard:       { width: '100%', maxWidth: 340, backgroundColor: colors.card, borderRadius: radius.lg, borderWidth: 1, borderColor: colors.border, padding: spacing.lg, shadowColor: colors.shadow, shadowOpacity: 0.16, shadowRadius: 16, shadowOffset: { width: 0, height: 8 }, elevation: 10 },
+  modalTitle:      { fontSize: 18, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.text, marginBottom: spacing.sm },
   modalText:       { fontSize: 14, lineHeight: 20, color: colors.text2, marginBottom: spacing.lg },
   modalButton:     { backgroundColor: colors.accent, borderRadius: radius.md, paddingVertical: 12, alignItems: 'center' },
-  modalButtonText: { fontSize: 14, fontWeight: '900', color: '#fff', letterSpacing: 1 },
+  modalButtonText: { fontSize: 14, fontFamily: typography.family.bold, fontWeight: typography.weight.bold, color: colors.inverseText, letterSpacing: 1 },
 });

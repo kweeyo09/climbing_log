@@ -20,7 +20,7 @@
 import { View, Text, StyleSheet, TouchableOpacity } from 'react-native';
 import { useRouter } from 'expo-router';
 import { getTopGrade } from '../constants/grades';
-import { colors } from '../constants/theme';
+import { colors, typography } from '../constants/theme';
 import type { Session } from '../types';
 
 function shortLocation(loc: string): string {
@@ -100,13 +100,13 @@ const s = StyleSheet.create({
   // .card-hdr
   cardHdr:      { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 6 },
   // .card-loc
-  cardLoc:      { fontSize: 15, fontWeight: '700', color: colors.text, flex: 1 },
+  cardLoc:      { fontSize: 15, fontFamily: typography.family.semibold, fontWeight: typography.weight.bold, color: colors.text, flex: 1 },
   // .card-date
   cardDate:     { fontSize: 11, color: colors.text2, marginLeft: 8, marginTop: 2 },
   // .card-stats
   cardStats:    { flexDirection: 'row', gap: 10, alignItems: 'center' },
   // .card-stat
-  cardStat:     { fontSize: 12, color: colors.text2, fontWeight: '500' },
+  cardStat:     { fontSize: 12, color: colors.text2, fontFamily: typography.family.regular, fontWeight: typography.weight.medium },
   unsyncedDot:  { fontSize: 8, color: colors.text3, marginLeft: 'auto' },
   // .pills
   pills:        { flexDirection: 'row', flexWrap: 'wrap', gap: 5, marginTop: 8 },
@@ -116,7 +116,7 @@ const s = StyleSheet.create({
   pillDone:     { backgroundColor: colors.successDim, borderColor: colors.successBdr },
   // .pill.fail
   pillFail:     { opacity: 0.5 },
-  pillText:     { fontSize: 11, fontWeight: '600', color: colors.text2 },
+  pillText:     { fontSize: 11, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold, color: colors.text2 },
   // .pill.done color
   pillTextDone: { color: colors.success },
 });
