@@ -78,7 +78,7 @@ const styles = StyleSheet.create({
     flex: 1,
     width: '100%',
     alignItems: 'center',
-    backgroundColor: '#F0ECFF',
+    backgroundColor: colors.bg,
   },
   webPreviewFrame: {
     flex: 1,

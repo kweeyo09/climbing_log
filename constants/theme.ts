@@ -1,9 +1,8 @@
 /**
  * Core design tokens for the Ascenta mobile app.
  *
- * The refreshed visual direction uses a near-white athletic canvas, crisp white
- * cards, and a stronger purple accent system to feel more premium, focused, and
- * sporty than the previous warm beige palette.
+ * The refreshed visual direction uses a pure white athletic canvas, crisp white
+ * cards, and a vibrant purple accent system to feel premium, focused, and sporty.
  */
 import { Platform } from 'react-native';
 
@@ -36,22 +35,22 @@ export const typography = {
 export const fonts = typography.family;
 
 export const colors = {
-  bg:           '#FBFAFF',
+  bg:           '#FFFFFF',
   card:         '#FFFFFF',
   surface:      '#F5F2FF',
   surfaceStrong:'#EEE8FF',
   border:       '#E4DDF5',
 
-  accent:       '#6D4AFF',
-  accent2:      '#8B5CF6',
-  accentDark:   '#35206F',
-  accentDim:    'rgba(109,74,255,0.10)',
-  accentBorder: 'rgba(109,74,255,0.30)',
-  accentBdr:    'rgba(109,74,255,0.30)',
+  accent:       '#7C3AED',
+  accent2:      '#A855F7',
+  accentDark:   '#3B0764',
+  accentDim:    'rgba(124,58,237,0.10)',
+  accentBorder: 'rgba(124,58,237,0.32)',
+  accentBdr:    'rgba(124,58,237,0.32)',
 
-  highlight:    '#8B5CF6',
-  highlightDim: 'rgba(139,92,246,0.12)',
-  highlightBdr: 'rgba(139,92,246,0.32)',
+  highlight:    '#A855F7',
+  highlightDim: 'rgba(168,85,247,0.12)',
+  highlightBdr: 'rgba(168,85,247,0.34)',
 
   success:      '#16A34A',
   successDim:   'rgba(22,163,74,0.10)',
