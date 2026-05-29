@@ -38,7 +38,9 @@ function StatIcon({ variant }: { variant: WeeklyStatIcon }) {
   if (variant === 'duration') {
     return (
       <View style={s.statIconFrame} accessibilityElementsHidden>
-        <Ionicons name="time-outline" size={33} color={colors.accent} />
+        <View style={s.clockRing} />
+        <View style={s.clockHandVertical} />
+        <View style={s.clockHandHorizontal} />
       </View>
     );
   }
@@ -85,17 +87,19 @@ function MiniTrend() {
       <View style={s.chartLabels}>
         {['V6', 'V4', 'V2', 'V0'].map(label => <Text key={label} style={s.chartLabel}>{label}</Text>)}
       </View>
-      <View style={s.chartArea}>
-        {[0, 1, 2, 3].map(i => <View key={i} style={[s.gridLine, { top: 16 + i * 42 }]} />)}
-        <View style={[s.segment, s.seg1]} />
-        <View style={[s.segment, s.seg2]} />
-        <View style={[s.segment, s.seg3]} />
-        <View style={[s.segment, s.seg4]} />
-        <View style={[s.point, { left: '6%', top: 109 }]} />
-        <View style={[s.point, { left: '28%', top: 91 }]} />
-        <View style={[s.point, { left: '53%', top: 78 }]} />
-        <View style={[s.point, { left: '75%', top: 91 }]} />
-        <View style={s.pointActive} />
+      <View style={s.chartColumn}>
+        <View style={s.chartArea}>
+          {[0, 1, 2, 3].map(i => <View key={i} style={[s.gridLine, { top: 12 + i * 35 }]} />)}
+          <View style={[s.segment, s.seg1]} />
+          <View style={[s.segment, s.seg2]} />
+          <View style={[s.segment, s.seg3]} />
+          <View style={[s.segment, s.seg4]} />
+          <View style={[s.point, { left: '6%', top: 91 }]} />
+          <View style={[s.point, { left: '28%', top: 76 }]} />
+          <View style={[s.point, { left: '53%', top: 65 }]} />
+          <View style={[s.point, { left: '75%', top: 76 }]} />
+          <View style={s.pointActive} />
+        </View>
         <View style={s.chartDates}>
           {['May 12', 'May 19', 'May 26', 'Jun 2', 'Jun 9'].map(label => <Text key={label} style={s.chartDate}>{label}</Text>)}
         </View>
@@ -232,24 +236,27 @@ const s = StyleSheet.create({
   weekCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, paddingHorizontal: 16, paddingTop: 18, paddingBottom: 16, marginBottom: 16, shadowColor: colors.shadow, shadowOpacity: 0.07, shadowRadius: 12, shadowOffset: { width: 0, height: 7 }, elevation: 2 },
   cardHeading: { fontSize: 19, lineHeight: 23, letterSpacing: 0.2, color: colors.accentDark, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold },
   metricRow: { flexDirection: 'row', alignItems: 'center', marginTop: 17, marginBottom: 16 },
-  statIconFrame: { width: 36, height: 34, alignItems: 'center', justifyContent: 'center', position: 'relative' },
-  sessionsCircle: { width: 30, height: 30, borderRadius: 15, borderWidth: 3, borderColor: colors.accent, position: 'absolute', top: 2, left: 3 },
-  sessionsPeakLeft: { position: 'absolute', width: 13, height: 3, backgroundColor: colors.accent, left: 9, top: 18, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
-  sessionsPeakRight: { position: 'absolute', width: 13, height: 3, backgroundColor: colors.accent, left: 17, top: 18, borderRadius: 3, transform: [{ rotate: '42deg' }] },
-  sessionsSmallPeakLeft: { position: 'absolute', width: 9, height: 3, backgroundColor: colors.accent, left: 8, top: 18, borderRadius: 3, transform: [{ rotate: '42deg' }] },
-  sessionsSmallPeakRight: { position: 'absolute', width: 9, height: 3, backgroundColor: colors.accent, left: 14, top: 18, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
-  routeLineA: { position: 'absolute', width: 3, height: 17, backgroundColor: colors.accent, left: 11, top: 10, borderRadius: 3, transform: [{ rotate: '0deg' }] },
-  routeLineB: { position: 'absolute', width: 3, height: 18, backgroundColor: colors.accent, left: 20, top: 8, borderRadius: 3, transform: [{ rotate: '-47deg' }] },
-  routeNode: { position: 'absolute', width: 8, height: 8, borderRadius: 4, borderWidth: 3, borderColor: colors.accent, backgroundColor: colors.card },
-  routeNodeTop: { left: 17, top: 3 },
-  routeNodeMiddle: { left: 8, top: 14 },
-  routeNodeBottom: { left: 8, top: 26 },
-  hardestDot: { position: 'absolute', width: 8, height: 8, borderRadius: 4, borderWidth: 3, borderColor: colors.accent, left: 15, top: 2, backgroundColor: colors.card },
-  hardestPeakLeft: { position: 'absolute', width: 22, height: 3, backgroundColor: colors.accent, left: 4, top: 22, borderRadius: 3, transform: [{ rotate: '-43deg' }] },
-  hardestPeakRight: { position: 'absolute', width: 23, height: 3, backgroundColor: colors.accent, left: 14, top: 22, borderRadius: 3, transform: [{ rotate: '43deg' }] },
-  hardestSmallPeakLeft: { position: 'absolute', width: 14, height: 3, backgroundColor: colors.accent, left: 3, top: 23, borderRadius: 3, transform: [{ rotate: '43deg' }] },
-  hardestSmallPeakRight: { position: 'absolute', width: 14, height: 3, backgroundColor: colors.accent, left: 13, top: 23, borderRadius: 3, transform: [{ rotate: '-43deg' }] },
-  hardestBase: { position: 'absolute', width: 32, height: 3, backgroundColor: colors.accent, left: 2, top: 29, borderRadius: 3 },
+  statIconFrame: { width: 38, height: 34, alignItems: 'center', justifyContent: 'center', position: 'relative' },
+  sessionsCircle: { width: 30, height: 30, borderRadius: 15, borderWidth: 2.7, borderColor: colors.accent, position: 'absolute', top: 2, left: 4 },
+  sessionsPeakLeft: { position: 'absolute', width: 12, height: 3, backgroundColor: colors.accent, left: 10, top: 18, borderRadius: 3, transform: [{ rotate: '35deg' }] },
+  sessionsPeakRight: { position: 'absolute', width: 17, height: 3, backgroundColor: colors.accent, left: 17, top: 16, borderRadius: 3, transform: [{ rotate: '-38deg' }] },
+  sessionsSmallPeakLeft: { position: 'absolute', width: 10, height: 3, backgroundColor: colors.accent, left: 12, top: 20, borderRadius: 3, transform: [{ rotate: '-35deg' }] },
+  sessionsSmallPeakRight: { position: 'absolute', width: 8, height: 3, backgroundColor: colors.accent, left: 9, top: 17, borderRadius: 3, transform: [{ rotate: '-35deg' }] },
+  clockRing: { position: 'absolute', width: 31, height: 31, borderRadius: 16, borderWidth: 2.7, borderColor: colors.accent, left: 4, top: 2 },
+  clockHandVertical: { position: 'absolute', width: 3, height: 11, backgroundColor: colors.accent, left: 18, top: 8, borderRadius: 3 },
+  clockHandHorizontal: { position: 'absolute', width: 10, height: 3, backgroundColor: colors.accent, left: 18, top: 17, borderRadius: 3 },
+  routeLineA: { position: 'absolute', width: 3, height: 17, backgroundColor: colors.accent, left: 13, top: 10, borderRadius: 3, transform: [{ rotate: '-1deg' }] },
+  routeLineB: { position: 'absolute', width: 3, height: 18, backgroundColor: colors.accent, left: 21, top: 7, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
+  routeNode: { position: 'absolute', width: 9, height: 9, borderRadius: 5, borderWidth: 2.7, borderColor: colors.accent, backgroundColor: colors.card },
+  routeNodeTop: { left: 20, top: 3 },
+  routeNodeMiddle: { left: 9, top: 15 },
+  routeNodeBottom: { left: 10, top: 26 },
+  hardestDot: { position: 'absolute', width: 8, height: 8, borderRadius: 4, borderWidth: 2.7, borderColor: colors.accent, left: 18, top: 2, backgroundColor: colors.card },
+  hardestPeakLeft: { position: 'absolute', width: 23, height: 3, backgroundColor: colors.accent, left: 7, top: 23, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
+  hardestPeakRight: { position: 'absolute', width: 20, height: 3, backgroundColor: colors.accent, left: 20, top: 22, borderRadius: 3, transform: [{ rotate: '42deg' }] },
+  hardestSmallPeakLeft: { position: 'absolute', width: 13, height: 3, backgroundColor: colors.accent, left: 6, top: 24, borderRadius: 3, transform: [{ rotate: '42deg' }] },
+  hardestSmallPeakRight: { position: 'absolute', width: 12, height: 3, backgroundColor: colors.accent, left: 17, top: 24, borderRadius: 3, transform: [{ rotate: '-42deg' }] },
+  hardestBase: { position: 'absolute', width: 32, height: 3, backgroundColor: colors.accent, left: 3, top: 30, borderRadius: 3 },
   metricItem: { flex: 1, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
   metricItemWide: { flex: 1.3, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
   metricValue: { marginTop: 7, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, textAlign: 'center' },
@@ -272,19 +279,20 @@ const s = StyleSheet.create({
   pillGrade: { fontSize: 25, lineHeight: 28, color: colors.accent, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, letterSpacing: -0.3 },
   pillLabel: { fontSize: 14, color: colors.accentDark, fontFamily: typography.family.label, fontWeight: typography.weight.medium },
 
-  trendCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16, minHeight: 212, shadowColor: colors.shadow, shadowOpacity: 0.045, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
-  chartWrap: { flexDirection: 'row', height: 146 },
-  chartLabels: { width: 28, paddingTop: 4, justifyContent: 'space-between', paddingBottom: 23 },
-  chartLabel: { fontSize: 14, color: colors.text2, fontFamily: typography.family.labelRegular, fontWeight: typography.weight.regular },
-  chartArea: { flex: 1, position: 'relative', borderBottomWidth: 1, borderBottomColor: colors.border, marginLeft: 8, marginTop: 2 },
+  trendCard: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16, minHeight: 218, shadowColor: colors.shadow, shadowOpacity: 0.045, shadowRadius: 12, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
+  chartWrap: { flexDirection: 'row', height: 154 },
+  chartLabels: { width: 28, paddingTop: 2, justifyContent: 'space-between', paddingBottom: 28 },
+  chartLabel: { fontSize: 13, lineHeight: 17, color: colors.text2, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
+  chartColumn: { flex: 1, marginLeft: 8 },
+  chartArea: { height: 118, position: 'relative', borderBottomWidth: 1, borderBottomColor: colors.border, marginTop: 2 },
   gridLine: { position: 'absolute', left: 0, right: 0, height: 1, borderTopWidth: 1, borderTopColor: '#D8D1E5', borderStyle: 'dashed' },
   segment: { position: 'absolute', height: 3, backgroundColor: colors.accent, borderRadius: 2, transformOrigin: 'left center' },
-  seg1: { left: '7%', top: 115, width: '22%', transform: [{ rotate: '-8deg' }] },
-  seg2: { left: '29%', top: 98, width: '24%', transform: [{ rotate: '-4deg' }] },
-  seg3: { left: '53%', top: 84, width: '23%', transform: [{ rotate: '7deg' }] },
-  seg4: { left: '76%', top: 93, width: '21%', transform: [{ rotate: '-12deg' }] },
-  point: { position: 'absolute', width: 9, height: 9, borderRadius: 5, backgroundColor: colors.accent },
-  pointActive: { position: 'absolute', right: 5, top: 68, width: 22, height: 22, borderRadius: 11, backgroundColor: colors.accent, borderWidth: 4, borderColor: colors.accentDim },
-  chartDates: { position: 'absolute', left: 0, right: 0, bottom: -28, flexDirection: 'row', justifyContent: 'space-between' },
-  chartDate: { fontSize: 13, color: colors.text2, fontFamily: typography.family.labelRegular, fontWeight: typography.weight.regular },
+  seg1: { left: '7%', top: 96, width: '22%', transform: [{ rotate: '-8deg' }] },
+  seg2: { left: '29%', top: 82, width: '24%', transform: [{ rotate: '-4deg' }] },
+  seg3: { left: '53%', top: 70, width: '23%', transform: [{ rotate: '7deg' }] },
+  seg4: { left: '76%', top: 78, width: '21%', transform: [{ rotate: '-12deg' }] },
+  point: { position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accent },
+  pointActive: { position: 'absolute', right: 5, top: 56, width: 22, height: 22, borderRadius: 11, backgroundColor: colors.accent, borderWidth: 4, borderColor: colors.accentDim },
+  chartDates: { flexDirection: 'row', justifyContent: 'space-between', paddingTop: 9 },
+  chartDate: { fontSize: 12, lineHeight: 16, color: colors.text2, fontFamily: typography.family.regular, fontWeight: typography.weight.regular },
 });

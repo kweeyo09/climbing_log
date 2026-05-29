@@ -7,11 +7,6 @@ import { getTopGrade } from '../../constants/grades';
 import { colors, typography } from '../../constants/theme';
 
 const FALLBACK_COVER: ImageSourcePropType = require('../../assets/mockups/indoor_bouldering_wall.jpg');
-const FALLBACK_GALLERY: ImageSourcePropType[] = [
-  require('../../assets/mockups/indoor_bouldering_wall.jpg'),
-  require('../../assets/mockups/indoor_bouldering_activity.jpg'),
-  require('../../assets/mockups/indoor_bouldering_gym.jpg'),
-];
 
 function shortLocation(loc: string): string {
   const parts = loc.split(',').map(p => p.trim()).filter(Boolean);
@@ -74,7 +69,7 @@ export default function SessionDetailScreen() {
   const coverPhoto: ImageSourcePropType = session.photo_uris?.[0] ? { uri: session.photo_uris[0] } : FALLBACK_COVER;
   const gallery: ImageSourcePropType[] = session.photo_uris?.length
     ? session.photo_uris.slice(0, 3).map(uri => ({ uri }))
-    : FALLBACK_GALLERY;
+    : [];
   const breakdown = gradeBreakdown(session.routes);
 
   return (
@@ -153,11 +148,13 @@ export default function SessionDetailScreen() {
           <Text style={s.notesText}>{session.reflections || 'Felt strong on overhangs. Retry blue V5 next time.'}</Text>
         </View>
 
-        <View style={s.galleryRow}>
-          {gallery.map((uri, index) => (
-            <Image key={`gallery-${index}`} source={uri} style={s.galleryImage} resizeMode="cover" accessibilityLabel={`Session gallery image ${index + 1}`} />
-          ))}
-        </View>
+        {gallery.length > 0 ? (
+          <View style={s.galleryRow}>
+            {gallery.map((uri, index) => (
+              <Image key={`gallery-${index}`} source={uri} style={s.galleryImage} resizeMode="cover" accessibilityLabel={`Session gallery image ${index + 1}`} />
+            ))}
+          </View>
+        ) : null}
       </ScrollView>
 
       <View style={s.actionDock}>

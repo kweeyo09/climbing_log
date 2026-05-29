@@ -81,8 +81,8 @@ export default function StatsScreen() {
   const chartRange = chartMax - chartMin || 1;
   const positionedPoints = chartPoints.map((point, index) => ({
     ...point,
-    x: chartPoints.length === 1 ? 50 : 8 + (index * 84) / (chartPoints.length - 1),
-    y: 82 - ((point.index - chartMin) / chartRange) * 62,
+    x: chartPoints.length === 1 ? 50 : 10 + (index * 80) / (chartPoints.length - 1),
+    y: 78 - ((point.index - chartMin) / chartRange) * 56,
   }));
   const newBest = topVGrade !== '—' ? topVGrade : positionedPoints[positionedPoints.length - 1]?.grade ?? 'V5';
 
@@ -132,7 +132,7 @@ export default function StatsScreen() {
           </View>
           <View style={s.chartWrap}>
             {V_CHART_GRADES.slice().reverse().map((grade, index) => (
-              <View key={grade} style={[s.gridLine, { top: 18 + index * 28 }] as any}>
+              <View key={grade} style={[s.gridLine, { top: 14 + index * 25 }] as any}>
                 <Text style={s.gridLabel}>{grade}</Text>
                 <View style={s.gridRule} />
               </View>
@@ -258,16 +258,16 @@ const s = StyleSheet.create({
   sectionTitle: { fontSize: 24, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -0.5, lineHeight: 25 },
   bestPill: { flexDirection: 'row', alignItems: 'center', gap: 5, backgroundColor: colors.accentDim, borderRadius: 11, paddingHorizontal: 9, paddingVertical: 7 },
   bestPillText: { fontSize: 14, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.accent },
-  chartWrap: { height: 186, position: 'relative', marginTop: 0, overflow: 'hidden' },
+  chartWrap: { height: 176, position: 'relative', marginTop: 4, overflow: 'visible' },
   gridLine: { position: 'absolute', left: 0, right: 0, flexDirection: 'row', alignItems: 'center', gap: 12 },
-  gridLabel: { width: 26, fontSize: 13, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2 },
+  gridLabel: { width: 28, fontSize: 13, lineHeight: 17, fontFamily: typography.family.regular, fontWeight: typography.weight.regular, color: colors.text2 },
   gridRule: { flex: 1, borderTopWidth: 1, borderStyle: 'dashed', borderColor: colors.border },
-  lineShade: { position: 'absolute', left: 32, right: 2, bottom: 17, height: 84, backgroundColor: colors.accentDim, borderTopLeftRadius: 20, borderTopRightRadius: 20, opacity: 0.75 },
-  lineSegment: { position: 'absolute', height: 2.5, backgroundColor: colors.accentDark, borderRadius: 3, marginLeft: 28, transformOrigin: 'left center' as any },
-  point: { position: 'absolute', width: 7, height: 7, borderRadius: 4, backgroundColor: colors.accentDark, marginLeft: 25, marginTop: -2 },
-  pointActive: { width: 15, height: 15, borderRadius: 8, backgroundColor: colors.accent, borderWidth: 3, borderColor: '#EDE9FE', marginLeft: 21, marginTop: -6 },
-  axisRow: { flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 42, paddingRight: 2, marginTop: -7 },
-  axisLabel: { fontSize: 13, fontFamily: typography.family.label, fontWeight: typography.weight.medium, color: colors.text2 },
+  lineShade: { position: 'absolute', left: 40, right: 12, bottom: 26, height: 78, backgroundColor: colors.accentDim, borderTopLeftRadius: 20, borderTopRightRadius: 20, opacity: 0.68 },
+  lineSegment: { position: 'absolute', height: 2.5, backgroundColor: colors.accentDark, borderRadius: 3, marginLeft: 34, transformOrigin: 'left center' as any },
+  point: { position: 'absolute', width: 8, height: 8, borderRadius: 4, backgroundColor: colors.accentDark, marginLeft: 31, marginTop: -3 },
+  pointActive: { width: 18, height: 18, borderRadius: 9, backgroundColor: colors.accent, borderWidth: 3, borderColor: '#EDE9FE', marginLeft: 26, marginTop: -8 },
+  axisRow: { flexDirection: 'row', justifyContent: 'space-between', paddingLeft: 44, paddingRight: 8, marginTop: 6 },
+  axisLabel: { fontSize: 12, lineHeight: 16, fontFamily: typography.family.regular, fontWeight: typography.weight.regular, color: colors.text2 },
   mixList: { gap: 12, marginTop: 14 },
   mixRow: { flexDirection: 'row', alignItems: 'center', gap: 10 },
   mixIconBubble: { width: 31, height: 31, borderRadius: 9, backgroundColor: colors.accentDim, alignItems: 'center', justifyContent: 'center' },
