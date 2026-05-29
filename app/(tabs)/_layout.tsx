@@ -2,10 +2,9 @@ import { Tabs } from 'expo-router';
 import { StyleSheet, View } from 'react-native';
 import { colors } from '../../constants/theme';
 
-const TAB_BAR_HEIGHT = 78;
-const TAB_BAR_PADDING_TOP = 10;
-const TAB_BAR_PADDING_BOTTOM = 20;
-const LOG_TAB_VERTICAL_OFFSET = 10;
+const TAB_BAR_HEIGHT = 82;
+const TAB_BAR_PADDING_TOP = 8;
+const TAB_BAR_PADDING_BOTTOM = 12;
 const TAB_ICON_SIZE = 22;
 
 type TabIconKind = 'calendar' | 'log' | 'sessions' | 'stats';
@@ -83,12 +82,23 @@ export default function TabLayout() {
           paddingBottom:   TAB_BAR_PADDING_BOTTOM,
           paddingTop:      TAB_BAR_PADDING_TOP,
         },
+        tabBarItemStyle: {
+          alignItems:     'center',
+          justifyContent: 'center',
+          paddingVertical: 4,
+        },
+        tabBarIconStyle: {
+          marginBottom: 3,
+          marginTop:    0,
+        },
         tabBarActiveTintColor:   colors.accent,
         tabBarInactiveTintColor: colors.text3,
         tabBarLabelStyle: {
           fontSize:      10,
           fontWeight:    '700',
           letterSpacing: 0.6,
+          lineHeight:    13,
+          marginBottom:  0,
           textTransform: 'uppercase',
         },
       }}
@@ -102,9 +112,6 @@ export default function TabLayout() {
             tabBarIcon: ({ focused, color }) => (
               <TabIcon kind={tab.icon} color={color} focused={focused} />
             ),
-            tabBarItemStyle: tab.name === 'log'
-              ? { transform: [{ translateY: LOG_TAB_VERTICAL_OFFSET }] }
-              : undefined,
           }}
         />
       ))}
