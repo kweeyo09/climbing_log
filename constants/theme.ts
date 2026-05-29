@@ -1,27 +1,22 @@
 /**
  * Core design tokens for the Ascenta mobile app.
  *
- * The refreshed visual direction uses a pure white athletic canvas, crisp white
- * cards, and a vibrant purple accent system to feel premium, focused, and sporty.
+ * The refreshed visual direction uses a soft lavender-white athletic canvas,
+ * crisp white cards, and a vibrant purple accent system to feel premium,
+ * focused, and sporty.
  */
 import { Platform } from 'react-native';
 
-const beatriceFallback = Platform.select({
-  web: '"Beatrice Standard", Beatrice, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-  default: 'Beatrice Standard',
+const clashDisplayFamily = Platform.select({
+  web: '"Clash Display", Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
+  default: 'ClashDisplay',
 });
 
 export const typography = {
   family: {
-    regular: beatriceFallback,
-    semibold: Platform.select({
-      web: '"Beatrice Standard Semibold", "Beatrice Standard", Beatrice, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      default: 'Beatrice Standard Semibold',
-    }),
-    bold: Platform.select({
-      web: '"Beatrice Standard Bold", "Beatrice Standard", Beatrice, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif',
-      default: 'Beatrice Standard Bold',
-    }),
+    regular: clashDisplayFamily,
+    semibold: clashDisplayFamily,
+    bold: clashDisplayFamily,
   },
   weight: {
     regular: '400' as const,
@@ -35,10 +30,10 @@ export const typography = {
 export const fonts = typography.family;
 
 export const colors = {
-  bg:           '#FFFFFF',
+  bg:           '#F8F6FF',
   card:         '#FFFFFF',
-  surface:      '#F5F2FF',
-  surfaceStrong:'#EEE8FF',
+  surface:      '#F1ECFF',
+  surfaceStrong:'#E9DDFF',
   border:       '#E4DDF5',
 
   accent:       '#7C3AED',

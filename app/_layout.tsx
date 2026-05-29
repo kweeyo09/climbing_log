@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react';
 import { Platform, StyleSheet, Text, TextInput, View } from 'react-native';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
+import { useFonts } from 'expo-font';
 import { useSessionStore } from '../store/sessions';
 import { hasSeenOnboarding } from './onboarding';
 import { useRouter } from 'expo-router';
@@ -33,6 +34,10 @@ export default function RootLayout() {
   const loadSessions = useSessionStore(s => s.loadSessions);
   const router = useRouter();
   const [checked, setChecked] = useState(false);
+  const [fontsLoaded] = useFonts({
+    ClashDisplay: require('../assets/fonts/ClashDisplay-Variable.ttf'),
+    'Clash Display': require('../assets/fonts/ClashDisplay-Variable.ttf'),
+  });
 
   useEffect(() => {
     const init = async () => {
@@ -47,6 +52,10 @@ export default function RootLayout() {
     };
     init();
   }, []);
+
+  if (!fontsLoaded) {
+    return <View style={styles.loadingShell} />;
+  }
 
   const app = (
     <>
@@ -74,6 +83,10 @@ export default function RootLayout() {
 }
 
 const styles = StyleSheet.create({
+  loadingShell: {
+    flex: 1,
+    backgroundColor: colors.bg,
+  },
   webPreviewShell: {
     flex: 1,
     width: '100%',
