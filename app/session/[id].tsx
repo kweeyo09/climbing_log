@@ -73,13 +73,26 @@ export default function SessionDetailScreen() {
         <Text style={s.location}>{session.location}</Text>
         <Text style={s.date}>{fmtDate(session.date)}</Text>
 
-        {session.photo_uri ? (
-          <Image
-            source={{ uri: session.photo_uri }}
-            style={s.sessionPhoto}
-            resizeMode="cover"
-            accessibilityLabel="Climbing session photo"
-          />
+        {session.photo_uris?.length ? (
+          <View style={s.galleryBlock}>
+            <ScrollView
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={s.galleryStrip}
+              accessibilityLabel="Climbing session photo gallery"
+            >
+              {session.photo_uris.map((uri, index) => (
+                <Image
+                  key={`${uri}-${index}`}
+                  source={{ uri }}
+                  style={s.sessionPhoto}
+                  resizeMode="cover"
+                  accessibilityLabel={`Climbing session photo ${index + 1}`}
+                />
+              ))}
+            </ScrollView>
+            <Text style={s.galleryCount}>{session.photo_uris.length} {session.photo_uris.length === 1 ? 'photo' : 'photos'}</Text>
+          </View>
         ) : null}
 
         {/* Stat chips */}
@@ -156,7 +169,10 @@ const s = StyleSheet.create({
   editBtnText:     { fontSize: 12, fontWeight: '700', color: colors.accent },
   location:        { fontSize: 28, fontWeight: '900', color: colors.text, letterSpacing: 0.5 },
   date:            { fontSize: 13, color: colors.text2, marginTop: 4, marginBottom: spacing.md },
-  sessionPhoto:    { width: '100%', height: 220, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border, marginBottom: spacing.md },
+  galleryBlock:    { marginBottom: spacing.md, gap: spacing.sm },
+  galleryStrip:    { gap: spacing.sm },
+  sessionPhoto:    { width: 260, height: 220, backgroundColor: colors.surface, borderRadius: radius.md, borderWidth: 1, borderColor: colors.border },
+  galleryCount:    { fontSize: 11, fontWeight: '700', color: colors.text3, letterSpacing: 0.8 },
   chips:           { flexDirection: 'row', flexWrap: 'wrap', gap: 8, marginBottom: spacing.lg },
   chip:            { backgroundColor: colors.surface, borderWidth: 1, borderColor: colors.border, borderRadius: radius.sm, paddingHorizontal: 12, paddingVertical: 6 },
   chipText:        { fontSize: 13, fontWeight: '600', color: colors.text2 },

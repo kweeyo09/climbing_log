@@ -31,7 +31,7 @@ export default function LogScreen() {
   const [duration,    setDuration]    = useState('');
   const [gradeSystem, setGradeSystem] = useState<GradeSystem>('french');
   const [routes,      setRoutes]      = useState<DraftRoute[]>([]);
-  const [photoUri,    setPhotoUri]    = useState<string | null>(null);
+  const [photoUris,   setPhotoUris]   = useState<string[]>([]);
   const [reflections, setReflections] = useState('');
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
 
@@ -83,7 +83,7 @@ export default function LogScreen() {
       duration:     durationMinutes,
       grade_system: gradeSystem,
       reflections:  reflections.trim(),
-      photo_uri:    photoUri,
+      photo_uris:   photoUris,
       routes:       routes.map(({ grade, style, completed }) => ({
         grade, style, completed,
       })),
@@ -94,7 +94,7 @@ export default function LogScreen() {
     setDuration('');
     setGradeSystem('french');
     setRoutes([]);
-    setPhotoUri(null);
+    setPhotoUris([]);
     setReflections('');
 
     router.push('/(tabs)/history');
@@ -191,10 +191,10 @@ export default function LogScreen() {
           {/* Photo */}
           <View style={s.field}>
             <PhotoCapture
-              value={photoUri}
-              onChange={setPhotoUri}
-              label="📷 Photo"
-              helperText="Optional. Take one clear photo to remember the session."
+              value={photoUris}
+              onChange={setPhotoUris}
+              label="📷 Photos"
+              helperText="Optional. Take a photo or choose multiple images to remember the session."
             />
           </View>
 

@@ -16,7 +16,9 @@
       "supportsTablet": false,
       "bundleIdentifier": "com.kweeyo09.ascenta",
       "infoPlist": {
-        "NSCameraUsageDescription": "Ascenta needs camera access so you can add a photo to your climbing session."
+        "NSCameraUsageDescription": "Ascenta needs camera access so you can add photos to your climbing sessions.",
+        "NSPhotoLibraryUsageDescription": "Ascenta needs photo library access so you can choose photos for your climbing sessions.",
+        "NSPhotoLibraryAddUsageDescription": "Ascenta can save edited session photos when needed."
       }
     },
     "android": {
@@ -24,7 +26,12 @@
         "foregroundImage": "./assets/icon.png",
         "backgroundColor": "#EDE5D8"
       },
-      "package": "com.kweeyo09.ascenta"
+      "package": "com.kweeyo09.ascenta",
+      "permissions": [
+        "CAMERA",
+        "READ_MEDIA_IMAGES",
+        "READ_EXTERNAL_STORAGE"
+      ]
     },
     "plugins": [
       "expo-router"

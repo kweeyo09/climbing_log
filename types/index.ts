@@ -10,6 +10,18 @@ export interface Route {
   completed: boolean;
 }
 
+export interface SessionPhoto {
+  id: string;
+  session_id: string;
+  local_uri: string;
+  remote_url?: string | null;
+  storage_path?: string | null;
+  owner_id?: string | null;
+  uploaded_at?: string | null;
+  created_at: string;
+  tags?: string[];
+}
+
 export interface Session {
   id: string;
   user_id?: string;
@@ -18,7 +30,8 @@ export interface Session {
   duration: number;      // minutes
   grade_system: GradeSystem;
   reflections: string;
-  photo_uri?: string | null;
+  photo_uris: string[];
+  photos?: SessionPhoto[];
   routes: Route[];
   created_at: string;
   synced?: boolean;
@@ -31,6 +44,7 @@ export type NewSessionInput = {
   duration: number;
   grade_system: GradeSystem;
   reflections: string;
-  photo_uri?: string | null;
+  photo_uris?: string[];
+  photos?: SessionPhoto[];
   routes: Array<Omit<Route, 'id' | 'session_id'>>;
 };

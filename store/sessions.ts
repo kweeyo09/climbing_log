@@ -17,10 +17,20 @@ import {
   dbDeleteSession,
   dbMarkSynced,
 } from '../lib/db';
-import type { Session, NewSessionInput } from '../types';
+import { deleteLocalPhoto, uploadPhotoToSupabase } from '../lib/photos';
+import type { Session, SessionPhoto, NewSessionInput } from '../types';
 
 const uid = () =>
   `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`;
+
+const buildPhotoMeta = (sessionId: string, photoUris: string[]): SessionPhoto[] =>
+  photoUris.map((localUri, index) => ({
+    id: `${sessionId}-photo-${index}-${Math.random().toString(36).slice(2, 8)}`,
+    session_id: sessionId,
+    local_uri: localUri,
+    created_at: new Date().toISOString(),
+    tags: [],
+  }));
 
 interface SessionState {
   sessions: Session[];
@@ -50,12 +60,16 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   /** Save a new session locally, then try to sync it to Supabase */
   addSession: async (input) => {
+    const sessionId = uid();
+    const photoUris = input.photo_uris ?? [];
     const session: Session = {
-      id:           uid(),
+      id:           sessionId,
       created_at:   new Date().toISOString(),
       synced:       false,
       user_id:      undefined,
       ...input,
+      photo_uris:   photoUris,
+      photos:       input.photos ?? buildPhotoMeta(sessionId, photoUris),
       routes: input.routes.map((r, i) => ({
         ...r,
         id:         `${Date.now()}-${i}`,
@@ -83,9 +97,16 @@ export const useSessionStore = create<SessionState>((set, get) => ({
   updateSession: async (id, input) => {
     const existing = get().sessions.find(s => s.id === id);
     if (!existing) return;
+    const photoUris = input.photo_uris ?? [];
+    const existingPhotoByUri = new Map((existing.photos ?? []).map(photo => [photo.local_uri, photo]));
+    const photos = photoUris.map(uri => existingPhotoByUri.get(uri)).filter(Boolean) as SessionPhoto[];
+    const newPhotos = photoUris.filter(uri => !existingPhotoByUri.has(uri));
+
     const updated: Session = {
       ...existing,
       ...input,
+      photo_uris: photoUris,
+      photos: [...photos, ...buildPhotoMeta(id, newPhotos)],
       synced: false,
       routes: input.routes.map((r, i) => ({
         ...r,
@@ -104,8 +125,13 @@ export const useSessionStore = create<SessionState>((set, get) => ({
 
   /** Delete locally and from Supabase (if configured) */
   deleteSession: async (id) => {
+    const existing = get().sessions.find(s => s.id === id);
     await dbDeleteSession(id);
     set(state => ({ sessions: state.sessions.filter(s => s.id !== id) }));
+
+    if (existing?.photo_uris?.length) {
+      existing.photo_uris.forEach(uri => deleteLocalPhoto(uri));
+    }
 
     // Best-effort remote delete — only when Supabase is configured
     if (supabase) {
@@ -146,11 +172,67 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         });
       }
 
-      await dbMarkSynced(session.id);
+      const uploadedPhotos: SessionPhoto[] = [];
+      let photoUploadFailed = false;
+      for (const uri of session.photo_uris ?? []) {
+        const existingPhoto = session.photos?.find(photo => photo.local_uri === uri && photo.remote_url);
+        if (existingPhoto) {
+          uploadedPhotos.push(existingPhoto);
+          continue;
+        }
+
+        try {
+          const uploaded = await uploadPhotoToSupabase(uri, session.id, user.id);
+          if (!uploaded) {
+            photoUploadFailed = true;
+            continue;
+          }
+
+          const photoMeta: SessionPhoto = {
+            id: `${session.id}-${uploaded.storage_path}`,
+            session_id: session.id,
+            local_uri: uri,
+            remote_url: uploaded.remote_url,
+            storage_path: uploaded.storage_path,
+            owner_id: user.id,
+            uploaded_at: uploaded.uploaded_at,
+            created_at: uploaded.uploaded_at,
+            tags: [],
+          };
+
+          uploadedPhotos.push(photoMeta);
+
+          await supabase.from('session_photos').upsert({
+            id: photoMeta.id,
+            session_id: session.id,
+            user_id: user.id,
+            storage_path: photoMeta.storage_path,
+            public_url: photoMeta.remote_url,
+            tags: photoMeta.tags,
+            created_at: photoMeta.created_at,
+            uploaded_at: photoMeta.uploaded_at,
+          });
+        } catch {
+          photoUploadFailed = true;
+          // Keep the session unsynced so the photo upload can be retried later.
+        }
+      }
+
+      const syncedSession: Session = {
+        ...session,
+        user_id: user.id,
+        photos: uploadedPhotos.length > 0 ? uploadedPhotos : session.photos,
+        synced: !photoUploadFailed,
+      };
+
+      await dbInsertSession(syncedSession);
+      if (!photoUploadFailed) {
+        await dbMarkSynced(session.id);
+      }
 
       set(state => ({
         sessions: state.sessions.map(s =>
-          s.id === session.id ? { ...s, synced: true } : s,
+          s.id === session.id ? syncedSession : s,
         ),
       }));
     }

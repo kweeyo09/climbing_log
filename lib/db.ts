@@ -7,6 +7,26 @@ import type { Session } from "../types";
 
 const SESSIONS_KEY = "ascenta_sessions";
 
+type LegacySession = Session & { photo_uri?: string | null; photo_uris?: string[] };
+
+const normalizeSession = (session: LegacySession): Session => {
+  const legacyPhotoUri = typeof session.photo_uri === "string" && session.photo_uri.length > 0
+    ? session.photo_uri
+    : null;
+  const photoUris = Array.isArray(session.photo_uris)
+    ? session.photo_uris.filter((uri): uri is string => typeof uri === "string" && uri.length > 0)
+    : legacyPhotoUri
+      ? [legacyPhotoUri]
+      : [];
+
+  const { photo_uri: _legacyPhotoUri, ...normalized } = session;
+
+  return {
+    ...normalized,
+    photo_uris: photoUris,
+  };
+};
+
 async function readAll(): Promise<Session[]> {
   try {
     const raw = await AsyncStorage.getItem(SESSIONS_KEY);
@@ -21,7 +41,7 @@ async function readAll(): Promise<Session[]> {
       return [];
     }
     if (!Array.isArray(parsed)) return [];
-    return parsed as Session[];
+    return (parsed as LegacySession[]).map(normalizeSession);
   } catch {
     return [];
   }
@@ -29,7 +49,7 @@ async function readAll(): Promise<Session[]> {
 
 async function writeAll(sessions: Session[]): Promise<void> {
   try {
-    await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions));
+    await AsyncStorage.setItem(SESSIONS_KEY, JSON.stringify(sessions.map(normalizeSession)));
   } catch {
     // Storage full or unavailable — fail silently
   }
@@ -46,9 +66,9 @@ export async function dbInsertSession(session: Session): Promise<void> {
   const sessions = await readAll();
   const idx = sessions.findIndex((s) => s.id === session.id);
   if (idx >= 0) {
-    sessions[idx] = session;
+    sessions[idx] = normalizeSession(session);
   } else {
-    sessions.push(session);
+    sessions.push(normalizeSession(session));
   }
   await writeAll(sessions);
 }
