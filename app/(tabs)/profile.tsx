@@ -1,6 +1,8 @@
-import { Alert, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
+import { useRouter } from 'expo-router';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSessionStore } from '../../store/sessions';
 import { colors, typography } from '../../constants/theme';
 
@@ -16,7 +18,13 @@ function showComingSoon(label: string) {
 }
 
 export default function ProfileScreen() {
+  const router = useRouter();
   const sessions = useSessionStore(s => s.sessions);
+
+  const handleLogout = async () => {
+    await AsyncStorage.removeItem('ascenta_onboarding_done');
+    router.replace('/onboarding');
+  };
   const syncedSessions = sessions.filter(session => session.synced).length;
   const photoCount = sessions.reduce((acc, session) => acc + (session.photo_uris?.length ?? 0), 0);
   const backedUpPhotoCount = sessions.reduce((acc, session) => acc + (session.synced ? (session.photo_uris?.length ?? 0) : 0), 0);
@@ -28,6 +36,7 @@ export default function ProfileScreen() {
     { label: 'Export data', icon: 'download-outline', onPress: () => showComingSoon('Export data') },
     { label: 'Delete account', icon: 'trash-outline', destructive: true, onPress: () => showComingSoon('Delete account') },
     { label: 'Support', icon: 'headset-outline', onPress: () => showComingSoon('Support') },
+    { label: 'Log out', icon: 'log-out-outline', destructive: true, onPress: handleLogout },
   ];
 
   return (
@@ -35,11 +44,7 @@ export default function ProfileScreen() {
       <ScrollView contentContainerStyle={s.scroll} showsVerticalScrollIndicator={false}>
         <View style={s.headerRow}>
           <Text style={s.screenTitle}>Profile</Text>
-          <View style={s.brandMark} accessibilityLabel="Ascenta logo mark">
-            <View style={s.logoStrokeLeft} />
-            <View style={s.logoStrokeRight} />
-            <View style={s.logoStrokeCross} />
-          </View>
+          <Image source={require('../../assets/logo_default.png')} style={s.brandMark} accessibilityLabel="Ascenta logo" resizeMode="contain" />
         </View>
 
         <TouchableOpacity style={s.profileCard} activeOpacity={0.86} onPress={() => showComingSoon('Account profile')} accessibilityRole="button" accessibilityLabel="Open account profile details">
@@ -117,10 +122,7 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 112 },
   headerRow: { flexDirection: 'row', alignItems: 'center', justifyContent: 'space-between', marginBottom: 16 },
   screenTitle: { fontSize: 52, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -1.8, lineHeight: 54 },
-  brandMark: { width: 48, height: 48, position: 'relative' },
-  logoStrokeLeft: { position: 'absolute', left: 10, bottom: 4, width: 3, height: 42, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '18deg' }] },
-  logoStrokeRight: { position: 'absolute', right: 10, bottom: 4, width: 3, height: 42, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '-18deg' }] },
-  logoStrokeCross: { position: 'absolute', left: 17, bottom: 15, width: 18, height: 3, borderRadius: 2, backgroundColor: colors.accent, transform: [{ rotate: '-24deg' }] },
+  brandMark: { width: 56, height: 56, backgroundColor: colors.bg },
   profileCard: { minHeight: 136, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 22, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 16, marginBottom: 14, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
   avatarWrap: { width: 86, height: 86, borderRadius: 43, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
   avatar: { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.accentDark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },

@@ -6,11 +6,12 @@
 import { useState } from 'react';
 import {
   View, Text, StyleSheet, TouchableOpacity, TextInput,
-  KeyboardAvoidingView, Platform, ScrollView, Alert,
+  KeyboardAvoidingView, Platform, ScrollView, ActivityIndicator,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { supabase } from '../lib/supabase';
 import { colors, spacing, radius, typography } from '../constants/theme';
 
 const ONBOARDING_KEY = 'ascenta_onboarding_done';
@@ -66,6 +67,10 @@ export default function OnboardingScreen() {
   const [step,  setStep]  = useState(0);
   const [email, setEmail] = useState('');
   const [emailError, setEmailError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [emailSent, setEmailSent] = useState(false);
+  const [otp, setOtp] = useState('');
+  const [otpError, setOtpError] = useState('');
 
   const current = STEPS[step];
   const isSignIn = current.type === 'signin';
@@ -86,14 +91,34 @@ export default function OnboardingScreen() {
 
   const handleSignInWithEmail = async () => {
     const emailRe = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!email.trim()) {
-      setEmailError('Please enter your email');
-      return;
-    }
-    if (!emailRe.test(email.trim())) {
-      setEmailError('Invalid email — try again');
-      return;
-    }
+    if (!email.trim()) { setEmailError('Please enter your email'); return; }
+    if (!emailRe.test(email.trim())) { setEmailError('Invalid email — try again'); return; }
+    if (!supabase) { await finish(); return; }
+
+    setLoading(true);
+    const { error } = await supabase.auth.signInWithOtp({
+      email: email.trim(),
+      options: { shouldCreateUser: true },
+    });
+    setLoading(false);
+
+    if (error) { setEmailError(error.message); return; }
+    setEmailSent(true);
+  };
+
+  const handleVerifyOtp = async () => {
+    if (!otp.trim() || otp.trim().length < 6) { setOtpError('Enter the 6-digit code'); return; }
+    if (!supabase) { await finish(); return; }
+
+    setLoading(true);
+    const { error } = await supabase.auth.verifyOtp({
+      email: email.trim(),
+      token: otp.trim(),
+      type: 'email',
+    });
+    setLoading(false);
+
+    if (error) { setOtpError(error.message); return; }
     await finish();
   };
 
@@ -122,26 +147,19 @@ export default function OnboardingScreen() {
           </Text>
           <Text style={s.desc}>{current.desc}</Text>
 
-          {isSignIn && (
+          {isSignIn && !emailSent && (
             <View style={s.authBlock}>
-              {/* Apple */}
               <TouchableOpacity style={[s.authBtn, s.authApple]} onPress={finish} activeOpacity={0.85}>
                 <Text style={s.authAppleText}>Continue with Apple</Text>
               </TouchableOpacity>
-
-              {/* Google */}
               <TouchableOpacity style={[s.authBtn, s.authGoogle]} onPress={finish} activeOpacity={0.85}>
                 <Text style={s.authGoogleText}>Continue with Google</Text>
               </TouchableOpacity>
-
-              {/* Divider */}
               <View style={s.divider}>
                 <View style={s.dividerLine} />
                 <Text style={s.dividerText}>or</Text>
                 <View style={s.dividerLine} />
               </View>
-
-              {/* Email */}
               <TextInput
                 style={[s.emailInput, emailError ? s.emailInputError : null]}
                 value={email}
@@ -151,11 +169,36 @@ export default function OnboardingScreen() {
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
+                editable={!loading}
               />
               {emailError ? <Text style={s.emailError}>{emailError}</Text> : null}
+              <TouchableOpacity style={[s.authBtn, s.authEmail, loading && s.authBtnDisabled]} onPress={handleSignInWithEmail} activeOpacity={0.85} disabled={loading}>
+                {loading ? <ActivityIndicator color={colors.inverseText} /> : <Text style={s.authEmailText}>Continue with Email</Text>}
+              </TouchableOpacity>
+            </View>
+          )}
 
-              <TouchableOpacity style={[s.authBtn, s.authEmail]} onPress={handleSignInWithEmail} activeOpacity={0.85}>
-                <Text style={s.authEmailText}>Continue with Email</Text>
+          {isSignIn && emailSent && (
+            <View style={s.authBlock}>
+              <Text style={s.otpHint}>We sent a 6-digit code to <Text style={s.otpEmail}>{email}</Text></Text>
+              <TextInput
+                style={[s.emailInput, otpError ? s.emailInputError : null]}
+                value={otp}
+                onChangeText={v => { setOtp(v.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }}
+                placeholder="Enter 6-digit code"
+                placeholderTextColor={colors.text3}
+                keyboardType="number-pad"
+                autoCapitalize="none"
+                autoCorrect={false}
+                maxLength={6}
+                editable={!loading}
+              />
+              {otpError ? <Text style={s.emailError}>{otpError}</Text> : null}
+              <TouchableOpacity style={[s.authBtn, s.authEmail, loading && s.authBtnDisabled]} onPress={handleVerifyOtp} activeOpacity={0.85} disabled={loading}>
+                {loading ? <ActivityIndicator color={colors.inverseText} /> : <Text style={s.authEmailText}>Verify Code</Text>}
+              </TouchableOpacity>
+              <TouchableOpacity style={s.skipBtn} onPress={() => { setEmailSent(false); setOtp(''); setOtpError(''); }} activeOpacity={0.7}>
+                <Text style={s.skipText}>Use a different email</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -209,6 +252,9 @@ const s = StyleSheet.create({
   emailInput:     { width: '100%', backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, padding: 13, fontSize: 14, color: colors.text },
   emailInputError:{ borderColor: colors.error },
   emailError:     { fontSize: 12, color: colors.error, alignSelf: 'flex-start', marginTop: -4 },
+  authBtnDisabled:{ opacity: 0.6 },
+  otpHint:        { fontSize: 14, color: colors.text2, textAlign: 'center', lineHeight: 20 },
+  otpEmail:       { color: colors.highlight, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
 
   // Footer
   footer:         { paddingHorizontal: spacing.lg, paddingBottom: 32 },
