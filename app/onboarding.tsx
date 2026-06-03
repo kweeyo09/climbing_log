@@ -107,7 +107,7 @@ export default function OnboardingScreen() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp.trim() || otp.trim().length < 6) { setOtpError('Enter the 6-digit code'); return; }
+    if (!otp.trim() || otp.trim().length < 6) { setOtpError('Enter the 6-character code from your email'); return; }
     if (!supabase) { await finish(); return; }
 
     setLoading(true);
@@ -180,16 +180,17 @@ export default function OnboardingScreen() {
 
           {isSignIn && emailSent && (
             <View style={s.authBlock}>
-              <Text style={s.otpHint}>We sent a 6-digit code to <Text style={s.otpEmail}>{email}</Text></Text>
+              <Text style={s.otpHint}>We sent a code to <Text style={s.otpEmail}>{email}</Text></Text>
               <TextInput
                 style={[s.emailInput, otpError ? s.emailInputError : null]}
                 value={otp}
-                onChangeText={v => { setOtp(v.replace(/\D/g, '').slice(0, 6)); setOtpError(''); }}
-                placeholder="Enter 6-digit code"
+                onChangeText={v => { setOtp(v.trim().slice(0, 6)); setOtpError(''); }}
+                placeholder="Enter code"
                 placeholderTextColor={colors.text3}
-                keyboardType="number-pad"
+                keyboardType="default"
                 autoCapitalize="none"
                 autoCorrect={false}
+                autoComplete="one-time-code"
                 maxLength={6}
                 editable={!loading}
               />
