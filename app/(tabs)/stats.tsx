@@ -132,52 +132,53 @@ export default function StatsScreen() {
               <Text style={s.chartEmptyText}>Log 2+ V-grade sessions to see your progression</Text>
             </View>
           ) : (
-          <View style={s.chartWrap}>
-            {V_CHART_GRADES.slice().reverse().map((grade, index) => (
-              <View key={grade} style={[s.gridLine, { top: 14 + index * 25 }] as any}>
-                <Text style={s.gridLabel}>{grade}</Text>
-                <View style={s.gridRule} />
-              </View>
-            ))}
-            <View style={s.lineShade} />
-            {positionedPoints.slice(0, -1).map((point, index) => {
-              const next = positionedPoints[index + 1];
-              const dx = next.x - point.x;
-              const dy = next.y - point.y;
-              const length = Math.sqrt(dx * dx + dy * dy);
-              const angle = Math.atan2(dy, dx) * (180 / Math.PI);
-              return (
+          <>
+            <View style={s.chartWrap}>
+              {V_CHART_GRADES.slice().reverse().map((grade, index) => (
+                <View key={grade} style={[s.gridLine, { top: 14 + index * 25 }] as any}>
+                  <Text style={s.gridLabel}>{grade}</Text>
+                  <View style={s.gridRule} />
+                </View>
+              ))}
+              <View style={s.lineShade} />
+              {positionedPoints.slice(0, -1).map((point, index) => {
+                const next = positionedPoints[index + 1];
+                const dx = next.x - point.x;
+                const dy = next.y - point.y;
+                const length = Math.sqrt(dx * dx + dy * dy);
+                const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+                return (
+                  <View
+                    key={`${point.date}-${next.date}`}
+                    style={[
+                      s.lineSegment,
+                      {
+                        left: `${point.x}%` as any,
+                        top: `${point.y}%` as any,
+                        width: `${length}%` as any,
+                        transform: [{ rotate: `${angle}deg` }],
+                      },
+                    ]}
+                  />
+                );
+              })}
+              {positionedPoints.map((point, index) => (
                 <View
-                  key={`${point.date}-${next.date}`}
+                  key={`${point.date}-${index}`}
                   style={[
-                    s.lineSegment,
-                    {
-                      left: `${point.x}%` as any,
-                      top: `${point.y}%` as any,
-                      width: `${length}%` as any,
-                      transform: [{ rotate: `${angle}deg` }],
-                    },
+                    s.point,
+                    index === positionedPoints.length - 1 && s.pointActive,
+                    { left: `${point.x}%` as any, top: `${point.y}%` as any },
                   ]}
                 />
-              );
-            })}
-            {positionedPoints.map((point, index) => (
-              <View
-                key={`${point.date}-${index}`}
-                style={[
-                  s.point,
-                  index === positionedPoints.length - 1 && s.pointActive,
-                  { left: `${point.x}%` as any, top: `${point.y}%` as any },
-                ]}
-              />
-            ))}
-          </View>
-          <View style={s.axisRow}>
-            {positionedPoints.map((point, index) => (
-              <Text key={`${point.date}-${index}`} style={s.axisLabel}>{new Date(point.date + 'T12:00').toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</Text>
-            ))}
-          </View>
-          </View>
+              ))}
+            </View>
+            <View style={s.axisRow}>
+              {positionedPoints.map((point, index) => (
+                <Text key={`${point.date}-${index}`} style={s.axisLabel}>{new Date(point.date + 'T12:00').toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</Text>
+              ))}
+            </View>
+          </>
           )}
         </View>
 
