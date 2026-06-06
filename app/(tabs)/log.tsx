@@ -1,10 +1,10 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import {
   View, Text, TextInput, ScrollView, StyleSheet, TouchableOpacity,
   Pressable, Modal,
 } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
-import { useRouter } from 'expo-router';
+import { useRouter, useLocalSearchParams } from 'expo-router';
 import { useSessionStore } from '../../store/sessions';
 import RouteEntry from '../../components/RouteEntry';
 import LocationSearch from '../../components/LocationSearch';
@@ -62,8 +62,12 @@ function calendarDays(monthDate: Date): Date[] {
 }
 
 export default function LogScreen() {
-  const router      = useRouter();
-  const addSession  = useSessionStore(s => s.addSession);
+  const router         = useRouter();
+  const { editId }     = useLocalSearchParams<{ editId?: string }>();
+  const addSession     = useSessionStore(s => s.addSession);
+  const updateSession  = useSessionStore(s => s.updateSession);
+  const sessions       = useSessionStore(s => s.sessions);
+  const editingSession = editId ? sessions.find(s => s.id === editId) : undefined;
 
   const [date,        setDate]        = useState(todayISO());
   const [calendarOpen,setCalendarOpen]= useState(false);
@@ -75,6 +79,19 @@ export default function LogScreen() {
   const [photoUris,   setPhotoUris]   = useState<string[]>([]);
   const [reflections, setReflections] = useState('');
   const [validationMessage, setValidationMessage] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (editingSession) {
+      setDate(editingSession.date);
+      setCalendarMonth(dateFromISO(editingSession.date));
+      setLocation(editingSession.location);
+      setDuration(String(editingSession.duration || ''));
+      setGradeSystem(editingSession.grade_system);
+      setRoutes(editingSession.routes.map((r, i) => ({ tempId: i, grade: r.grade, style: r.style, completed: r.completed })));
+      setPhotoUris(editingSession.photo_uris ?? []);
+      setReflections(editingSession.reflections ?? '');
+    }
+  }, [editId]);
 
   const grades = getGrades(gradeSystem);
   const selectedDate = dateFromISO(date);
@@ -131,28 +148,32 @@ export default function LogScreen() {
       return;
     }
 
-    await addSession({
+    const payload = {
       date,
       location:     trimmedLocation,
       duration:     durationMinutes,
       grade_system: gradeSystem,
       reflections:  reflections.trim(),
       photo_uris:   photoUris,
-      routes:       routes.map(({ grade, style, completed }) => ({
-        grade, style, completed,
-      })),
-    });
-    // Reset form
-    setDate(todayISO());
-    setCalendarMonth(dateFromISO(todayISO()));
-    setLocation('');
-    setDuration('');
-    setGradeSystem('french');
-    setRoutes([]);
-    setPhotoUris([]);
-    setReflections('');
+      routes:       routes.map(({ grade, style, completed }) => ({ grade, style, completed })),
+    };
 
-    router.push('/(tabs)/history');
+    if (editId) {
+      await updateSession(editId, payload);
+      router.back();
+    } else {
+      await addSession(payload);
+      // Reset form
+      setDate(todayISO());
+      setCalendarMonth(dateFromISO(todayISO()));
+      setLocation('');
+      setDuration('');
+      setGradeSystem('french');
+      setRoutes([]);
+      setPhotoUris([]);
+      setReflections('');
+      router.push('/(tabs)/history');
+    }
   };
 
   return (
@@ -160,8 +181,8 @@ export default function LogScreen() {
       <ScrollView contentContainerStyle={s.scroll} keyboardShouldPersistTaps="handled">
 
         <View style={s.header}>
-          <Text style={s.headerTitle}>✏️ LOG SESSION</Text>
-          <Text style={s.headerSub}>Record your climb 🧗</Text>
+          <Text style={s.headerTitle}>{editingSession ? '✏️ EDIT SESSION' : '✏️ LOG SESSION'}</Text>
+          <Text style={s.headerSub}>{editingSession ? 'Update your session details 🧗' : 'Record your climb 🧗'}</Text>
         </View>
         <View style={s.accentLine} />
 
@@ -274,7 +295,7 @@ export default function LogScreen() {
           </View>
 
           <TouchableOpacity style={s.saveBtn} onPress={handleSave} activeOpacity={0.85}>
-            <Text style={s.saveBtnText}>💾 SAVE SESSION</Text>
+            <Text style={s.saveBtnText}>{editingSession ? '💾 UPDATE SESSION' : '💾 SAVE SESSION'}</Text>
           </TouchableOpacity>
 
           <View style={{ height: 16 }} />

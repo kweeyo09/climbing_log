@@ -3,7 +3,7 @@ import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useSessionStore } from '../../store/sessions';
-import { getTopGrade } from '../../constants/grades';
+import { getTopGrade, V_GRADES } from '../../constants/grades';
 import { colors, typography } from '../../constants/theme';
 
 const TAB_BAR_HEIGHT = 92;
@@ -50,27 +50,46 @@ function StatIcon({ variant }: { variant: WeeklyStatIcon }) {
   );
 }
 
-function MiniTrend() {
+function MiniTrend({ points }: { points: Array<{ date: string; grade: string; index: number }> }) {
+  const CHART_LABELS = ['V6', 'V4', 'V2', 'V0'];
+  const minIdx = Math.min(...points.map(p => p.index), 0);
+  const maxIdx = Math.max(...points.map(p => p.index), 6);
+  const range = maxIdx - minIdx || 1;
+  const positioned = points.map((p, i) => ({
+    ...p,
+    x: points.length === 1 ? 50 : 6 + (i * 88) / (points.length - 1),
+    y: 90 - ((p.index - minIdx) / range) * 75,
+  }));
+
   return (
     <View style={s.chartWrap}>
       <View style={s.chartLabels}>
-        {['V6', 'V4', 'V2', 'V0'].map(label => <Text key={label} style={s.chartLabel}>{label}</Text>)}
+        {CHART_LABELS.map(label => <Text key={label} style={s.chartLabel}>{label}</Text>)}
       </View>
       <View style={s.chartColumn}>
         <View style={s.chartArea}>
           {[0, 1, 2, 3].map(i => <View key={i} style={[s.gridLine, { top: 12 + i * 35 }]} />)}
-          <View style={[s.segment, s.seg1]} />
-          <View style={[s.segment, s.seg2]} />
-          <View style={[s.segment, s.seg3]} />
-          <View style={[s.segment, s.seg4]} />
-          <View style={[s.point, { left: '6%', top: 91 }]} />
-          <View style={[s.point, { left: '28%', top: 76 }]} />
-          <View style={[s.point, { left: '53%', top: 65 }]} />
-          <View style={[s.point, { left: '75%', top: 76 }]} />
-          <View style={s.pointActive} />
+          {positioned.slice(0, -1).map((p, i) => {
+            const next = positioned[i + 1];
+            const dx = next.x - p.x;
+            const dy = next.y - p.y;
+            const len = Math.sqrt(dx * dx + dy * dy);
+            const angle = Math.atan2(dy, dx) * (180 / Math.PI);
+            return (
+              <View
+                key={`seg-${i}`}
+                style={[s.segment, { left: `${p.x}%` as any, top: `${p.y}%` as any, width: `${len}%` as any, transform: [{ rotate: `${angle}deg` }] }]}
+              />
+            );
+          })}
+          {positioned.map((p, i) => (
+            <View key={`pt-${i}`} style={[i === positioned.length - 1 ? s.pointActive : s.point, { left: `${p.x}%` as any, top: `${p.y}%` as any }]} />
+          ))}
         </View>
         <View style={s.chartDates}>
-          {['May 12', 'May 19', 'May 26', 'Jun 2', 'Jun 9'].map(label => <Text key={label} style={s.chartDate}>{label}</Text>)}
+          {positioned.map(p => (
+            <Text key={p.date} style={s.chartDate}>{new Date(p.date + 'T12:00').toLocaleDateString('en-GB', { day: 'numeric', month: 'short' })}</Text>
+          ))}
         </View>
       </View>
     </View>
@@ -93,6 +112,21 @@ export default function HomeScreen() {
   const weekMinutes = weekSessions.reduce((sum, session) => sum + (session.duration || 0), 0);
   const topGrade = latestSession ? getTopGrade(latestSession.routes, latestSession.grade_system) : getTopGrade(allRoutes, 'v');
   const hasData = sessions.length > 0;
+
+  const trendPoints = sessions
+    .filter(s => s.grade_system === 'v')
+    .slice(0, 5)
+    .reverse()
+    .map(s => {
+      const done = s.routes.filter(r => r.completed);
+      const best = done.reduce<typeof done[number] | null>((b, r) => {
+        if (!b) return r;
+        return V_GRADES.indexOf(r.grade) > V_GRADES.indexOf(b.grade) ? r : b;
+      }, null);
+      return best ? { date: s.date, grade: best.grade, index: V_GRADES.indexOf(best.grade) } : null;
+    })
+    .filter(Boolean) as Array<{ date: string; grade: string; index: number }>;
+  const hasTrend = trendPoints.length >= 2;
 
   const displaySessions = weekSessions.length;
   const displayDuration = weekMinutes > 0 ? formatDuration(weekMinutes) : '--';
@@ -182,13 +216,13 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
 
-        {hasData && (
+        {hasTrend && (
           <TouchableOpacity style={s.trendCard} activeOpacity={0.86} onPress={() => router.push('/(tabs)/stats')}>
             <View style={s.cardTitleRow}>
               <Text style={s.cardHeading}>GRADE TREND</Text>
               <Ionicons name="chevron-forward" size={25} color={colors.accent} />
             </View>
-            <MiniTrend />
+            <MiniTrend points={trendPoints} />
           </TouchableOpacity>
         )}
       </ScrollView>

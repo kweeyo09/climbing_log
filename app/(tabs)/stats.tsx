@@ -69,22 +69,17 @@ export default function StatsScreen() {
     })
     .filter(Boolean) as Array<{ date: string; grade: string; index: number }>;
 
-  const chartPoints = (vSessions.length >= 2 ? vSessions : [
-    { date: '2026-04-20', grade: 'V2', index: 2 },
-    { date: '2026-04-27', grade: 'V3', index: 3 },
-    { date: '2026-05-04', grade: 'V3', index: 3 },
-    { date: '2026-05-11', grade: 'V4', index: 4 },
-    { date: '2026-05-18', grade: topVGrade !== '—' ? topVGrade : 'V5', index: Math.max(V_GRADES.indexOf(topVGrade), 5) },
-  ]).slice(0, 5);
-  const chartMin = Math.min(...chartPoints.map(point => point.index), 2);
-  const chartMax = Math.max(...chartPoints.map(point => point.index), 6);
+  const chartPoints = vSessions.slice(0, 5);
+  const hasChart = chartPoints.length >= 2;
+  const chartMin = hasChart ? Math.min(...chartPoints.map(point => point.index), 2) : 0;
+  const chartMax = hasChart ? Math.max(...chartPoints.map(point => point.index), 6) : 6;
   const chartRange = chartMax - chartMin || 1;
   const positionedPoints = chartPoints.map((point, index) => ({
     ...point,
     x: chartPoints.length === 1 ? 50 : 10 + (index * 80) / (chartPoints.length - 1),
     y: 78 - ((point.index - chartMin) / chartRange) * 56,
   }));
-  const newBest = topVGrade !== '—' ? topVGrade : positionedPoints[positionedPoints.length - 1]?.grade ?? 'V5';
+  const newBest = topVGrade !== '—' ? topVGrade : null;
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
@@ -125,11 +120,18 @@ export default function StatsScreen() {
         <View style={s.card}>
           <View style={s.sectionHeaderRow}>
             <Text style={s.sectionTitle}>Grade progression</Text>
-            <View style={s.bestPill}>
-              <Ionicons name="star" size={13} color={colors.accent} />
-              <Text style={s.bestPillText}>New best {newBest}</Text>
-            </View>
+            {newBest && (
+              <View style={s.bestPill}>
+                <Ionicons name="star" size={13} color={colors.accent} />
+                <Text style={s.bestPillText}>New best {newBest}</Text>
+              </View>
+            )}
           </View>
+          {!hasChart ? (
+            <View style={s.chartEmpty}>
+              <Text style={s.chartEmptyText}>Log 2+ V-grade sessions to see your progression</Text>
+            </View>
+          ) : (
           <View style={s.chartWrap}>
             {V_CHART_GRADES.slice().reverse().map((grade, index) => (
               <View key={grade} style={[s.gridLine, { top: 14 + index * 25 }] as any}>
@@ -175,6 +177,8 @@ export default function StatsScreen() {
               <Text key={`${point.date}-${index}`} style={s.axisLabel}>{new Date(point.date + 'T12:00').toLocaleDateString('en-GB', { month: 'short', day: 'numeric' })}</Text>
             ))}
           </View>
+          </View>
+          )}
         </View>
 
         <View style={s.card}>
@@ -288,4 +292,6 @@ const s = StyleSheet.create({
   empty: { backgroundColor: colors.card, borderWidth: 1, borderColor: colors.border, borderRadius: 20, padding: 16, alignItems: 'center' },
   emptyTitle: { fontSize: 22, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, marginBottom: 4 },
   emptyText: { fontSize: 13, color: colors.text2, textAlign: 'center', lineHeight: 20 },
+  chartEmpty: { alignItems: 'center', justifyContent: 'center', paddingVertical: 32 },
+  chartEmptyText: { fontSize: 14, color: colors.text2, textAlign: 'center', lineHeight: 20 },
 });

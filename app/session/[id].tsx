@@ -159,10 +159,7 @@ export default function SessionDetailScreen() {
 
       <View style={s.actionDock}>
         <TouchableOpacity style={s.addRouteButton} activeOpacity={0.86} onPress={() => router.push({ pathname: '/(tabs)/log', params: { editId: session.id } })}>
-          <Text style={s.addRouteText}>ADD ROUTE</Text>
-        </TouchableOpacity>
-        <TouchableOpacity style={s.editSessionButton} activeOpacity={0.8} onPress={() => router.push({ pathname: '/(tabs)/log', params: { editId: session.id } })}>
-          <Text style={s.editSessionText}>EDIT SESSION</Text>
+          <Text style={s.addRouteText}>EDIT SESSION</Text>
         </TouchableOpacity>
       </View>
     </SafeAreaView>
@@ -213,6 +210,4 @@ const s = StyleSheet.create({
   actionDock: { position: 'absolute', left: 14, right: 14, bottom: 0, borderTopLeftRadius: 18, borderTopRightRadius: 18, backgroundColor: 'rgba(14,15,19,0.98)', borderWidth: 1, borderBottomWidth: 0, borderColor: '#27242D', paddingHorizontal: 13, paddingTop: 14, paddingBottom: 24 },
   addRouteButton: { height: 48, borderRadius: 8, backgroundColor: colors.accent, alignItems: 'center', justifyContent: 'center' },
   addRouteText: { color: '#FFFFFF', fontSize: 20, lineHeight: 25, letterSpacing: 0.7, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
-  editSessionButton: { alignItems: 'center', justifyContent: 'center', paddingTop: 15, paddingBottom: 2 },
-  editSessionText: { color: '#A855F7', fontSize: 16, lineHeight: 21, letterSpacing: 1.05, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
 });
