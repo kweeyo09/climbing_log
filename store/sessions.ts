@@ -16,6 +16,7 @@ import {
   dbInsertSession,
   dbDeleteSession,
   dbMarkSynced,
+  dbClearAll,
 } from '../lib/db';
 import { deleteLocalPhoto, uploadPhotoToSupabase } from '../lib/photos';
 import type { Session, SessionPhoto, NewSessionInput } from '../types';
@@ -36,11 +37,13 @@ interface SessionState {
   sessions: Session[];
   loading: boolean;
   // Methods
-  loadSessions:   () => Promise<void>;
-  addSession:     (input: NewSessionInput) => Promise<void>;
-  updateSession:  (id: string, input: NewSessionInput) => Promise<void>;
-  deleteSession:  (id: string) => Promise<void>;
-  syncToCloud:    () => Promise<void>;
+  loadSessions:        () => Promise<void>;
+  addSession:          (input: NewSessionInput) => Promise<void>;
+  updateSession:       (id: string, input: NewSessionInput) => Promise<void>;
+  deleteSession:       (id: string) => Promise<void>;
+  syncToCloud:         () => Promise<void>;
+  loadFromCloud:       () => Promise<void>;
+  clearLocalSessions:  () => Promise<void>;
 }
 
 export const useSessionStore = create<SessionState>((set, get) => ({
@@ -236,5 +239,74 @@ export const useSessionStore = create<SessionState>((set, get) => ({
         ),
       }));
     }
+  },
+
+  /** Fetch this user's sessions from Supabase and merge into local store */
+  loadFromCloud: async () => {
+    if (!supabase) return;
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) return;
+
+    const { data: sessionRows, error } = await supabase
+      .from('sessions')
+      .select('*')
+      .eq('user_id', user.id)
+      .order('date', { ascending: false });
+
+    if (error || !sessionRows?.length) return;
+
+    const { data: routeRows } = await supabase
+      .from('routes')
+      .select('*')
+      .in('session_id', sessionRows.map(s => s.id));
+
+    const routesBySession = new Map<string, typeof routeRows>();
+    (routeRows ?? []).forEach(r => {
+      const list = routesBySession.get(r.session_id) ?? [];
+      list.push(r);
+      routesBySession.set(r.session_id, list);
+    });
+
+    const cloudSessions: Session[] = sessionRows.map(sr => ({
+      id:           sr.id,
+      user_id:      sr.user_id,
+      date:         sr.date,
+      location:     sr.location,
+      duration:     sr.duration ?? 0,
+      grade_system: sr.grade_system ?? 'french',
+      reflections:  sr.reflections ?? '',
+      created_at:   sr.created_at,
+      synced:       true,
+      photo_uris:   [],
+      photos:       [],
+      routes: (routesBySession.get(sr.id) ?? []).map(r => ({
+        id:         r.id,
+        session_id: r.session_id,
+        grade:      r.grade,
+        style:      r.style,
+        completed:  r.completed ?? false,
+      })),
+    }));
+
+    // Merge: cloud wins on id conflict, preserve local-only sessions
+    const existingMap = new Map(get().sessions.map(s => [s.id, s]));
+    for (const cs of cloudSessions) {
+      existingMap.set(cs.id, { ...existingMap.get(cs.id), ...cs });
+    }
+    const merged = [...existingMap.values()].sort(
+      (a, b) => new Date(b.date).getTime() - new Date(a.date).getTime(),
+    );
+
+    for (const s of cloudSessions) {
+      await dbInsertSession(s);
+    }
+
+    set({ sessions: merged });
+  },
+
+  /** Wipe all local session data — called on sign-out */
+  clearLocalSessions: async () => {
+    await dbClearAll();
+    set({ sessions: [] });
   },
 }));

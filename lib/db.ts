@@ -84,3 +84,9 @@ export async function dbMarkSynced(id: string): Promise<void> {
     sessions.map((s) => (s.id === id ? { ...s, synced: true } : s)),
   );
 }
+
+export async function dbClearAll(): Promise<void> {
+  try {
+    await AsyncStorage.removeItem(SESSIONS_KEY);
+  } catch {}
+}

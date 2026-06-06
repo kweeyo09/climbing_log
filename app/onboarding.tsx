@@ -71,6 +71,8 @@ export default function OnboardingScreen() {
   const [emailSent, setEmailSent] = useState(false);
   const [otp, setOtp] = useState('');
   const [otpError, setOtpError] = useState('');
+  const [nameStep, setNameStep] = useState(false);
+  const [displayName, setDisplayName] = useState('');
 
   const current = STEPS[step];
   const isSignIn = current.type === 'signin';
@@ -119,8 +121,49 @@ export default function OnboardingScreen() {
     setLoading(false);
 
     if (error) { setOtpError(error.message); return; }
+    setNameStep(true);
+  };
+
+  const handleSaveName = async () => {
+    if (supabase && displayName.trim()) {
+      await supabase.auth.updateUser({ data: { display_name: displayName.trim() } });
+    }
     await finish();
   };
+
+  if (nameStep) {
+    return (
+      <SafeAreaView style={s.safe}>
+        <KeyboardAvoidingView style={{ flex: 1 }} behavior={Platform.OS === 'ios' ? 'padding' : 'height'}>
+          <ScrollView contentContainerStyle={s.body} keyboardShouldPersistTaps="handled">
+            <Text style={s.icon}>👋</Text>
+            <Text style={s.title}>What's your <Text style={s.titleHi}>name?</Text></Text>
+            <Text style={s.desc}>This is how you'll appear in the app. You can change it later.</Text>
+            <View style={s.authBlock}>
+              <TextInput
+                style={s.emailInput}
+                value={displayName}
+                onChangeText={setDisplayName}
+                placeholder="Your name"
+                placeholderTextColor={colors.text3}
+                autoCapitalize="words"
+                autoCorrect={false}
+                autoFocus
+              />
+            </View>
+          </ScrollView>
+          <View style={s.footer}>
+            <TouchableOpacity style={s.mainBtn} onPress={handleSaveName} activeOpacity={0.88}>
+              <Text style={s.mainBtnText}>Continue</Text>
+            </TouchableOpacity>
+            <TouchableOpacity style={s.skipBtn} onPress={finish} activeOpacity={0.7}>
+              <Text style={s.skipText}>Skip for now</Text>
+            </TouchableOpacity>
+          </View>
+        </KeyboardAvoidingView>
+      </SafeAreaView>
+    );
+  }
 
   return (
     <SafeAreaView style={s.safe}>

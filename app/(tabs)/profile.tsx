@@ -20,15 +20,30 @@ export default function ProfileScreen() {
   const sessions = useSessionStore(s => s.sessions);
   const [isSignedIn, setIsSignedIn] = useState(false);
   const [authProvider, setAuthProvider] = useState<string | null>(null);
+  const [displayName, setDisplayName] = useState('');
+  const [userEmail, setUserEmail] = useState('');
 
   useEffect(() => {
     supabase?.auth.getSession().then(({ data }) => {
-      setIsSignedIn(!!data.session);
-      setAuthProvider(data.session?.user?.app_metadata?.provider ?? null);
+      const user = data.session?.user;
+      setIsSignedIn(!!user);
+      setAuthProvider(user?.app_metadata?.provider ?? null);
+      if (user) {
+        setDisplayName(user.user_metadata?.display_name ?? '');
+        setUserEmail(user.email ?? '');
+      }
     });
   }, []);
 
+  const name = displayName || (userEmail ? userEmail.split('@')[0] : 'Climber');
+  const handle = userEmail ? `@${userEmail.split('@')[0]}` : '@climber';
+  const avatarLetter = (displayName || userEmail || 'C')[0].toUpperCase();
+
   const handleLogout = async () => {
+    if (supabase) {
+      await supabase.auth.signOut();
+      // clearLocalSessions is handled by the SIGNED_OUT listener in _layout.tsx
+    }
     await AsyncStorage.removeItem('ascenta_onboarding_done');
     router.replace('/onboarding');
   };
@@ -56,12 +71,12 @@ export default function ProfileScreen() {
         <TouchableOpacity style={s.profileCard} activeOpacity={0.86} onPress={() => router.push('/account-details')} accessibilityRole="button" accessibilityLabel="Open account profile details">
           <View style={s.avatarWrap}>
             <View style={s.avatar}>
-              <Text style={s.avatarLetter}>A</Text>
+              <Text style={s.avatarLetter}>{avatarLetter}</Text>
             </View>
           </View>
           <View style={s.profileCopy}>
-            <Text style={s.name}>Angel</Text>
-            <Text style={s.handle}>@angelclimbs</Text>
+            <Text style={s.name}>{name}</Text>
+            <Text style={s.handle}>{handle}</Text>
             {authProvider === 'apple' && (
               <View style={s.applePill}>
                 <Ionicons name="logo-apple" size={16} color={colors.accentDark} />
@@ -87,7 +102,7 @@ export default function ProfileScreen() {
             <Text style={s.syncTitle}>{allBackedUp ? 'All sessions backed up' : `${syncedSessions}/${sessions.length} sessions backed up`}</Text>
             <View style={s.syncStatusRow}>
               <View style={s.statusDot} />
-              <Text style={s.syncStatus}>{sessions.length === 0 ? 'Ready when you log your first session' : 'Last sync 2 min ago'}</Text>
+              <Text style={s.syncStatus}>{sessions.length === 0 ? 'Ready when you log your first session' : sessions.every(s => s.synced) ? 'Up to date' : `${sessions.filter(s => !s.synced).length} session${sessions.filter(s => !s.synced).length === 1 ? '' : 's'} pending sync`}</Text>
             </View>
             <View style={s.syncRule} />
             <View style={s.photoBackupRow}>

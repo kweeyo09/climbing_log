@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { useFonts } from 'expo-font';
 import { useSessionStore } from '../store/sessions';
+import { supabase } from '../lib/supabase';
 import { colors, typography } from '../constants/theme';
 
 const defaultTextStyle = {
@@ -29,7 +30,9 @@ const defaultTextStyle = {
 };
 
 export default function RootLayout() {
-  const loadSessions = useSessionStore(s => s.loadSessions);
+  const loadSessions        = useSessionStore(s => s.loadSessions);
+  const loadFromCloud       = useSessionStore(s => s.loadFromCloud);
+  const clearLocalSessions  = useSessionStore(s => s.clearLocalSessions);
   const [fontsLoaded] = useFonts({
     'Inter-Regular': require('../assets/fonts/Inter-Regular.ttf'),
     'Inter-Medium': require('../assets/fonts/Inter-Medium.ttf'),
@@ -45,6 +48,18 @@ export default function RootLayout() {
 
   useEffect(() => {
     loadSessions();
+  }, []);
+
+  useEffect(() => {
+    if (!supabase) return;
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((event, session) => {
+      if ((event === 'SIGNED_IN' || event === 'INITIAL_SESSION') && session?.user) {
+        loadFromCloud();
+      } else if (event === 'SIGNED_OUT') {
+        clearLocalSessions();
+      }
+    });
+    return () => subscription.unsubscribe();
   }, []);
 
   if (!fontsLoaded && Platform.OS !== 'web') {
