@@ -1,4 +1,4 @@
-import { Alert, Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
+import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
@@ -12,10 +12,6 @@ type MenuItem = {
   destructive?: boolean;
   onPress: () => void;
 };
-
-function showComingSoon(label: string) {
-  Alert.alert(label, 'This account feature is part of the launch-ready sync and account roadmap.');
-}
 
 export default function ProfileScreen() {
   const router = useRouter();
@@ -31,11 +27,10 @@ export default function ProfileScreen() {
   const allBackedUp = sessions.length > 0 && syncedSessions === sessions.length;
 
   const menuItems: MenuItem[] = [
-    { label: 'Account details', icon: 'person-circle-outline', onPress: () => showComingSoon('Account details') },
-    { label: 'Privacy policy', icon: 'shield-checkmark-outline', onPress: () => showComingSoon('Privacy policy') },
-    { label: 'Export data', icon: 'download-outline', onPress: () => showComingSoon('Export data') },
-    { label: 'Delete account', icon: 'trash-outline', destructive: true, onPress: () => showComingSoon('Delete account') },
-    { label: 'Support', icon: 'headset-outline', onPress: () => showComingSoon('Support') },
+    { label: 'Account details', icon: 'person-circle-outline', onPress: () => router.push('/account-details') },
+    { label: 'Privacy policy', icon: 'shield-checkmark-outline', onPress: () => router.push('/privacy-policy') },
+    { label: 'Delete account', icon: 'trash-outline', destructive: true, onPress: () => router.push('/delete-account') },
+    { label: 'Support', icon: 'headset-outline', onPress: () => router.push('/support') },
     { label: 'Log out', icon: 'log-out-outline', destructive: true, onPress: handleLogout },
   ];
 
