@@ -130,7 +130,7 @@ const s = StyleSheet.create({
   scroll: { paddingHorizontal: 20, paddingTop: 6, paddingBottom: 112 },
   headerRow: { flexDirection: 'row', alignItems: 'flex-end', justifyContent: 'space-between', marginBottom: 16 },
   screenTitle: { fontSize: 52, fontFamily: typography.family.labelBold, fontWeight: typography.weight.semibold, color: colors.text, letterSpacing: -1.8, lineHeight: 54 },
-  brandMark: { width: 52, height: 52 },
+  brandMark: { width: 54, height: 54 },
   profileCard: { minHeight: 136, flexDirection: 'row', alignItems: 'center', backgroundColor: colors.card, borderRadius: 22, borderWidth: 1, borderColor: colors.border, padding: 16, gap: 16, marginBottom: 14, shadowColor: colors.shadow, shadowOpacity: 0.04, shadowRadius: 14, shadowOffset: { width: 0, height: 6 }, elevation: 2 },
   avatarWrap: { width: 86, height: 86, borderRadius: 43, borderWidth: 1, borderColor: colors.border, alignItems: 'center', justifyContent: 'center', backgroundColor: colors.card },
   avatar: { width: 76, height: 76, borderRadius: 38, backgroundColor: colors.accentDark, alignItems: 'center', justifyContent: 'center', overflow: 'hidden' },
