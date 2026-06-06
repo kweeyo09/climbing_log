@@ -19,10 +19,12 @@ export default function ProfileScreen() {
   const router = useRouter();
   const sessions = useSessionStore(s => s.sessions);
   const [isSignedIn, setIsSignedIn] = useState(false);
+  const [authProvider, setAuthProvider] = useState<string | null>(null);
 
   useEffect(() => {
     supabase?.auth.getSession().then(({ data }) => {
       setIsSignedIn(!!data.session);
+      setAuthProvider(data.session?.user?.app_metadata?.provider ?? null);
     });
   }, []);
 
@@ -60,7 +62,7 @@ export default function ProfileScreen() {
           <View style={s.profileCopy}>
             <Text style={s.name}>Angel</Text>
             <Text style={s.handle}>@angelclimbs</Text>
-            {isSignedIn && (
+            {authProvider === 'apple' && (
               <View style={s.applePill}>
                 <Ionicons name="logo-apple" size={16} color={colors.accentDark} />
                 <Text style={s.appleText}>Signed in with Apple</Text>
