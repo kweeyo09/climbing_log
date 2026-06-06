@@ -11,7 +11,7 @@ const FAQ = [
   },
   {
     q: 'Is my data backed up?',
-    a: 'If you're signed in, sessions sync automatically to the cloud. You can see sync status on your Profile.',
+    a: "If you're signed in, sessions sync automatically to the cloud. You can see sync status on your Profile.",
   },
   {
     q: 'Which grade systems are supported?',
