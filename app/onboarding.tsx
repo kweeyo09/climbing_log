@@ -107,7 +107,7 @@ export default function OnboardingScreen() {
   };
 
   const handleVerifyOtp = async () => {
-    if (!otp.trim() || otp.trim().length < 6) { setOtpError('Enter the 6-character code from your email'); return; }
+    if (!otp.trim() || otp.trim().length < 6) { setOtpError('Enter the code from your email'); return; }
     if (!supabase) { await finish(); return; }
 
     setLoading(true);
@@ -149,11 +149,13 @@ export default function OnboardingScreen() {
 
           {isSignIn && !emailSent && (
             <View style={s.authBlock}>
-              <TouchableOpacity style={[s.authBtn, s.authApple]} onPress={finish} activeOpacity={0.85}>
+              <TouchableOpacity style={[s.authBtn, s.authApple, s.authBtnDisabled]} activeOpacity={1} disabled>
                 <Text style={s.authAppleText}>Continue with Apple</Text>
+                <View style={s.soonBadge}><Text style={s.soonText}>Soon</Text></View>
               </TouchableOpacity>
-              <TouchableOpacity style={[s.authBtn, s.authGoogle]} onPress={finish} activeOpacity={0.85}>
+              <TouchableOpacity style={[s.authBtn, s.authGoogle, s.authBtnDisabled]} activeOpacity={1} disabled>
                 <Text style={s.authGoogleText}>Continue with Google</Text>
+                <View style={s.soonBadgeAlt}><Text style={s.soonTextAlt}>Soon</Text></View>
               </TouchableOpacity>
               <View style={s.divider}>
                 <View style={s.dividerLine} />
@@ -184,14 +186,14 @@ export default function OnboardingScreen() {
               <TextInput
                 style={[s.emailInput, otpError ? s.emailInputError : null]}
                 value={otp}
-                onChangeText={v => { setOtp(v.trim().slice(0, 6)); setOtpError(''); }}
+                onChangeText={v => { setOtp(v.trim().slice(0, 8)); setOtpError(''); }}
                 placeholder="Enter code"
                 placeholderTextColor={colors.text3}
                 keyboardType="default"
                 autoCapitalize="none"
                 autoCorrect={false}
                 autoComplete="one-time-code"
-                maxLength={6}
+                maxLength={8}
                 editable={!loading}
               />
               {otpError ? <Text style={s.emailError}>{otpError}</Text> : null}
@@ -253,7 +255,11 @@ const s = StyleSheet.create({
   emailInput:     { width: '100%', backgroundColor: colors.surface, borderWidth: 1.5, borderColor: colors.border, borderRadius: 12, padding: 13, fontSize: 14, color: colors.text },
   emailInputError:{ borderColor: colors.error },
   emailError:     { fontSize: 12, color: colors.error, alignSelf: 'flex-start', marginTop: -4 },
-  authBtnDisabled:{ opacity: 0.6 },
+  authBtnDisabled:{ opacity: 0.5 },
+  soonBadge:      { backgroundColor: 'rgba(255,255,255,0.25)', borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2 },
+  soonText:       { fontSize: 11, color: colors.inverseText, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
+  soonBadgeAlt:   { backgroundColor: colors.accentDim, borderRadius: 8, paddingHorizontal: 7, paddingVertical: 2 },
+  soonTextAlt:    { fontSize: 11, color: colors.accent, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
   otpHint:        { fontSize: 14, color: colors.text2, textAlign: 'center', lineHeight: 20 },
   otpEmail:       { color: colors.highlight, fontFamily: typography.family.semibold, fontWeight: typography.weight.semibold },
 

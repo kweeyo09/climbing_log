@@ -1,9 +1,11 @@
+import { useEffect, useState } from 'react';
 import { Image, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { SafeAreaView } from 'react-native-safe-area-context';
 import { Ionicons } from '@expo/vector-icons';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSessionStore } from '../../store/sessions';
+import { supabase } from '../../lib/supabase';
 import { colors, typography } from '../../constants/theme';
 
 type MenuItem = {
@@ -16,6 +18,13 @@ type MenuItem = {
 export default function ProfileScreen() {
   const router = useRouter();
   const sessions = useSessionStore(s => s.sessions);
+  const [isSignedIn, setIsSignedIn] = useState(false);
+
+  useEffect(() => {
+    supabase?.auth.getSession().then(({ data }) => {
+      setIsSignedIn(!!data.session);
+    });
+  }, []);
 
   const handleLogout = async () => {
     await AsyncStorage.removeItem('ascenta_onboarding_done');
@@ -42,7 +51,7 @@ export default function ProfileScreen() {
           <Image source={require('../../assets/logo_default.png')} style={s.brandMark} accessibilityLabel="Ascenta logo" resizeMode="contain" />
         </View>
 
-        <TouchableOpacity style={s.profileCard} activeOpacity={0.86} onPress={() => showComingSoon('Account profile')} accessibilityRole="button" accessibilityLabel="Open account profile details">
+        <TouchableOpacity style={s.profileCard} activeOpacity={0.86} onPress={() => router.push('/account-details')} accessibilityRole="button" accessibilityLabel="Open account profile details">
           <View style={s.avatarWrap}>
             <View style={s.avatar}>
               <Text style={s.avatarLetter}>A</Text>
@@ -51,10 +60,12 @@ export default function ProfileScreen() {
           <View style={s.profileCopy}>
             <Text style={s.name}>Angel</Text>
             <Text style={s.handle}>@angelclimbs</Text>
-            <View style={s.applePill}>
-              <Ionicons name="logo-apple" size={16} color={colors.accentDark} />
-              <Text style={s.appleText}>Signed in with Apple</Text>
-            </View>
+            {isSignedIn && (
+              <View style={s.applePill}>
+                <Ionicons name="logo-apple" size={16} color={colors.accentDark} />
+                <Text style={s.appleText}>Signed in with Apple</Text>
+              </View>
+            )}
           </View>
           <Ionicons name="chevron-forward" size={24} color={colors.text2} />
         </TouchableOpacity>

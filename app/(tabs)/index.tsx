@@ -14,7 +14,6 @@ const STAT_ICONS: Record<WeeklyStatIcon, ImageSourcePropType> = {
   routes: require('../../assets/icons/stat_routes.png'),
   hardest: require('../../assets/icons/stat_hardest.png'),
 };
-const AVATAR_IMAGE = 'https://images.unsplash.com/photo-1544005313-94ddf0286df2?auto=format&fit=crop&w=180&q=80';
 
 function startOfWeek(date: Date) {
   const d = new Date(date);
@@ -95,21 +94,23 @@ export default function HomeScreen() {
   const topGrade = latestSession ? getTopGrade(latestSession.routes, latestSession.grade_system) : getTopGrade(allRoutes, 'v');
   const hasData = sessions.length > 0;
 
-  const displaySessions = hasData ? weekSessions.length : 3;
-  const displayDuration = hasData ? formatDuration(weekMinutes) : '6h 20m';
-  const displayRoutes = hasData ? weekRoutes : 42;
-  const displayTopGrade = topGrade || 'V5';
-  const displayLocation = latestSession ? shortLocation(latestSession.location) : 'City Bouldering Aldgate';
-  const displayRecentDuration = latestSession ? formatDuration(latestSession.duration || 0) : '1h 45m';
-  const displayRecentRoutes = latestSession ? latestSession.routes.length : 12;
-  const displayRecentSends = latestSession ? latestSession.routes.filter(route => route.completed).length : 8;
+  const displaySessions = weekSessions.length;
+  const displayDuration = weekMinutes > 0 ? formatDuration(weekMinutes) : '--';
+  const displayRoutes = weekRoutes;
+  const displayTopGrade = topGrade || '--';
+  const displayLocation = latestSession ? shortLocation(latestSession.location) : '';
+  const displayRecentDuration = latestSession ? formatDuration(latestSession.duration || 0) : '';
+  const displayRecentRoutes = latestSession ? latestSession.routes.length : 0;
+  const displayRecentSends = latestSession ? latestSession.routes.filter(route => route.completed).length : 0;
   const recentImage: ImageSourcePropType = latestSession?.photo_uris?.[0] ? { uri: latestSession.photo_uris[0] } : DEMO_IMAGE;
 
   return (
     <SafeAreaView style={s.safe} edges={['top']}>
       <ScrollView style={s.scroll} contentContainerStyle={s.content} showsVerticalScrollIndicator={false}>
         <View style={s.header}>
-          <Image source={{ uri: AVATAR_IMAGE }} style={s.avatar} accessibilityLabel="Profile avatar" />
+          <View style={s.avatar}>
+            <Ionicons name="person-outline" size={22} color={colors.text3} />
+          </View>
           <Text style={[s.brand, isNarrow && s.brandSmall]}>Ascenta</Text>
           <View style={s.backupPill}>
             <Ionicons name="checkmark-circle-outline" size={17} color={colors.accent} />
@@ -131,7 +132,7 @@ export default function HomeScreen() {
             <View style={s.verticalRule} />
             <View style={s.metricItemWide}>
               <StatIcon variant="duration" />
-              <Text style={s.metricValue}>{displayDuration}</Text>
+              <Text style={s.metricValueDuration}>{displayDuration}</Text>
             </View>
             <View style={s.verticalRule} />
             <View style={s.metricItem}>
@@ -151,41 +152,45 @@ export default function HomeScreen() {
           </TouchableOpacity>
         </View>
 
-        <TouchableOpacity
-          style={s.activityCard}
-          activeOpacity={0.86}
-          onPress={() => latestSession ? router.push(`/session/${latestSession.id}`) : router.push('/(tabs)/log')}
-        >
-          <View style={s.cardTitleRow}>
-            <Text style={s.cardHeading}>RECENT ACTIVITY</Text>
-            <Ionicons name="chevron-forward" size={25} color={colors.accent} />
-          </View>
-          <View style={s.activityBody}>
-            <Image source={recentImage} style={s.activityImage} accessibilityLabel="Recent climbing activity" />
-            <View style={s.activityCopy}>
-              <Text style={s.activityTitle} numberOfLines={2}>{displayLocation}</Text>
-              <Text style={s.activityMeta}>Today · {displayRecentDuration} · {displayRecentRoutes} routes</Text>
-              <View style={s.pillStack}>
-                <View style={s.statPill}>
-                  <Text style={s.pillGrade}>{displayTopGrade}</Text>
-                  <Text style={s.pillLabel}>top grade</Text>
-                </View>
-                <View style={s.statPillSmall}>
-                  <Text style={s.pillGrade}>{displayRecentSends}</Text>
-                  <Text style={s.pillLabel}>sends</Text>
+        {hasData && (
+          <TouchableOpacity
+            style={s.activityCard}
+            activeOpacity={0.86}
+            onPress={() => latestSession ? router.push(`/session/${latestSession.id}`) : router.push('/(tabs)/log')}
+          >
+            <View style={s.cardTitleRow}>
+              <Text style={s.cardHeading}>RECENT ACTIVITY</Text>
+              <Ionicons name="chevron-forward" size={25} color={colors.accent} />
+            </View>
+            <View style={s.activityBody}>
+              <Image source={recentImage} style={s.activityImage} accessibilityLabel="Recent climbing activity" />
+              <View style={s.activityCopy}>
+                <Text style={s.activityTitle} numberOfLines={2}>{displayLocation}</Text>
+                <Text style={s.activityMeta}>Today · {displayRecentDuration} · {displayRecentRoutes} routes</Text>
+                <View style={s.pillStack}>
+                  <View style={s.statPill}>
+                    <Text style={s.pillGrade}>{displayTopGrade}</Text>
+                    <Text style={s.pillLabel}>top grade</Text>
+                  </View>
+                  <View style={s.statPillSmall}>
+                    <Text style={s.pillGrade}>{displayRecentSends}</Text>
+                    <Text style={s.pillLabel}>sends</Text>
+                  </View>
                 </View>
               </View>
             </View>
-          </View>
-        </TouchableOpacity>
+          </TouchableOpacity>
+        )}
 
-        <TouchableOpacity style={s.trendCard} activeOpacity={0.86} onPress={() => router.push('/(tabs)/stats')}>
-          <View style={s.cardTitleRow}>
-            <Text style={s.cardHeading}>GRADE TREND</Text>
-            <Ionicons name="chevron-forward" size={25} color={colors.accent} />
-          </View>
-          <MiniTrend />
-        </TouchableOpacity>
+        {hasData && (
+          <TouchableOpacity style={s.trendCard} activeOpacity={0.86} onPress={() => router.push('/(tabs)/stats')}>
+            <View style={s.cardTitleRow}>
+              <Text style={s.cardHeading}>GRADE TREND</Text>
+              <Ionicons name="chevron-forward" size={25} color={colors.accent} />
+            </View>
+            <MiniTrend />
+          </TouchableOpacity>
+        )}
       </ScrollView>
     </SafeAreaView>
   );
@@ -196,7 +201,7 @@ const s = StyleSheet.create({
   scroll: { flex: 1 },
   content: { paddingHorizontal: 16, paddingTop: 12, paddingBottom: TAB_BAR_HEIGHT + 26 },
   header: { flexDirection: 'row', alignItems: 'center', gap: 11, marginBottom: 22 },
-  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surface },
+  avatar: { width: 42, height: 42, borderRadius: 21, backgroundColor: colors.surface, alignItems: 'center', justifyContent: 'center' },
   brand: { flex: 1, fontSize: 40, lineHeight: 44, letterSpacing: -1.3, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold },
   brandSmall: { fontSize: 34, letterSpacing: -1 },
   backupPill: { flexDirection: 'row', alignItems: 'center', gap: 6, backgroundColor: colors.accentDim, borderRadius: 20, paddingHorizontal: 11, paddingVertical: 7 },
@@ -210,6 +215,7 @@ const s = StyleSheet.create({
   metricItem: { flex: 1, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
   metricItemWide: { flex: 1.3, minHeight: 82, alignItems: 'center', justifyContent: 'flex-start' },
   metricValue: { marginTop: 4, fontSize: 28, lineHeight: 32, letterSpacing: -0.8, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, textAlign: 'center' },
+  metricValueDuration: { marginTop: 4, fontSize: 22, lineHeight: 26, letterSpacing: -0.5, color: colors.accentDark, fontFamily: typography.family.bold, fontWeight: typography.weight.semibold, textAlign: 'center' },
   metricCaption: { marginTop: 0, fontSize: 14, lineHeight: 16, color: colors.text2, fontFamily: typography.family.label, fontWeight: typography.weight.medium, textAlign: 'center' },
   hardestLabel: { marginTop: 2, fontSize: 14, color: colors.text2, fontFamily: typography.family.label, fontWeight: typography.weight.medium, textAlign: 'center' },
   verticalRule: { width: 1, height: 60, backgroundColor: colors.border, marginHorizontal: 8 },
